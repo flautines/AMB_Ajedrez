@@ -8,10 +8,23 @@ menu_t menuJugadores =
 {	3, 	// 3 items in the menu (title does not count)
 	1,	// First item selected
 	{
-		{ "  Tipo de jugadores"	 },
+		{ "Elige jugadores"	 },
 		{ "     CPU vs HUMANO   " },
 		{ "  HUMANO vs HUMANO   " }, 
 		{ "     CPU vs CPU      " },
+	},
+};
+
+/////////////////////////////////////////////////////////////////////
+// strings y posicion del menu eleccion de color
+//
+menu_t menuColorJugador = 
+{	2, 	// 3 items in the menu (title does not count)
+	1,	// First item selected
+	{
+		{ "Jugador 1: Blancas o Negras"	 },
+		{ "   Blancas   " },
+		{ "   Negras    " }, 
 	},
 };
 
@@ -19,7 +32,15 @@ menu_t menuJugadores =
 /////////////////////////////////////////////////////////////////////
 // menuJuego Elección de tipo de jugadores, humano vs cpu y color
 //
-void menuJuego()
+void menuJuego(AJD_Estado* estado)
 {
-	dibujaMenu (5, 7, &menuJugadores);
+	if (muestraMenu (5, 7, &menuJugadores))
+	{
+		if ( muestraMenu (5, 7, &menuColorJugador) )
+		{
+			estado->turno_jugador = menuColorJugador.selected-1;
+		}
+	}
+
+
 }

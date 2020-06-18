@@ -12,8 +12,8 @@ int main()
 
    inicializa (&tablero);
 
-   menuJuego();
    nuevoJuego (&tablero);
+   menuJuego (&estado_juego);
    
    dibujaTablero (&tablero);
    dibujaMarcadores (turno, &estado_juego);

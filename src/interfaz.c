@@ -59,6 +59,9 @@ void inicializaPantalla()
 	// Envío de teclas inmediato (sin pulsar ENTER)
 	cbreak();
 
+	// No mostrar caracteres pulsados
+	noecho();
+
 	// No espera en lectura de caracter
 	nodelay(stdscr, 1);
 
@@ -99,6 +102,8 @@ void liberaPantalla()
 //
 void dibujaTablero(AJD_TableroPtr tablero)
 {
+	clear();
+
 	int idCasilla = 0;
 	for (int row=0; row < 8; row++)
 	for (int col=0; col < 8; col++)
@@ -156,7 +161,7 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
 
 	y = MARCADOR_LAST_ROW - 1;
 	move (y,x);
-	printw ("Turno %02d", turno);
+	printw ("Turno %02d (Jugador %c)", turno, estado->turno_jugador+'1');
 
 	y += 1;
 	move (y,x);
@@ -198,10 +203,27 @@ void dibujaMenu(int y, int x, menu_t* menu)
 		item_id++;
 	}
 
+	y += 3;
+	attron (COLOR_PAIR (2));
+	move (y,x);
+	printw ("Cursores selecciona opcion, ENTER confirmar");
+}
+
+int muestraMenu (int x, int y, menu_t* menu)
+{	
 	int ch;
+
+	clear();
 	do
 	{
+		dibujaMenu (x, y, menu);
 		ch = getch();
-	} while (ch != KEY_UP);
+		if (ch == KEY_UP) 	menu->selected--;
+		if (ch == KEY_DOWN)	menu->selected++;
 
+		if (menu->selected < 1) menu->selected = menu->nitems;
+		if (menu->selected > menu->nitems) menu->selected = 1;
+	} while (ch != '\n');
+
+	return true;
 }
