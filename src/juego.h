@@ -36,4 +36,5 @@ extern AJD_Estado estado_juego;   // Estado del juego
 
 void inicializa(AJD_TableroPtr tablero);
 void nuevoJuego(AJD_TableroPtr tablero);
+void muevePieza (AJD_TableroPtr tablero, int casilla_origen, casilla_destino);
 void liberaRecursos();

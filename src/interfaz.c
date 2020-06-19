@@ -102,11 +102,12 @@ void liberaPantalla()
 //
 void dibujaTablero(AJD_TableroPtr tablero)
 {
+	int row, col, y, x;
 	clear();
 
 	int idCasilla = 0;
-	for (int row=0; row < 8; row++)
-	for (int col=0; col < 8; col++)
+	for (row=0; row < 8; row++)
+	for (col=0; col < 8; col++)
 	{
 		_dibujaCasilla (tablero, idCasilla, 
 			TABLERO_COL_START + col * ANCHO_CASILLA,
@@ -114,6 +115,31 @@ void dibujaTablero(AJD_TableroPtr tablero)
 
 		// Siguiente casilla
 		idCasilla++;
+	}
+
+	// Dibuja los numeros de las filas
+	attron ( COLOR_PAIR (2) );
+	row = 8;
+	y = TABLERO_ROW_START + 1;
+	x = TABLERO_COL_START-2;
+	while (row)
+	{
+		move (y, x);
+		printw("%d", row);
+		y += 3;
+		row--;
+	}
+
+	// Dibuja letras de columnas
+	col = 8;
+	x = TABLERO_COL_START + 8 * 3 - 2;
+	y = TABLERO_ROW_START - 2;
+	while (col)
+	{
+		move (y, x);
+		printw ("%c", col+'a'-1);
+		x -= 3;
+		col--;
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -166,12 +192,6 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
 	y += 1;
 	move (y,x);
 	printw ("Juegan %s", estado->juegan_blancas ? "blancas" : "negras");
-
-	int ch;
-	do
-	{
-		ch = getch();
-	} while (ch != KEY_UP);
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaMenu Dibuja un menu con su titulo y sus elementos.
@@ -226,4 +246,58 @@ int muestraMenu (int x, int y, menu_t* menu)
 	} while (ch != '\n');
 
 	return true;
+}
+
+int obtenJugada (int* celda_origen, int* celda_destino)
+{
+	// columna/fila
+	int columna, fila, celda;
+	int ch;
+
+	int y = MARCADOR_ROW_START + 11;
+	move (y, MARCADOR_COL_START);
+	printw ("Instroduzca casilla ORIGEN");
+	move (y+=1, MARCADOR_COL_START);
+	printw ("Columna:");
+	move (y+=1, MARCADOR_COL_START);	
+	printw ("Fila:");
+
+	// Activar que se muestren caracteres tecleados
+	curs_set (1);
+	echo ();
+	nodelay(stdscr, 0);
+
+	move (MARCADOR_ROW_START + 12, MARCADOR_COL_START + 9);
+	ch = getch();
+	columna = ch - 'a';
+
+	move (MARCADOR_ROW_START + 13, MARCADOR_COL_START + 6);
+	ch = getch();
+	fila = 8 - 	ch + '0';
+	*celda_origen = 8 * fila + columna;
+
+	move (0,0);
+	printw ("Celda Origen %d", *celda_origen);
+
+	move (y+=2, MARCADOR_COL_START);
+	printw ("Instroduzca casilla DESTINO");
+	move (y+=1, MARCADOR_COL_START);
+	printw ("Columna:");
+	move (y+=1, MARCADOR_COL_START);	
+	printw ("Fila:");
+
+	move (MARCADOR_ROW_START + 16, MARCADOR_COL_START + 10);
+	
+	ch = getch();
+	columna = ch - 'a';
+
+	move (MARCADOR_ROW_START + 17, MARCADOR_COL_START + 6);
+	ch = getch();
+	fila = 8 - ch + '0';
+	*celda_destino = 8 * fila + columna;
+
+	move (1,0);
+	printw ("Celda Destino %d", *celda_destino);
+
+	ch = getch();
 }

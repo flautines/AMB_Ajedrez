@@ -14,3 +14,4 @@ void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color);
 void dibujaMarcadores(uint16_t turno, AJD_Estado* estado);
 void dibujaMenu (int y, int x, menu_t* menu);
 int muestraMenu (int x, int y, menu_t* menu);
+int obtenJugada (int* celda_origen, int* celda_destino);

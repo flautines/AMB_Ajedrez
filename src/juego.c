@@ -87,6 +87,19 @@ void nuevoJuego(AJD_TableroPtr tablero)
    _colocaPiezas (tablero);
 }
 ////////////////////////////////////////////////////////////////////////////
+// muevePieza
+//
+// Mueve una pieza desde una casilla origen a una casilla destino
+void muevePieza (AJD_TableroPtr tablero, int casilla_origen, casilla_destino)
+{
+   AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
+   AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;
+
+   tablero->casilla[casilla_origen].pieza        = NONE;
+   tablero->casilla[casilla_destino].pieza       = pieza_a_mover;
+   tablero->casilla[casilla_destino].color_pieza = color_pieza;
+}
+////////////////////////////////////////////////////////////////////////////
 // INTERFAZ PRIVADA
 ////////////////////////////////////////////////////////////////////////////
 // _colocaPiezas

@@ -9,14 +9,21 @@
 int main()
 {
    AJD_Tablero tablero;
+   int celda_origen, celda_destino;
 
    inicializa (&tablero);
 
    nuevoJuego (&tablero);
    menuJuego (&estado_juego);
    
-   dibujaTablero (&tablero);
-   dibujaMarcadores (turno, &estado_juego);
+   for (;;)
+   {
+   		dibujaTablero (&tablero);
+   		dibujaMarcadores (turno, &estado_juego);
+   		obtenJugada(&celda_origen, &celda_destino);	
+   		muevePieza (&tablero, celda_origen, celda_destino);
+   }
+   
    
    liberaRecursos();
 
