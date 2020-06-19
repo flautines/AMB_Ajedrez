@@ -229,6 +229,10 @@ void dibujaMenu(int y, int x, menu_t* menu)
 	printw ("Cursores selecciona opcion, ENTER confirmar");
 }
 
+////////////////////////////////////////////////////////////////////////////
+// muestraMenu Muestra un menu y espera selección.
+//			   Devuelve true cuando se ha seleccionado una opción del menu
+//
 int muestraMenu (int x, int y, menu_t* menu)
 {	
 	int ch;
@@ -248,10 +252,14 @@ int muestraMenu (int x, int y, menu_t* menu)
 	return true;
 }
 
+////////////////////////////////////////////////////////////////////////////
+// obtenJugada Introducción por teclado de la pieza a mover.
+//			   Devuelve celda origen y destino de la pieza a mover.
+//
 int obtenJugada (int* celda_origen, int* celda_destino)
 {
 	// columna/fila
-	int columna, fila, celda;
+	int columna, fila;
 	int ch;
 
 	int y = MARCADOR_ROW_START + 11;
@@ -299,5 +307,5 @@ int obtenJugada (int* celda_origen, int* celda_destino)
 	move (1,0);
 	printw ("Celda Destino %d", *celda_destino);
 
-	ch = getch();
+	return true;
 }

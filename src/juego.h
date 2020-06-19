@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tablero.h>
 #include <stdint.h>
 
 // Tipo para representar el estado
@@ -25,9 +26,6 @@ typedef struct _AJD_Estado
    uint8_t turno_jugador       : 1; // bit 7
 } AJD_Estado;
 
-// forward declaration, definida en "tablero.h"
-typedef struct _AJD_Tablero* AJD_TableroPtr;
-
 /////////////////////////////////////////////////////////////////////
 // INTERFAZ PUBLICA
 //
@@ -36,5 +34,5 @@ extern AJD_Estado estado_juego;   // Estado del juego
 
 void inicializa(AJD_TableroPtr tablero);
 void nuevoJuego(AJD_TableroPtr tablero);
-void muevePieza (AJD_TableroPtr tablero, int casilla_origen, casilla_destino);
+void muevePieza (AJD_TableroPtr tablero, int casilla_origen, int casilla_destino);
 void liberaRecursos();
