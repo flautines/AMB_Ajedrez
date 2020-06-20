@@ -7,7 +7,7 @@ SOURCES := ${OBJDIR}/interfaz.o \
 		   ${OBJDIR}/main.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
-CFLAGS 	:= -Wall -pedantic -std=c99 -I ${INCDIRS}
+CFLAGS 	:= -Wall -pedantic -std=c99 -I ${INCDIRS} -finput-charset=UTF-8
 LDFLAGS := -lncurses
 
 ${APP}: ${SOURCES}

@@ -28,10 +28,19 @@ typedef struct _AJD_Casilla
    AJD_Color   color_pieza:1;// Color de la pieza en esta casilla
 } AJD_Casilla;
 
+////////////////////////////////////////////////////////////////////////////
+// Cursor de selección de pieza
+typedef struct 
+{
+   uint8_t idCasilla:6;
+   uint8_t visible:1;
+} AJD_Cursor;
+
+AJD_Cursor _cursorSeleccion;
 typedef struct _AJD_Tablero
 {
    AJD_Casilla casilla[8*8];
-
+   AJD_Cursor cursor;
 } AJD_Tablero;
 
 typedef struct _AJD_Tablero* AJD_TableroPtr;

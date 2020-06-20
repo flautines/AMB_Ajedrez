@@ -56,7 +56,7 @@ void inicializaPantalla()
 	// Habilita teclas especiales (F1, cursores, ESC, etc.)
 	keypad (stdscr, 1);
 
-	// Env韔 de teclas inmediato (sin pulsar ENTER)
+	// Env铆o de teclas inmediato (sin pulsar ENTER)
 	cbreak();
 
 	// No mostrar caracteres pulsados
@@ -65,7 +65,7 @@ void inicializaPantalla()
 	// No espera en lectura de caracter
 	nodelay(stdscr, 1);
 
-	// Ocultar cursor
+	// Ocultar cursor de pantalla
 	curs_set(0);
 
 	// Inicializa colores 
@@ -84,7 +84,8 @@ void inicializaPantalla()
 
 		attron(COLOR_PAIR(1));
 	}
-	//printw("Ncurses Inicializado");
+
+	clear();
 }
 ////////////////////////////////////////////////////////////////////////////
 // liberaPantalla
@@ -98,12 +99,11 @@ void liberaPantalla()
 ////////////////////////////////////////////////////////////////////////////
 // dibujaTablero
 //
-// Dibuja el tablero en pantalla seg鷑 su estado actual.
+// Dibuja el tablero en pantalla seg煤n su estado actual.
 //
 void dibujaTablero(AJD_TableroPtr tablero)
 {
 	int row, col, y, x;
-	clear();
 
 	int idCasilla = 0;
 	for (row=0; row < 8; row++)
@@ -141,9 +141,16 @@ void dibujaTablero(AJD_TableroPtr tablero)
 		x -= 3;
 		col--;
 	}
+
+	// Dibuja el cursor de seleccion
+	if (tablero->cursor.visible)
+	{
+		dibujaCursor(tablero);
+	}
+
 }
 ////////////////////////////////////////////////////////////////////////////
-// dibujaPieza Dibuja una pieza del ajedrez en la posici髇 indicada
+// dibujaPieza Dibuja una pieza del ajedrez en la posici贸n indicada
 //
 void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color)
 {
@@ -194,6 +201,43 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
 	printw ("Juegan %s", estado->juegan_blancas ? "blancas" : "negras");
 }
 ////////////////////////////////////////////////////////////////////////////
+// dibujaCursor Dibuja el cursor de seleccion
+//
+void dibujaCursor (AJD_TableroPtr tablero)
+{
+	int y, x;
+	
+	y = TABLERO_ROW_START + (tablero->cursor.idCasilla/8) * ALTO_CASILLA;
+	x = TABLERO_COL_START + (tablero->cursor.idCasilla & 7) * ANCHO_CASILLA;
+
+	// Color principal/fondo a usar dependiendo de la casilla
+	int color = tablero->casilla[tablero->cursor.idCasilla].color == BLANCO ? 1 : 2;
+	attron (COLOR_PAIR (color));
+	/*mvaddstr (y  , x,  "+-+");
+	mvaddstr (y+2, x,  "+-+");
+	mvaddstr (y+1, x,   "|" );
+	mvaddstr (y+1, x+2, "|" );
+	*/
+	struct symbol_t {
+		int dy;
+		int dx;
+		const chtype ch;
+	};
+
+	struct symbol_t symbols[8] = { 
+		{ 0, 0, ACS_ULCORNER } , { 0, 1 , ACS_HLINE } , { 0, 2, ACS_URCORNER },
+		{ 1, 0, ACS_VLINE    },                         { 1, 2, ACS_VLINE    },
+		{ 2, 0, ACS_LLCORNER },  { 2, 1, ACS_HLINE } ,  { 2, 2, ACS_LRCORNER }
+	};
+
+	for (int i=0; i<8; i++)
+	{
+		int dy = symbols[i].dy;
+		int dx = symbols[i].dx;		
+		mvaddch (y + dy, x + dx, symbols[i].ch);
+	}
+}
+////////////////////////////////////////////////////////////////////////////
 // dibujaMenu Dibuja un menu con su titulo y sus elementos.
 //
 void dibujaMenu(int y, int x, menu_t* menu)
@@ -230,8 +274,8 @@ void dibujaMenu(int y, int x, menu_t* menu)
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// muestraMenu Muestra un menu y espera selecci髇.
-//			   Devuelve true cuando se ha seleccionado una opci髇 del menu
+// muestraMenu Muestra un menu y espera selecci贸n.
+//			   Devuelve true cuando se ha seleccionado una opci贸n del menu
 //
 int muestraMenu (int x, int y, menu_t* menu)
 {	
@@ -249,11 +293,12 @@ int muestraMenu (int x, int y, menu_t* menu)
 		if (menu->selected > menu->nitems) menu->selected = 1;
 	} while (ch != '\n');
 
+	clear();
 	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// obtenJugada Introducci髇 por teclado de la pieza a mover.
+// obtenJugada Introducci贸n por teclado de la pieza a mover.
 //			   Devuelve celda origen y destino de la pieza a mover.
 //
 int obtenJugada (int* celda_origen, int* celda_destino)
@@ -308,4 +353,25 @@ int obtenJugada (int* celda_origen, int* celda_destino)
 	printw ("Celda Destino %d", *celda_destino);
 
 	return true;
+}
+////////////////////////////////////////////////////////////////////////////
+// procesaTeclado Lectura del teclado y actualizacion de cursor
+//			   Devuelve celda origen y destino de la pieza a mover.
+//
+int procesaTeclado (AJD_TableroPtr tablero)
+{
+	int ch;
+
+	ch = getch();
+
+	switch (ch)
+	{
+		case KEY_UP: 	tablero->cursor.idCasilla -= 8; break;
+		case KEY_DOWN: 	tablero->cursor.idCasilla += 8; break;
+		case KEY_LEFT: 	tablero->cursor.idCasilla -= 1; break;
+		case KEY_RIGHT: tablero->cursor.idCasilla += 1; break;
+	}
+
+	mvprintw (0,0, "cursor.idCasilla: %2d", tablero->cursor.idCasilla);
+	return 0;
 }

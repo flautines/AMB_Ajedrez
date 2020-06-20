@@ -24,7 +24,9 @@ AJD_Estado estado_juego;   // Estado del juego
 //
 void inicializa(AJD_TableroPtr tablero)
 {
-   
+   // El cursor de seleccion es visible
+   tablero->cursor.visible = 1;
+
    AJD_Color color = NEGRO;
    for (int i=0; i<8; i++) 
    {      
@@ -85,6 +87,9 @@ void nuevoJuego(AJD_TableroPtr tablero)
 
    // Coloca las piezas
    _colocaPiezas (tablero);
+
+   // Posicion inicial del cursor de selección de pieza
+   tablero->cursor.idCasilla = 8*6+3; //(d2)
 }
 ////////////////////////////////////////////////////////////////////////////
 // muevePieza

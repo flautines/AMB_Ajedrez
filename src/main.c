@@ -20,11 +20,13 @@ int main()
    {
    		dibujaTablero (&tablero);
    		dibujaMarcadores (turno, &estado_juego);
-   		obtenJugada(&celda_origen, &celda_destino);	
-   		muevePieza (&tablero, celda_origen, celda_destino);
-   		estado_juego.turno_jugador ^= 1;
-   		estado_juego.juegan_blancas ^= 1;   		
-   		turno += estado_juego.juegan_blancas;
+
+   		procesaTeclado (&tablero);
+   		//obtenJugada(&celda_origen, &celda_destino);	
+   		//muevePieza (&tablero, celda_origen, celda_destino);
+   		//estado_juego.turno_jugador ^= 1;
+   		//estado_juego.juegan_blancas ^= 1;   		
+   		//turno += estado_juego.juegan_blancas;
    }
    
    
