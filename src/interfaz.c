@@ -389,17 +389,22 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
             {                
                 estado->casilla_seleccionada = 1;
                 estado->casilla_origen = tablero->cursor.idCasilla;
+                //mvprintw (1,0, "Origen %d", estado->casilla_origen);
             }
             else
             {                
                 estado->casilla_seleccionada = 2;
-                estado_juego.casilla_destino = tablero->cursor.idCasilla;
-                //mvprintw (1,0, "Moviendo desde %d hasta %d", estado->casilla_origen, estado->casilla_destino);
+                estado->casilla_destino = tablero->cursor.idCasilla;
+                mvprintw (4,0, "Moviendo desde %d hasta %d", estado->casilla_origen, estado->casilla_destino);
             }
             break;
         }
     }
 
-    //mvprintw (0,0, "cursor.idCasilla: %2d", tablero->cursor.idCasilla);
+    mvprintw (0,0, "cursor.idCasilla: %2d", tablero->cursor.idCasilla);
+    mvprintw (0,25, "Pieza de color: %s", 
+              tablero->casilla[tablero->cursor.idCasilla].color_pieza 
+              ? "BLANCO" : "NEGRO ");
+    mvprintw (1,0, "casilla_seleccionada: %d", estado->casilla_seleccionada);
     return 0;
 }

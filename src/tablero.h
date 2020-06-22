@@ -36,7 +36,7 @@ typedef struct
    uint8_t visible:1;
 } AJD_Cursor;
 
-AJD_Cursor _cursorSeleccion;
+//AJD_Cursor _cursorSeleccion;
 typedef struct _AJD_Tablero
 {
    AJD_Casilla casilla[8*8];

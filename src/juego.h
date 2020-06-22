@@ -42,4 +42,5 @@ void inicializa(AJD_TableroPtr tablero);
 void nuevoJuego(AJD_TableroPtr tablero);
 void actualizaJuego (AJD_TableroPtr tablero);
 void muevePieza (AJD_TableroPtr tablero, uint8_t casilla_origen, uint8_t casilla_destino);
+int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla);
 void liberaRecursos();

@@ -3,6 +3,7 @@
 #include <juego.h>
 #include <tablero.h>
 #include <interfaz.h>
+#include <ncurses.h>
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PRIVADAS forward declarations
 void _colocaPiezas (AJD_TableroPtr tablero);
@@ -49,6 +50,7 @@ void inicializa(AJD_TableroPtr tablero)
          // Inicialmente el tablero está vacío
          // El color de la pieza cuando la casilla está vacía es irrelevante
          casilla->pieza = NONE;
+         casilla->color_pieza = BLANCO;
       }
    }   
    //printf("sizeof(AJD_Tablero) = %ld\n", sizeof (AJD_Tablero));
@@ -99,16 +101,44 @@ void actualizaJuego (AJD_TableroPtr tablero)
 {
    procesaTeclado (tablero, &estado_juego);
 
-   // Si se han seleccionado las casillas origen y destino movemos la pieza
-   if (estado_juego.casilla_seleccionada == 2)
-   {      
+   switch (estado_juego.casilla_seleccionada)
+   {
+   case 1:
+      if (!hayPiezaValida(tablero, estado_juego.casilla_origen))
+      {
+         estado_juego.casilla_origen = 0;
+         estado_juego.casilla_seleccionada = 0;
+      }
+      else
+      {
+         mvprintw(2,0, "Origen: %02d", estado_juego.casilla_origen);
+      }
+      break;
+   case 2:
       muevePieza (tablero, estado_juego.casilla_origen, estado_juego.casilla_destino);
       estado_juego.turno_jugador ^= 1;
       estado_juego.juegan_blancas ^= 1;
       estado_juego.casilla_seleccionada = 0;
       turno += estado_juego.juegan_blancas;
       estado_juego.casilla_origen = estado_juego.casilla_destino = 0;
+      break;
    }
+}
+////////////////////////////////////////////////////////////////////////////
+// hayPiezaValida
+//
+// Comprueba si la casilla seleccionada por el cursor contiene una pieza
+// válida para mover
+//
+// Devuelve 1 si lo es, 0 en caso contrario.
+//
+int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla)
+{
+   AJD_Casilla casilla = tablero->casilla[idCasilla];
+   AJD_Pieza pieza = casilla.pieza;
+
+   return (pieza != NONE
+      &&   casilla.color_pieza == estado_juego.juegan_blancas);
 }
 ////////////////////////////////////////////////////////////////////////////
 // muevePieza
@@ -140,12 +170,12 @@ void _colocaPiezas(AJD_TableroPtr tablero)
       tablero->casilla[col].color_pieza         = NEGRO;
 
       tablero->casilla[7*8 + col].pieza         = piezasMayores[col]; // fila 8: piezas mayores blancas
-      tablero->casilla[7*8 + col].color_pieza   = BLANCO;
+      //tablero->casilla[7*8 + col].color_pieza   = BLANCO;
 
       tablero->casilla[8 + col].pieza           = PEON;               // fila 2: peones negros
       tablero->casilla[8 + col].color_pieza     = NEGRO;
       
       tablero->casilla[6*8 + col].pieza         = PEON;               // fils 7: peones blancos
-      tablero->casilla[6*8 + col].color_pieza   = BLANCO;          
+      //tablero->casilla[6*8 + col].color_pieza   = BLANCO;          
    }
 }
