@@ -9,6 +9,7 @@
 
 void inicializaPantalla();
 void liberaPantalla();
+void dibujaJuego (AJD_TableroPtr tablero);
 void dibujaTablero(AJD_TableroPtr tablero);
 void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color);
 void dibujaMarcadores(uint16_t turno, AJD_Estado* estado);
@@ -16,4 +17,4 @@ void dibujaCursor (AJD_TableroPtr tablero);
 void dibujaMenu (int y, int x, menu_t* menu);
 int muestraMenu (int x, int y, menu_t* menu);
 int obtenJugada (int* celda_origen, int* celda_destino);
-int procesaTeclado (AJD_TableroPtr tablero);
+int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado);

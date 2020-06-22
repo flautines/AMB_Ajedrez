@@ -24,6 +24,12 @@ typedef struct _AJD_Estado
    uint8_t rey_negro_movido    : 1; // bit 5
    uint8_t rey_blanco_movido   : 1; // bit 6
    uint8_t turno_jugador       : 1; // bit 7
+   uint8_t casilla_seleccionada: 2; // 00: Ninguna casilla seleccionada
+                                    // 01: Celda origen seleccionada
+                                    // 02: Celda destino seleccionada
+   uint8_t casilla_origen;          // casilla origen de la pieza a mover
+   uint8_t casilla_destino;         // casilla destino de la pieza a mover
+
 } AJD_Estado;
 
 /////////////////////////////////////////////////////////////////////
@@ -34,5 +40,6 @@ extern AJD_Estado estado_juego;   // Estado del juego
 
 void inicializa(AJD_TableroPtr tablero);
 void nuevoJuego(AJD_TableroPtr tablero);
-void muevePieza (AJD_TableroPtr tablero, int casilla_origen, int casilla_destino);
+void actualizaJuego (AJD_TableroPtr tablero);
+void muevePieza (AJD_TableroPtr tablero, uint8_t casilla_origen, uint8_t casilla_destino);
 void liberaRecursos();

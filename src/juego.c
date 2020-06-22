@@ -92,13 +92,32 @@ void nuevoJuego(AJD_TableroPtr tablero)
    tablero->cursor.idCasilla = 8*6+3; //(d2)
 }
 ////////////////////////////////////////////////////////////////////////////
+// actualizaJuego
+//
+// Actualiza el estado del juego
+void actualizaJuego (AJD_TableroPtr tablero)
+{
+   procesaTeclado (tablero, &estado_juego);
+
+   // Si se han seleccionado las casillas origen y destino movemos la pieza
+   if (estado_juego.casilla_seleccionada == 2)
+   {      
+      muevePieza (tablero, estado_juego.casilla_origen, estado_juego.casilla_destino);
+      estado_juego.turno_jugador ^= 1;
+      estado_juego.juegan_blancas ^= 1;
+      estado_juego.casilla_seleccionada = 0;
+      turno += estado_juego.juegan_blancas;
+      estado_juego.casilla_origen = estado_juego.casilla_destino = 0;
+   }
+}
+////////////////////////////////////////////////////////////////////////////
 // muevePieza
 //
 // Mueve una pieza desde una casilla origen a una casilla destino
-void muevePieza (AJD_TableroPtr tablero, int casilla_origen, int casilla_destino)
+void muevePieza (AJD_TableroPtr tablero, uint8_t casilla_origen, uint8_t casilla_destino)
 {
    AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
-   AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;
+   AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;   
 
    tablero->casilla[casilla_origen].pieza        = NONE;
    tablero->casilla[casilla_destino].pieza       = pieza_a_mover;
