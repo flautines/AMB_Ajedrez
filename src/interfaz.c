@@ -215,14 +215,22 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
 //
 void dibujaCursor (AJD_TableroPtr tablero)
 {
-    int y, x;
+    int y, x, flash;
     
     y = TABLERO_ROW_START + (tablero->cursor.idCasilla/8) * ALTO_CASILLA;
     x = TABLERO_COL_START + (tablero->cursor.idCasilla & 7) * ANCHO_CASILLA;
 
-    // Color principal/fondo a usar dependiendo de la casilla
-    int color = tablero->casilla[tablero->cursor.idCasilla].color == BLANCO ? 1 : 2;
-    attron (COLOR_PAIR (color));
+    flash = tablero->cursor.flash;
+
+    if (flash)
+        attron (A_BLINK);
+    else
+        attroff (A_BLINK);
+
+    if (tablero->casilla[tablero->cursor.idCasilla].color == BLANCO)
+        attron (A_REVERSE);
+    else
+        attroff (A_REVERSE);
     /*mvaddstr (y  , x,  "+-+");
     mvaddstr (y+2, x,  "+-+");
     mvaddstr (y+1, x,   "|" );
@@ -246,6 +254,8 @@ void dibujaCursor (AJD_TableroPtr tablero)
         int dx = symbols[i].dx;     
         mvaddch (y + dy, x + dx, symbols[i].ch);
     }
+    attroff (A_BLINK);
+    attroff (A_REVERSE);
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaMenu Dibuja un menu con su titulo y sus elementos.
@@ -392,12 +402,26 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
                 //mvprintw (1,0, "Origen %d", estado->casilla_origen);
             }
             else
-            {                
-                estado->casilla_seleccionada = 2;
+            {
+                // Si se selecciona como casilla destino la misma casilla
+                // origen se cancela la selección.
                 estado->casilla_destino = tablero->cursor.idCasilla;
+                if (estado->casilla_destino == estado->casilla_origen)
+                {
+                    estado->casilla_seleccionada = 0;
+                    tablero->cursor.flash = 0;
+                }
+                else
+                    estado->casilla_seleccionada = 2;
+                
                 mvprintw (4,0, "Moviendo desde %d hasta %d", estado->casilla_origen, estado->casilla_destino);
             }
             break;
+        }
+        case '\x1b':    // ESC
+        {
+            if (estado->casilla_seleccionada == 1)
+                estado->casilla_seleccionada = 0;
         }
     }
 

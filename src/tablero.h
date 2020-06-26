@@ -34,6 +34,7 @@ typedef struct
 {
    uint8_t idCasilla:6;
    uint8_t visible:1;
+   uint8_t flash:1;
 } AJD_Cursor;
 
 //AJD_Cursor _cursorSeleccion;

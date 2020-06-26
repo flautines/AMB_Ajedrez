@@ -4,10 +4,11 @@ OBJDIR  := obj
 SOURCES := ${OBJDIR}/interfaz.o \
 		   ${OBJDIR}/menu.o     \
 		   ${OBJDIR}/juego.o    \
-		   ${OBJDIR}/main.o
+		   ${OBJDIR}/main.o 	\
+		   ${OBJDIR}/movimiento.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
-CFLAGS 	:= -Wall -pedantic -std=c99 -I ${INCDIRS} -finput-charset=UTF-8
+CFLAGS 	:= -Wall -Werror -pedantic -std=c99 -I ${INCDIRS} -finput-charset=UTF-8
 LDFLAGS := -lncurses
 
 ${APP}: ${SOURCES}
@@ -19,4 +20,4 @@ ${OBJDIR}/%.o : ${SRCDIR}/%.c
 .PHONY: clean
 
 clean:
-	rm ${OBJDIR}/*.o ${APP}
+	rm -f ${OBJDIR}/*.o ${APP}
