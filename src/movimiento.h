@@ -43,8 +43,15 @@ int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Estado* estad
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
 //
-// Comprueba hsi ay alguna pieza en la casilla indicada 
+// Comprueba si hay alguna pieza en la casilla indicada 
 // (1 ocupada / 0 libre) y el color de la pieza.
 //
 int hayPieza (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Color* color_pieza);
+////////////////////////////////////////////////////////////////////////////
+// hayPiezaEnTrayectoria
+//
+// Comprueba si alguna de las casillas desde una casilla origen hasta una 
+// casilla destino está ocupada (1) o libre (0). 
+// Las casillas origen/destino se infican en una estructura AJD_MovInfo.
+// 
 int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);

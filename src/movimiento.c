@@ -1,4 +1,6 @@
 #include <movimiento.h>
+#include <utils.h>
+
 #include <ncurses.h>
 
 #ifndef NULL
@@ -94,12 +96,23 @@ int  compruebaPeon (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 //
 int compruebaAlfil (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 {
-    return _compruebaDiagonales(tablero, estado_juego);
+    // movimiento será válido si se mueve por las diagonales del
+    // mismo color sin 'saltar' por encima de otras piezas
+    AJD_Color color_pieza;
+    int seMueveEnDiagonal = _compruebaDiagonales(tablero, estado_juego);
+    int casillaOcupada = hayPieza(tablero, 
+                            estado_juego->casilla_destino,
+                            &color_pieza);
+
+    return  (seMueveEnDiagonal && !casillaOcupada)
+         || (seMueveEnDiagonal 
+             && casillaOcupada 
+             && color_pieza != estado_juego->juegan_blancas);
 }
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
 //
-// Comprueba hsi ay alguna pieza en la casilla indicada 
+// Comprueba si hay alguna pieza en la casilla indicada 
 // (1 ocupada / 0 libre) y el color de la pieza.
 //
 int hayPieza (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Color* color_pieza)
@@ -122,17 +135,16 @@ int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     // Por tanto, comprobaremos si hay una pieza en cada punto p(t) 
     // que pertenezcan a la recta que forma la trayectoria.
     int8_t casillaX, casillaY, dy, dx;
-    uint8_t idCasilla;
+    uint8_t idCasilla, casilla_destino;
 
     idCasilla = mov_info->casilla_origen;
+    casilla_destino = mov_info->casilla_destino;
     casillaX  = mov_info->srcX;
     casillaY  = mov_info->srcY;
-    dy = mov_info->dy == 0 ? 0 :
-        mov_info->dy < 0 ? -1 : 1;
-    dx = mov_info->dx == 0 ? 0 :
-        mov_info->dx < 0 ? -1 : 1;
+    dy = sign (mov_info->dy);
+    dx = sign (mov_info->dx);
 
-    for (int t=0; mov_info->casilla_destino != idCasilla; ++t) {
+    for (int t=0; casilla_destino != idCasilla; ++t) {
         casillaX += dx;
         casillaY += dy;
         // Convierte de coordenadas x,y a id en el array unidimiensional
@@ -141,7 +153,7 @@ int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 
         mvprintw (5+t,0, "Comprobando idCasilla: %2d", idCasilla);
         
-        if (hayPieza (tablero, idCasilla, NULL))
+        if (hayPieza (tablero, idCasilla, NULL) && idCasilla != casilla_destino)
             return 1;
     }
     // Si hemos llegado aquí significa que no había ninguna pieza a lo
@@ -170,7 +182,7 @@ int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Estado* estad
 // compruebaDiagonales
 // 
 // Comprueba si el movimiento de una pieza se está haciendo en diagonal
-// y es válido.
+// y no hay piezas obstaculizando el movimiento.
 //
 int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 {
@@ -182,10 +194,8 @@ int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 
     // Movimiento es diagonal por casilla del mismo color
     if ((mov_info.dy == mov_info.dx) ||  
-        (mov_info.dy == -mov_info.dx)) {
-
-        if (!hayPiezaEnTrayectoria (tablero, &mov_info))
-            return 1;
+        (mov_info.dy == -mov_info.dx)) { 
+            return !hayPiezaEnTrayectoria (tablero, &mov_info);
     }
 
     return 0;
