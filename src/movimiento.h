@@ -3,6 +3,8 @@
 typedef struct _AJD_MovInfo {
     uint8_t casilla_origen:6;
     uint8_t casilla_destino:6;
+    AJD_Color color_pieza_origen;
+    AJD_Color color_pieza_destino;
     uint8_t srcY:3;
     uint8_t srcX:3;
     uint8_t dstY:3;
@@ -23,14 +25,14 @@ int esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estdo_juego);
 // Comprueba si el movimiento de un peon en casilla_origen hacia
 // casilla_destino es válido.
 //
-int compruebaPeon (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
+int compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
 // compruebaAlfil
 // 
 // Comprueba si el movimiento de un alfil en casilla_origen hacia
 // casilla_destino es válido.
 //
-int compruebaAlfil (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
+int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
 // hayPiezaValida
 //
@@ -39,21 +41,13 @@ int compruebaAlfil (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
 //
 // Devuelve 1 si lo es, 0 en caso contrario.
 //
-int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Estado* estado_juego);
+int hayPiezaValida (AJD_TableroPtr tablero, AJD_idCasilla idCasilla, AJD_Estado* estado_juego);
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
 //
-// Comprueba si hay alguna pieza en la casilla indicada 
-// (1 ocupada / 0 libre) y el color de la pieza.
+// Comprueba si en la casilla indicada hay alguna pieza (1) o esta libre (0)
 //
-int hayPieza (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Color* color_pieza);
-////////////////////////////////////////////////////////////////////////////
-// esMismoColor
-// 
-// Comprueba si la pieza en la casilla indicada es del mismo color 
-// que el jugador actual
-//
-int esMismoColor (AJD_Casilla* casilla, AJD_Estado* estado_juego);
+int hayPieza (AJD_TableroPtr tablero, AJD_idCasilla idCasilla);
 ////////////////////////////////////////////////////////////////////////////
 // hayPiezaEnTrayectoria
 //

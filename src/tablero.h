@@ -20,12 +20,13 @@ typedef enum { NONE, PEON, TORRE, CABALLO, ALFIL, DAMA, REY } AJD_Pieza;
 // El tipo casilla guarda información de una casilla en el tablero así como
 // qué pieza hay en esa casilla.
 //
+typedef uint8_t AJD_idCasilla ;
 typedef struct _AJD_Casilla
 {
-   AJD_Color   color:1;      // Color de la casilla (BLANCO o NEGRO)
-   //char        notacion[3];// Notación para la casilla ej: 'h2' ("a..h1..8\0")
-   AJD_Pieza   pieza:3;      // Tipo de pieza en la casilla
-   AJD_Color   color_pieza:1;// Color de la pieza en esta casilla
+   AJD_Color     color:1;      // Color de la casilla (BLANCO o NEGRO)
+   AJD_Pieza     pieza:3;      // Tipo de pieza en la casilla
+   AJD_Color     color_pieza:1;// Color de la pieza en esta casilla
+   AJD_idCasilla indice;       // Indice en el array de casillas (0..63)
 } AJD_Casilla;
 
 ////////////////////////////////////////////////////////////////////////////

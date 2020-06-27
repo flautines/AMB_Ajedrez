@@ -9,8 +9,9 @@
 
 // FUNCIONES PRIVADAS (forward declarations)
 int _longitud2 (int dx, int dy);
-int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
-void _obtenMovInfo (AJD_Estado* estado_juego, AJD_MovInfo* mov_info);
+int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
+                    AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PUBLICAS 
 ////////////////////////////////////////////////////////////////////////////
@@ -21,9 +22,13 @@ void _obtenMovInfo (AJD_Estado* estado_juego, AJD_MovInfo* mov_info);
 //
 int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 {
-    uint8_t casilla_origen = estado_juego->casilla_origen;
-    AJD_Pieza pieza = tablero->casilla[casilla_origen].pieza;
+    AJD_MovInfo mov_info;
+    AJD_Pieza   pieza; 
 
+    _obtenMovInfo (tablero, estado_juego, &mov_info);
+    pieza = tablero->casilla[mov_info.casilla_origen].pieza;
+
+    mvprintw (3,0, "pieza: %c",  " PTCADR"[pieza]);
     switch (pieza)
     {        
         // En principio no recibiremos nunca NONE, pero por si acaso...
@@ -31,12 +36,12 @@ int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
             return false;
 
         case PEON:
-            return compruebaPeon (tablero, estado_juego);
+            return compruebaPeon (tablero, &mov_info);
 
         case TORRE:
         case CABALLO:
         case ALFIL:
-            return compruebaAlfil (tablero, estado_juego);
+            return compruebaAlfil (tablero, &mov_info);
 
         case DAMA:
         case REY:
@@ -52,38 +57,36 @@ int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 // Comprueba si el movimiento de un peon en casilla_origen hacia
 // casilla_destino es válido.
 //
-int  compruebaPeon (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
+int  compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
-    uint8_t juegan_blancas; 
-    AJD_MovInfo mov_info;
-
-    _obtenMovInfo (estado_juego, &mov_info);
-    juegan_blancas = estado_juego->juegan_blancas;
-    //
     // Movimiento básico del peon
     //
-    int dir = juegan_blancas ? -1 : 1;
-    int filaPeones = juegan_blancas ? 6 : 1;
+    //   dir (direccion de movimiento) -1 BLANCAS, 1 NEGRAS
+    //   filaPeones (fila de inicio) 6 BLANCAS, 1 NEGRAS
+    //    
+    int dir         = mov_info->color_pieza_origen ? -1 : 1;
+    int filaPeones  = mov_info->color_pieza_origen ? 6 : 1;
+    mvprintw (4,0, "dir: %d, filaPeones: %d", dir, filaPeones);
 
     // El peon sólo puede mover "hacia adelante", excepto
     // para comer (digaonal adyacente) o si es el primer
     // movimiento del peon.
-    if (mov_info.dy == dir)
+    if (mov_info->dy == dir)
     {
-        AJD_Casilla casilla_destino = tablero->casilla[mov_info.casilla_destino];
-        return
+        return (
             // Come ficha
-            ((mov_info.dx == -1 || mov_info.dx == 1)
-            && hayPieza(tablero, mov_info.casilla_destino,NULL)
-            && !esMismoColor (&casilla_destino, estado_juego))
+            (mov_info->dx == -1 || mov_info->dx == 1)
+            && hayPieza(tablero, mov_info->casilla_destino)
+            && (mov_info->color_pieza_origen != mov_info->color_pieza_destino))
 
             // Movimiento 1 casilla adelante libre
-        ||  (mov_info.dx == 0 && !hayPieza (tablero, mov_info.casilla_destino, NULL));
+        ||  (mov_info->dx == 0 && !hayPieza (tablero, mov_info->casilla_destino)
+        );
     }
-            // Movimiento incial del peon dos casillas adelante libre
-    if (mov_info.dy == 2*dir && mov_info.dx == 0)
-        return (mov_info.srcY == filaPeones 
-            && !hayPieza (tablero, mov_info.casilla_destino, NULL));
+    // Movimiento incial del peon dos casillas adelante libre
+    if (mov_info->dy == 2*dir && mov_info->dx == 0)
+        return (mov_info->srcY == filaPeones 
+            && !hayPieza (tablero, mov_info->casilla_destino));
 
     // Si llega a este punto consideramos el movimiento ilegal.
     return false;
@@ -94,20 +97,18 @@ int  compruebaPeon (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 // Comprueba si el movimiento de un alfil en casilla_origen hacia
 // casilla_destino es válido.
 //
-int compruebaAlfil (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
+int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
     // movimiento será válido si se mueve por las diagonales del
     // mismo color sin 'saltar' por encima de otras piezas
-    AJD_Casilla casilla_destino = tablero->casilla[estado_juego->casilla_destino];
-    int seMueveEnDiagonal = _compruebaDiagonales(tablero, estado_juego);
-    int casillaOcupada    = hayPieza(tablero, 
-                              estado_juego->casilla_destino,
-                              NULL);
+    AJD_Casilla casilla_destino = tablero->casilla[mov_info->casilla_destino];
+    int seMueveEnDiagonal       = _compruebaDiagonales(tablero, mov_info);
+    int casillaOcupada          = hayPieza(tablero, casilla_destino.indice);
 
     return  (seMueveEnDiagonal && !casillaOcupada)
          || (seMueveEnDiagonal 
              && casillaOcupada 
-             && !esMismoColor (&casilla_destino, estado_juego));
+             && (mov_info->color_pieza_origen != mov_info->color_pieza_destino));
 }
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
@@ -115,28 +116,12 @@ int compruebaAlfil (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 // Comprueba si hay alguna pieza en la casilla indicada 
 // (1 ocupada / 0 libre) y el color de la pieza.
 //
-int hayPieza (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Color* color_pieza)
+int hayPieza (AJD_TableroPtr tablero, AJD_idCasilla idCasilla)
 {
     AJD_Casilla casilla = tablero->casilla[idCasilla]; 
     AJD_Pieza pieza = casilla.pieza;
-
-    if (color_pieza)
-        *color_pieza = casilla.color_pieza;
    
     return pieza != NONE;
-}
-////////////////////////////////////////////////////////////////////////////
-// esMismoColor
-// 
-// Comprueba si la pieza en la casilla indicada es del mismo color 
-// que el jugador actual
-//
-int esMismoColor (AJD_Casilla* casilla, AJD_Estado* estado_juego)
-{
-    // Si color_pieza == BLANCO y juegan_blancas --> esMismoColor = true
-    //  o color_pieza == NEGRO  y juegan_negras  --> esMismoColor = true
-    // Por tanto:
-    return casilla->color_pieza == estado_juego->juegan_blancas;
 }
 ////////////////////////////////////////////////////////////////////////////
 // hayPiezaEnTrayectoria
@@ -155,7 +140,7 @@ int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     // Por tanto, comprobaremos si hay una pieza en cada punto p(t) 
     // que pertenezcan a la recta que forma la trayectoria.
     int8_t casillaX, casillaY, dy, dx;
-    uint8_t idCasilla, casilla_destino;
+    AJD_idCasilla idCasilla, casilla_destino;
 
     idCasilla = mov_info->casilla_origen;
     casilla_destino = mov_info->casilla_destino;
@@ -173,7 +158,7 @@ int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 
         mvprintw (5+t,0, "Comprobando idCasilla: %2d", idCasilla);
         
-        if (hayPieza (tablero, idCasilla, NULL) && idCasilla != casilla_destino)
+        if (hayPieza (tablero, idCasilla) && idCasilla != casilla_destino)
             return 1;
     }
     // Si hemos llegado aquí significa que no había ninguna pieza a lo
@@ -188,12 +173,12 @@ int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 //
 // Devuelve 1 si lo es, 0 en caso contrario.
 //
-int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Estado* estado_juego)
+int hayPiezaValida (AJD_TableroPtr tablero, AJD_idCasilla idCasilla, AJD_Estado* estado_juego)
 {
    
-   AJD_Color color_pieza;
+   AJD_Color color_pieza = tablero->casilla[idCasilla].color_pieza;
 
-   return (hayPieza (tablero, idCasilla, &color_pieza)
+   return (hayPieza (tablero, idCasilla)
       &&   color_pieza == estado_juego->juegan_blancas);
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -204,18 +189,15 @@ int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Estado* estad
 // Comprueba si el movimiento de una pieza se está haciendo en diagonal
 // y no hay piezas obstaculizando el movimiento.
 //
-int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
+int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
-    AJD_MovInfo mov_info;
 
-    _obtenMovInfo (estado_juego, &mov_info);
-
-    mvprintw(2,0, "dy:%d, dx:%d", mov_info.dy, mov_info.dx);
+    mvprintw(2,0, "dy:%d, dx:%d", mov_info->dy, mov_info->dx);
 
     // Movimiento es diagonal por casilla del mismo color
-    if ((mov_info.dy == mov_info.dx) ||  
-        (mov_info.dy == -mov_info.dx)) { 
-            return !hayPiezaEnTrayectoria (tablero, &mov_info);
+    if ((mov_info->dy == mov_info->dx) ||  
+        (mov_info->dy == -mov_info->dx)) { 
+            return !hayPiezaEnTrayectoria (tablero, mov_info);
     }
 
     return 0;
@@ -227,7 +209,8 @@ int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 // movimiento de pieza. También calcula el desplazamiento dx,dy que supone
 // ese movimiento respecto a la casilla origen.
 //
-void _obtenMovInfo (AJD_Estado* estado_juego, AJD_MovInfo* mov_info)
+void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
+                    AJD_MovInfo* mov_info)
 {
     uint8_t casilla_origen; 
     uint8_t casilla_destino;
@@ -235,6 +218,8 @@ void _obtenMovInfo (AJD_Estado* estado_juego, AJD_MovInfo* mov_info)
     casilla_origen  = estado_juego->casilla_origen;
     casilla_destino = estado_juego->casilla_destino;
 
+    mov_info->color_pieza_origen = tablero->casilla[casilla_origen].color_pieza;
+    mov_info->color_pieza_destino = tablero->casilla[casilla_destino].color_pieza;
     mov_info->casilla_origen  = casilla_origen;
     mov_info->casilla_destino = casilla_destino;
     mov_info->srcY = casilla_origen / 8;

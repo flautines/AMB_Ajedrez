@@ -32,6 +32,8 @@ void inicializa(AJD_TableroPtr tablero)
    tablero->cursor.flash = 0;
 
    AJD_Color color = NEGRO;
+   AJD_idCasilla indice = 0;
+
    for (int i=0; i<8; i++) 
    {      
       color ^= 1; // Alterna entre blanco/negro       
@@ -54,6 +56,7 @@ void inicializa(AJD_TableroPtr tablero)
          // El color de la pieza cuando la casilla está vacía es irrelevante
          casilla->pieza = NONE;
          casilla->color_pieza = BLANCO;
+         casilla->indice = indice++;
       }
    }   
    //printf("sizeof(AJD_Tablero) = %ld\n", sizeof (AJD_Tablero));
