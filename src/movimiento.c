@@ -70,12 +70,12 @@ int  compruebaPeon (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
     // movimiento del peon.
     if (mov_info.dy == dir)
     {
-        AJD_Color color_pieza;
+        AJD_Casilla casilla_destino = tablero->casilla[mov_info.casilla_destino];
         return
             // Come ficha
             ((mov_info.dx == -1 || mov_info.dx == 1)
-            && hayPieza(tablero, mov_info.casilla_destino, &color_pieza)
-            && (color_pieza ^ juegan_blancas))
+            && hayPieza(tablero, mov_info.casilla_destino,NULL)
+            && !esMismoColor (&casilla_destino, estado_juego))
 
             // Movimiento 1 casilla adelante libre
         ||  (mov_info.dx == 0 && !hayPieza (tablero, mov_info.casilla_destino, NULL));
@@ -98,16 +98,16 @@ int compruebaAlfil (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 {
     // movimiento será válido si se mueve por las diagonales del
     // mismo color sin 'saltar' por encima de otras piezas
-    AJD_Color color_pieza;
+    AJD_Casilla casilla_destino = tablero->casilla[estado_juego->casilla_destino];
     int seMueveEnDiagonal = _compruebaDiagonales(tablero, estado_juego);
-    int casillaOcupada = hayPieza(tablero, 
-                            estado_juego->casilla_destino,
-                            &color_pieza);
+    int casillaOcupada    = hayPieza(tablero, 
+                              estado_juego->casilla_destino,
+                              NULL);
 
     return  (seMueveEnDiagonal && !casillaOcupada)
          || (seMueveEnDiagonal 
              && casillaOcupada 
-             && color_pieza != estado_juego->juegan_blancas);
+             && !esMismoColor (&casilla_destino, estado_juego));
 }
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
@@ -125,6 +125,26 @@ int hayPieza (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Color* color_pieza)
    
     return pieza != NONE;
 }
+////////////////////////////////////////////////////////////////////////////
+// esMismoColor
+// 
+// Comprueba si la pieza en la casilla indicada es del mismo color 
+// que el jugador actual
+//
+int esMismoColor (AJD_Casilla* casilla, AJD_Estado* estado_juego)
+{
+    // Si color_pieza == BLANCO y juegan_blancas --> esMismoColor = true
+    //  o color_pieza == NEGRO  y juegan_negras  --> esMismoColor = true
+    // Por tanto:
+    return casilla->color_pieza == estado_juego->juegan_blancas;
+}
+////////////////////////////////////////////////////////////////////////////
+// hayPiezaEnTrayectoria
+//
+// Comprueba si alguna de las casillas desde una casilla origen hasta una 
+// casilla destino está ocupada (1) o libre (0). 
+// Las casillas origen/destino se infican en una estructura AJD_MovInfo.
+//
 int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
     // La trayectoria del movimiento es una recta. Recordemos que un 

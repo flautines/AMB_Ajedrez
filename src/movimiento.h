@@ -48,6 +48,13 @@ int hayPiezaValida (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Estado* estad
 //
 int hayPieza (AJD_TableroPtr tablero, uint8_t idCasilla, AJD_Color* color_pieza);
 ////////////////////////////////////////////////////////////////////////////
+// esMismoColor
+// 
+// Comprueba si la pieza en la casilla indicada es del mismo color 
+// que el jugador actual
+//
+int esMismoColor (AJD_Casilla* casilla, AJD_Estado* estado_juego);
+////////////////////////////////////////////////////////////////////////////
 // hayPiezaEnTrayectoria
 //
 // Comprueba si alguna de las casillas desde una casilla origen hasta una 
