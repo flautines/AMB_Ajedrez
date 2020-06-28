@@ -1,12 +1,13 @@
-#include <ncurses.h>
-#include <tablero.h>
 #include <interfaz.h>
+#include <string.h>
 
 #define TABLERO_ROW_START   10
 #define TABLERO_COL_START   10
 #define MARCADOR_ROW_START  TABLERO_ROW_START
 #define MARCADOR_COL_START  TABLERO_COL_START + 8 * 3 + 2
 #define MARCADOR_LAST_ROW   TABLERO_ROW_START + 8 * 3 - 1
+AJD_Sprite sprCursorPiezaSeleccionada;
+AJD_Sprite sprCursorMovil;
 ////////////////////////////////////////////////////////////////////////////
 // _dibujaCasilla
 //
@@ -87,6 +88,29 @@ void inicializaPantalla()
 
     clear();
 }
+
+void inicializaSprites(AJD_TableroPtr tablero)
+{
+    // Definicion de los cursores
+    /*char ch[9] = {
+    ACS_ULCORNER, ACS_BULLET, ACS_URCORNER ,
+    ACS_BULLET  , ACS_BULLET, ACS_BULLET   ,
+    ACS_LLCORNER, ACS_BULLET, ACS_LRCORNER
+};
+    memcpy((void*)sprCursorMovil.ch, (void*)ch, 9);
+
+    char ch2[9] = {
+        ACS_ULCORNER, ACS_HLINE  , ACS_URCORNER ,
+        ACS_VLINE   , ACS_BULLET , ACS_VLINE    ,
+        ACS_LLCORNER, ACS_HLINE  , ACS_LRCORNER 
+    };
+    memcpy((void*)sprCursorPiezaSeleccionada.ch, (void*)ch2, 9);
+*/
+    strncpy (sprCursorMovil.ch, "+.+...+.+", 9); 
+    strncpy (sprCursorPiezaSeleccionada.ch, "+-+|.|+-+",9);
+    tablero->cursorMovil.sprite = &sprCursorMovil;
+    tablero->cursorPiezaSeleccionada.sprite = &sprCursorPiezaSeleccionada;
+}
 ////////////////////////////////////////////////////////////////////////////
 // liberaPantalla
 //
@@ -153,9 +177,13 @@ void dibujaTablero(AJD_TableroPtr tablero)
     }
 
     // Dibuja el cursor de seleccion
-    if (tablero->cursor.visible)
+    if (tablero->cursorMovil.visible)
     {
-        dibujaCursor(tablero);
+        dibujaCursor(tablero->cursorMovil);
+    }
+    if (tablero->cursorPiezaSeleccionada.visible)
+    {
+        dibujaCursor(tablero->cursorPiezaSeleccionada);
     }
 
 }
@@ -213,46 +241,38 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
 ////////////////////////////////////////////////////////////////////////////
 // dibujaCursor Dibuja el cursor de seleccion
 //
-void dibujaCursor (AJD_TableroPtr tablero)
+void dibujaCursor (AJD_Cursor cursor)
 {
     int y, x, flash;
     
-    y = TABLERO_ROW_START + (tablero->cursor.idCasilla/8) * ALTO_CASILLA;
-    x = TABLERO_COL_START + (tablero->cursor.idCasilla & 7) * ANCHO_CASILLA;
+    y = TABLERO_ROW_START + (cursor.idCasilla/8) * ALTO_CASILLA;
+    x = TABLERO_COL_START + (cursor.idCasilla & 7) * ANCHO_CASILLA;
 
-    flash = tablero->cursor.flash;
+    flash = cursor.flash;    
 
     if (flash)
         attron (A_BLINK);
     else
         attroff (A_BLINK);
 
-    if (tablero->casilla[tablero->cursor.idCasilla].color == BLANCO)
+    if (cursor.color_casilla == BLANCO)
         attron (A_REVERSE);
     else
         attroff (A_REVERSE);
-    /*mvaddstr (y  , x,  "+-+");
-    mvaddstr (y+2, x,  "+-+");
-    mvaddstr (y+1, x,   "|" );
-    mvaddstr (y+1, x+2, "|" );
-    */
-    struct symbol_t {
-        int dy;
-        int dx;
-        const chtype ch;
-    };
+    mvprintw (50,0, "cursor.color_casilla: %s", 
+              cursor.color_casilla == BLANCO ? "BLANCO" : "NEGRO");
 
-    struct symbol_t symbols[8] = { 
-        { 0, 0, ACS_ULCORNER } , { 0, 1 , ACS_HLINE } , { 0, 2, ACS_URCORNER },
-        { 1, 0, ACS_VLINE    },                         { 1, 2, ACS_VLINE    },
-        { 2, 0, ACS_LLCORNER },  { 2, 1, ACS_HLINE } ,  { 2, 2, ACS_LRCORNER }
-    };
+    char* ch = &(cursor.sprite->ch[0]);
 
-    for (int i=0; i<8; i++)
-    {
-        int dy = symbols[i].dy;
-        int dx = symbols[i].dx;     
-        mvaddch (y + dy, x + dx, symbols[i].ch);
+    for (int dy=0; dy<ALTO_CASILLA; dy++)
+    {    
+        for (int dx=0; dx<ANCHO_CASILLA; dx++)
+        {
+            if (*ch != '.')
+                mvaddch (y + dy, x + dx, *ch);
+            ch++;
+        }
+        
     }
     attroff (A_BLINK);
     attroff (A_REVERSE);
@@ -389,27 +409,28 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
 
     switch (ch)
     {
-        case KEY_UP:    tablero->cursor.idCasilla -= 8; break;
-        case KEY_DOWN:  tablero->cursor.idCasilla += 8; break;
-        case KEY_LEFT:  tablero->cursor.idCasilla -= 1; break;
-        case KEY_RIGHT: tablero->cursor.idCasilla += 1; break;
+        case KEY_UP:    tablero->cursorMovil.idCasilla -= 8; break;
+        case KEY_DOWN:  tablero->cursorMovil.idCasilla += 8; break;
+        case KEY_LEFT:  tablero->cursorMovil.idCasilla -= 1; break;
+        case KEY_RIGHT: tablero->cursorMovil.idCasilla += 1; break;
         case '\n':
         {            
             if (!estado->casilla_seleccionada)
             {                
                 estado->casilla_seleccionada = 1;
-                estado->casilla_origen = tablero->cursor.idCasilla;
+                estado->casilla_origen = tablero->cursorMovil.idCasilla;
+                tablero->cursorPiezaSeleccionada.idCasilla = tablero->cursorMovil.idCasilla;
                 //mvprintw (1,0, "Origen %d", estado->casilla_origen);
             }
             else
             {
                 // Si se selecciona como casilla destino la misma casilla
                 // origen se cancela la selección.
-                estado->casilla_destino = tablero->cursor.idCasilla;
+                estado->casilla_destino = tablero->cursorMovil.idCasilla;
                 if (estado->casilla_destino == estado->casilla_origen)
                 {
                     estado->casilla_seleccionada = 0;
-                    tablero->cursor.flash = 0;
+                    tablero->cursorPiezaSeleccionada.visible = 0;
                 }
                 else
                     estado->casilla_seleccionada = 2;
@@ -425,10 +446,15 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
         }
     }
 
-    mvprintw (0,0, "cursor.idCasilla: %2d", tablero->cursor.idCasilla);
+    tablero->cursorMovil.color_casilla = tablero->casilla[tablero->cursorMovil.idCasilla].color;
+    
+    mvprintw (0,0, "cursorMovil.idCasilla: %2d", tablero->cursorMovil.idCasilla);
     mvprintw (0,25, "Pieza de color: %s", 
-              tablero->casilla[tablero->cursor.idCasilla].color_pieza 
+              tablero->casilla[tablero->cursorMovil.idCasilla].color_pieza 
               ? "BLANCO" : "NEGRO ");
+    mvprintw (0,50, "Casilla de color: %s", 
+              tablero->cursorMovil.color_casilla
+              ? "BLANCO" : "NEGRO ");    
     mvprintw (1,0, "casilla_seleccionada: %d", estado->casilla_seleccionada);
     return 0;
 }

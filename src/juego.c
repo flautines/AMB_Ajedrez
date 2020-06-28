@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <interfaz.h>
 #include <juego.h>
 #include <tablero.h>
-#include <interfaz.h>
 #include <movimiento.h>
 //#include <ncurses.h>
 
@@ -28,8 +28,10 @@ AJD_Estado estado_juego;   // Estado del juego
 void inicializa(AJD_TableroPtr tablero)
 {
    // El cursor de seleccion es visible y sin flash
-   tablero->cursor.visible = 1;
-   tablero->cursor.flash = 0;
+   tablero->cursorMovil.visible = 1;
+   tablero->cursorPiezaSeleccionada.visible = 0;
+   tablero->cursorMovil.flash = 0;
+   tablero->cursorPiezaSeleccionada.flash = 0;
 
    AJD_Color color = NEGRO;
    AJD_idCasilla indice = 0;
@@ -63,6 +65,7 @@ void inicializa(AJD_TableroPtr tablero)
 
    // Inicializa la UI
    inicializaPantalla();
+   inicializaSprites(tablero);
 }
 ////////////////////////////////////////////////////////////////////////////
 // liberaRecursos
@@ -97,7 +100,8 @@ void nuevoJuego(AJD_TableroPtr tablero)
    _colocaPiezas (tablero);
 
    // Posicion inicial del cursor de selección de pieza
-   tablero->cursor.idCasilla = 8*6+3; //(d2)
+   tablero->cursorMovil.idCasilla = 8*6+3; //(d2)
+   tablero->cursorPiezaSeleccionada.idCasilla = 8*6+3; // (d2)
 }
 ////////////////////////////////////////////////////////////////////////////
 // actualizaJuego
@@ -106,6 +110,9 @@ void nuevoJuego(AJD_TableroPtr tablero)
 void actualizaJuego (AJD_TableroPtr tablero)
 {
    procesaTeclado (tablero, &estado_juego);
+
+   // Aseguramos que el cursor movil se mantiene en los límites del tablero
+   tablero->cursorMovil.idCasilla &= 63;
 
    switch (estado_juego.casilla_seleccionada)
    {   
@@ -117,8 +124,8 @@ void actualizaJuego (AJD_TableroPtr tablero)
       }
       else
       {
-         // Casilla origen seleccionada, flash cursor
-         tablero->cursor.flash = 1;        
+         // Casilla origen seleccionada, muestra el cursor fijo
+         tablero->cursorPiezaSeleccionada.visible = 1;
       }
       break;
    case 2:
@@ -134,8 +141,8 @@ void actualizaJuego (AJD_TableroPtr tablero)
          turno += estado_juego.juegan_blancas;
          estado_juego.casilla_origen = estado_juego.casilla_destino = 0;
 
-         // movimiento efectuado, restaura el cursor a "no-flash"
-         tablero->cursor.flash = 0;
+         // movimiento efectuado, oculta el cursor fijo
+         tablero->cursorPiezaSeleccionada.visible = 0;
       }
       else
       {

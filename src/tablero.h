@@ -20,6 +20,7 @@ typedef enum { NONE, PEON, TORRE, CABALLO, ALFIL, DAMA, REY } AJD_Pieza;
 // El tipo casilla guarda información de una casilla en el tablero así como
 // qué pieza hay en esa casilla.
 //
+
 typedef uint8_t AJD_idCasilla ;
 typedef struct _AJD_Casilla
 {
@@ -31,18 +32,25 @@ typedef struct _AJD_Casilla
 
 ////////////////////////////////////////////////////////////////////////////
 // Cursor de selección de pieza
+typedef struct _AJD_Sprite {
+   char ch[9];
+} AJD_Sprite;
+
 typedef struct 
 {
-   uint8_t idCasilla:6;
+   AJD_idCasilla idCasilla;
    uint8_t visible:1;
    uint8_t flash:1;
+   uint8_t color_casilla:1;
+   AJD_Sprite* sprite;
 } AJD_Cursor;
 
 //AJD_Cursor _cursorSeleccion;
 typedef struct _AJD_Tablero
 {
    AJD_Casilla casilla[8*8];
-   AJD_Cursor cursor;
+   AJD_Cursor cursorPiezaSeleccionada;
+   AJD_Cursor cursorMovil;
 } AJD_Tablero;
 
 typedef struct _AJD_Tablero* AJD_TableroPtr;

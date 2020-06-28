@@ -10,6 +10,7 @@
 // FUNCIONES PRIVADAS (forward declarations)
 int _longitud2 (int dx, int dy);
 int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int distancia);
 void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
                     AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,7 @@ int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
             return compruebaPeon (tablero, &mov_info);
 
         case TORRE:
+            return compruebaTorre (tablero, &mov_info);
         case CABALLO:
         case ALFIL:
             return compruebaAlfil (tablero, &mov_info);
@@ -88,6 +90,8 @@ int  compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
         return (mov_info->srcY == filaPeones 
             && !hayPieza (tablero, mov_info->casilla_destino));
 
+    // TODO: PROMOCION ULTIMA FILA
+
     // Si llega a este punto consideramos el movimiento ilegal.
     return false;
 }
@@ -99,7 +103,7 @@ int  compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 //
 int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
-    // movimiento será válido si se mueve por las diagonales del
+    // El movimiento será válido si se mueve por las diagonales del
     // mismo color sin 'saltar' por encima de otras piezas
     AJD_Casilla casilla_destino = tablero->casilla[mov_info->casilla_destino];
     int seMueveEnDiagonal       = _compruebaDiagonales(tablero, mov_info);
@@ -109,6 +113,28 @@ int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
          || (seMueveEnDiagonal 
              && casillaOcupada 
              && (mov_info->color_pieza_origen != mov_info->color_pieza_destino));
+}
+////////////////////////////////////////////////////////////////////////////
+// compruebaTorre
+// 
+// Comprueba si el movimiento de una torre en casilla_origen hacia
+// casilla_destino es válido.
+//
+int compruebaTorre (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
+{
+    // El movimiento será válido si se mueve horizontal o vertical
+    // sin 'saltar' por encima de otras piezas
+    AJD_Casilla casilla_destino = tablero->casilla[mov_info->casilla_destino];
+    int seMueveHorzVert         = _compruebaHorzVert(tablero, mov_info, MAX_CASILLAS_TORRE);
+    int casillaOcupada          = hayPieza(tablero, casilla_destino.indice);
+
+    mvprintw(3,0, "Comprobando Torre");
+    return  (seMueveHorzVert && !casillaOcupada)
+         || (seMueveHorzVert 
+             && casillaOcupada 
+             && (mov_info->color_pieza_origen != mov_info->color_pieza_destino));    
+
+    //TODO: Enroque
 }
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
@@ -184,7 +210,7 @@ int hayPiezaValida (AJD_TableroPtr tablero, AJD_idCasilla idCasilla, AJD_Estado*
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PRIVADAS
 ////////////////////////////////////////////////////////////////////////////
-// compruebaDiagonales
+// _compruebaDiagonales
 // 
 // Comprueba si el movimiento de una pieza se está haciendo en diagonal
 // y no hay piezas obstaculizando el movimiento.
@@ -197,6 +223,31 @@ int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     // Movimiento es diagonal por casilla del mismo color
     if ((mov_info->dy == mov_info->dx) ||  
         (mov_info->dy == -mov_info->dx)) { 
+            return !hayPiezaEnTrayectoria (tablero, mov_info);
+    }
+
+    return 0;
+}
+////////////////////////////////////////////////////////////////////////////
+// _compruebaHorzVert
+// 
+// Comprueba si el movimiento de una pieza se está haciendo en horizontal
+// o vertical y no hay piezas obstaculizando el movimiento.
+//
+int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int distancia)
+{
+    int dx, dy;
+
+    dx = mov_info->dx;
+    dy = mov_info->dy;
+
+    mvprintw(4,0, "dy:%2d, dx:%2d", dy, dx);
+
+    // Movimiento invalido si se mueve mas lejos de lo permitido
+    if (dx > distancia || dy > distancia) return 0;
+
+    // Movimiento es horizontal/vertical y sin piezas que obstaculicen?
+    if (mov_info->dx == 0 || mov_info->dy== 0) {
             return !hayPiezaEnTrayectoria (tablero, mov_info);
     }
 

@@ -1,0 +1,5 @@
+src/interfaz.c:102:10: error: expected expression
+    ch = {
+         ^
+1 error generated.
+make: *** [Makefile:19: obj/interfaz.o] Error 1

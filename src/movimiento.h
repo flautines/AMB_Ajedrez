@@ -1,5 +1,19 @@
+#pragma once 
+
 #include <tablero.h>
 #include <juego.h>
+
+// Máximo número de casillas que pueden moverse la TORRE
+#define MAX_CASILLAS_TORRE 7  
+// Máximo número de casillas que pueden moverse el ALFIL
+#define MAX_CASILLAS_ALFIL 7  
+// Máximo número de casillas que pueden moverse la DAMA
+#define MAX_CASILLAS_DAMA 7  
+// Máximo número de casillas que puede moverse el PEON
+#define MAX_CASILLAS_PEON   1
+// Máximo número de casillas que puede moverse el REY
+#define MAX_CASILLAS_REY    1
+
 typedef struct _AJD_MovInfo {
     uint8_t casilla_origen:6;
     uint8_t casilla_destino:6;
@@ -33,6 +47,13 @@ int compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 // casilla_destino es válido.
 //
 int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+////////////////////////////////////////////////////////////////////////////
+// compruebaTorre
+// 
+// Comprueba si el movimiento de una torre en casilla_origen hacia
+// casilla_destino es válido.
+//
+int compruebaTorre (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
 // hayPiezaValida
 //
