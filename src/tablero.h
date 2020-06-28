@@ -1,4 +1,5 @@
 #pragma once
+#include <ncurses.h>
 #include <stdint.h>
 
 // BOOL typedef
@@ -32,8 +33,9 @@ typedef struct _AJD_Casilla
 
 ////////////////////////////////////////////////////////////////////////////
 // Cursor de selección de pieza
+#define NCHARS_IN_SPRITE 9
 typedef struct _AJD_Sprite {
-   char ch[9];
+   chtype ch[NCHARS_IN_SPRITE];
 } AJD_Sprite;
 
 typedef struct 

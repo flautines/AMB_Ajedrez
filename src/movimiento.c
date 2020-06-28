@@ -2,8 +2,8 @@
 #include <utils.h>
 #include <stdlib.h>
 
-#include <ncurses.h>
-
+// el uso de ncurses es temporal, mientras se depuran los movimientos
+//#include <ncurses.h>
 #ifndef NULL
 #define NULL 0
 #endif
@@ -31,7 +31,7 @@ int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
     _obtenMovInfo (tablero, estado_juego, &mov_info);
     pieza = tablero->casilla[mov_info.casilla_origen].pieza;
 
-    mvprintw (3,0, "pieza: %c",  " PTCADR"[pieza]);
+    //mvprintw (3,0, "pieza: %c",  " PTCADR"[pieza]);
     switch (pieza)
     {        
         // En principio no recibiremos nunca NONE, pero por si acaso...
@@ -73,7 +73,7 @@ int  compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     //    
     int dir         = mov_info->color_pieza_origen ? -1 : 1;
     int filaPeones  = mov_info->color_pieza_origen ? 6 : 1;
-    mvprintw (4,0, "dir: %d, filaPeones: %d", dir, filaPeones);
+    //mvprintw (4,0, "dir: %d, filaPeones: %d", dir, filaPeones);
 
     // El peon sólo puede mover "hacia adelante", excepto
     // para comer (digaonal adyacente) o si es el primer
@@ -202,7 +202,7 @@ int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
         // de casillas.
         idCasilla = (casillaY << 3) + casillaX;
 
-        mvprintw (5+t,0, "Comprobando idCasilla: %2d", idCasilla);
+        //mvprintw (5+t,0, "Comprobando idCasilla: %2d", idCasilla);
         
         if (hayPieza (tablero, idCasilla) && idCasilla != casilla_destino)
             return 1;
@@ -238,7 +238,7 @@ int hayPiezaValida (AJD_TableroPtr tablero, AJD_idCasilla idCasilla, AJD_Estado*
 int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
 
-    mvprintw(2,0, "dy:%d, dx:%d", mov_info->dy, mov_info->dx);
+    //mvprintw(2,0, "dy:%d, dx:%d", mov_info->dy, mov_info->dx);
 
     // Movimiento es diagonal por casilla del mismo color
     if ((mov_info->dy == mov_info->dx) ||  
@@ -261,7 +261,7 @@ int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int dista
     dx = mov_info->dx;
     dy = mov_info->dy;
 
-    mvprintw(4,0, "dy:%2d, dx:%2d", dy, dx);
+    //mvprintw(4,0, "dy:%2d, dx:%2d", dy, dx);
 
     // Movimiento invalido si se mueve mas lejos de lo permitido
     if (dx > distancia || dy > distancia) return 0;
@@ -280,7 +280,7 @@ int _compruebaMovEnL (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     dx = mov_info->dx;
     dy = mov_info->dy;
 
-    mvprintw(4,0, "dy:%2d, dx:%2d", dy, dx);
+    //mvprintw(4,0, "dy:%2d, dx:%2d", dy, dx);
 
     return (abs (dx) == 2 && abs (dy) == 1)
         || (abs (dy) == 2 && abs (dx) == 1);

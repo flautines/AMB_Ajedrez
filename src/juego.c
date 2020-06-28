@@ -27,11 +27,12 @@ AJD_Estado estado_juego;   // Estado del juego
 //
 void inicializa(AJD_TableroPtr tablero)
 {
-   // El cursor de seleccion es visible y sin flash
+   // El cursor movil es visible y sin flash
+   // El cursor de pieza seleccionada no es visible y con flash
    tablero->cursorMovil.visible = 1;
    tablero->cursorPiezaSeleccionada.visible = 0;
    tablero->cursorMovil.flash = 0;
-   tablero->cursorPiezaSeleccionada.flash = 0;
+   tablero->cursorPiezaSeleccionada.flash = 1;
 
    AJD_Color color = NEGRO;
    AJD_idCasilla indice = 0;

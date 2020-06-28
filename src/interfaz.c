@@ -92,22 +92,23 @@ void inicializaPantalla()
 void inicializaSprites(AJD_TableroPtr tablero)
 {
     // Definicion de los cursores
-    /*char ch[9] = {
-    ACS_ULCORNER, ACS_BULLET, ACS_URCORNER ,
-    ACS_BULLET  , ACS_BULLET, ACS_BULLET   ,
-    ACS_LLCORNER, ACS_BULLET, ACS_LRCORNER
-};
-    memcpy((void*)sprCursorMovil.ch, (void*)ch, 9);
-
-    char ch2[9] = {
+    chtype charsCursorMovil[] = {
+        ACS_ULCORNER, '.', ACS_URCORNER, 
+        '.','.','.', 
+        ACS_LLCORNER, '.', ACS_LRCORNER,
+    };
+    chtype charsCursorPiezaSeleccionada[] = {
         ACS_ULCORNER, ACS_HLINE  , ACS_URCORNER ,
-        ACS_VLINE   , ACS_BULLET , ACS_VLINE    ,
+        ACS_VLINE   , '.'        , ACS_VLINE    ,
         ACS_LLCORNER, ACS_HLINE  , ACS_LRCORNER 
     };
-    memcpy((void*)sprCursorPiezaSeleccionada.ch, (void*)ch2, 9);
-*/
-    strncpy (sprCursorMovil.ch, "+.+...+.+", 9); 
-    strncpy (sprCursorPiezaSeleccionada.ch, "+-+|.|+-+",9);
+    
+    memcpy (sprCursorMovil.ch, charsCursorMovil, 
+            NCHARS_IN_SPRITE*sizeof(chtype));
+
+    memcpy (sprCursorPiezaSeleccionada.ch, charsCursorPiezaSeleccionada, 
+            NCHARS_IN_SPRITE*sizeof(chtype));
+
     tablero->cursorMovil.sprite = &sprCursorMovil;
     tablero->cursorPiezaSeleccionada.sprite = &sprCursorPiezaSeleccionada;
 }
@@ -262,7 +263,7 @@ void dibujaCursor (AJD_Cursor cursor)
     mvprintw (50,0, "cursor.color_casilla: %s", 
               cursor.color_casilla == BLANCO ? "BLANCO" : "NEGRO");
 
-    char* ch = &(cursor.sprite->ch[0]);
+    chtype* ch = &(cursor.sprite->ch[0]);
 
     for (int dy=0; dy<ALTO_CASILLA; dy++)
     {    
@@ -420,7 +421,7 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
                 estado->casilla_seleccionada = 1;
                 estado->casilla_origen = tablero->cursorMovil.idCasilla;
                 tablero->cursorPiezaSeleccionada.idCasilla = tablero->cursorMovil.idCasilla;
-                //mvprintw (1,0, "Origen %d", estado->casilla_origen);
+                tablero->cursorPiezaSeleccionada.color_casilla = tablero->cursorMovil.color_casilla;
             }
             else
             {
