@@ -55,6 +55,13 @@ int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 //
 int compruebaTorre (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
+// compruebaCaballo
+// 
+// Comprueba si el movimiento de un caballo en casilla_origen hacia
+// casilla_destino es válido.
+//
+int compruebaCaballo (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+////////////////////////////////////////////////////////////////////////////
 // hayPiezaValida
 //
 // Comprueba si la casilla seleccionada por el cursor contiene una pieza

@@ -1,5 +1,6 @@
 #include <movimiento.h>
 #include <utils.h>
+#include <stdlib.h>
 
 #include <ncurses.h>
 
@@ -11,6 +12,7 @@
 int _longitud2 (int dx, int dy);
 int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int distancia);
+int _compruebaMovEnL (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
                     AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
@@ -41,7 +43,10 @@ int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
 
         case TORRE:
             return compruebaTorre (tablero, &mov_info);
+
         case CABALLO:
+            return compruebaCaballo (tablero, &mov_info);
+
         case ALFIL:
             return compruebaAlfil (tablero, &mov_info);
 
@@ -110,9 +115,8 @@ int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     int casillaOcupada          = hayPieza(tablero, casilla_destino.indice);
 
     return  (seMueveEnDiagonal && !casillaOcupada)
-         || (seMueveEnDiagonal 
-             && casillaOcupada 
-             && (mov_info->color_pieza_origen != mov_info->color_pieza_destino));
+         || (seMueveEnDiagonal && casillaOcupada && 
+            (mov_info->color_pieza_origen != mov_info->color_pieza_destino));
 }
 ////////////////////////////////////////////////////////////////////////////
 // compruebaTorre
@@ -125,16 +129,32 @@ int compruebaTorre (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
     // El movimiento será válido si se mueve horizontal o vertical
     // sin 'saltar' por encima de otras piezas
     AJD_Casilla casilla_destino = tablero->casilla[mov_info->casilla_destino];
-    int seMueveHorzVert         = _compruebaHorzVert(tablero, mov_info, MAX_CASILLAS_TORRE);
-    int casillaOcupada          = hayPieza(tablero, casilla_destino.indice);
+    int seMueveHorzVert         = _compruebaHorzVert (tablero, mov_info, MAX_CASILLAS_TORRE);
+    int casillaOcupada          = hayPieza (tablero, casilla_destino.indice);
 
-    mvprintw(3,0, "Comprobando Torre");
     return  (seMueveHorzVert && !casillaOcupada)
-         || (seMueveHorzVert 
-             && casillaOcupada 
-             && (mov_info->color_pieza_origen != mov_info->color_pieza_destino));    
+         || (seMueveHorzVert && casillaOcupada && 
+            (mov_info->color_pieza_origen != mov_info->color_pieza_destino));    
 
     //TODO: Enroque
+}
+////////////////////////////////////////////////////////////////////////////
+// compruebaCaballo
+// 
+// Comprueba si el movimiento de un caballo en casilla_origen hacia
+// casilla_destino es válido.
+//
+int compruebaCaballo (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
+{
+    AJD_Casilla casilla_destino = tablero->casilla[mov_info->casilla_destino];
+    int seMueveEnL              = _compruebaMovEnL (tablero, mov_info);
+    int casillaOcupada          = hayPieza(tablero, casilla_destino.indice);
+
+    // El movimiento será válido si se mueve en L a una casilla libre
+    // o se mueve en L y come una pieza enemiga.
+    return (seMueveEnL && !casillaOcupada) 
+        || (seMueveEnL && casillaOcupada &&
+            mov_info->color_pieza_origen != mov_info->color_pieza_destino);
 }
 ////////////////////////////////////////////////////////////////////////////
 // hayPieza
@@ -253,6 +273,18 @@ int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int dista
 
     return 0;
 }
+int _compruebaMovEnL (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
+{
+    int dx, dy;
+
+    dx = mov_info->dx;
+    dy = mov_info->dy;
+
+    mvprintw(4,0, "dy:%2d, dx:%2d", dy, dx);
+
+    return (abs (dx) == 2 && abs (dy) == 1)
+        || (abs (dy) == 2 && abs (dx) == 1);
+}
 ////////////////////////////////////////////////////////////////////////////
 // _obtenMovInfo
 // 
@@ -279,12 +311,4 @@ void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
     mov_info->dstX = casilla_destino & 7;
     mov_info->dy = mov_info->dstY - mov_info->srcY;
     mov_info->dx = mov_info->dstX - mov_info->srcX;
-}
-// _longitud2
-// 
-// Devuelve longitud del vector al cuadrado
-//
-int _longitud2 (int dx, int dy)
-{
-    return (dx*dx + dy*dy);
 }
