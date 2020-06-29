@@ -209,7 +209,7 @@ void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color)
 ////////////////////////////////////////////////////////////////////////////
 // dibujaMarcadores Dibuja los marcadores de tiempo, turno, etc.
 //
-void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
+void dibujaMarcadores(uint16_t turno, AJD_Estado* estado_juego)
 {
     int x,y;
 
@@ -233,11 +233,21 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado)
 
     y = MARCADOR_LAST_ROW - 1;
     move (y,x);
-    printw ("Turno %02d (Jugador %c)", turno, estado->turno_jugador+'1');
+    printw ("Turno %02d (Jugador %c)", turno, estado_juego->turno_jugador+'1');
 
     y += 1;
     move (y,x);
-    printw ("Juegan %s", estado->juegan_blancas ? "blancas" : "negras ");
+    printw ("Juegan %s", estado_juego->juegan_blancas ? "blancas" : "negras ");
+
+    // Debug info
+    mvprintw (MARCADOR_LAST_ROW+2, 0, "ttr | TTR");
+    mvprintw (MARCADOR_LAST_ROW+3, 0, "%c%c%c | %c%c%c",
+        estado_juego->torre_8a_movida ? 'X' : '.',
+        estado_juego->torre_8h_movida ? 'X' : '.',
+        estado_juego->rey_negro_movido ? 'X' : '.',
+        estado_juego->torre_1a_movida ? 'X' : '.',
+        estado_juego->torre_1h_movida ? 'X' : '.',
+        estado_juego->rey_blanco_movido ? 'X' : '.');
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaCursor Dibuja el cursor de seleccion
@@ -260,8 +270,6 @@ void dibujaCursor (AJD_Cursor cursor)
         attron (A_REVERSE);
     else
         attroff (A_REVERSE);
-    mvprintw (50,0, "cursor.color_casilla: %s", 
-              cursor.color_casilla == BLANCO ? "BLANCO" : "NEGRO");
 
     chtype* ch = &(cursor.sprite->ch[0]);
 

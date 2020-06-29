@@ -132,9 +132,7 @@ void actualizaJuego (AJD_TableroPtr tablero)
    case 2:
       if (esMovimientoValido (tablero, &estado_juego))
       {
-         muevePieza (tablero, 
-                     estado_juego.casilla_origen, 
-                     estado_juego.casilla_destino);
+         muevePieza (tablero, &estado_juego);
 
          estado_juego.turno_jugador ^= 1;
          estado_juego.juegan_blancas ^= 1;
@@ -153,19 +151,7 @@ void actualizaJuego (AJD_TableroPtr tablero)
       break;
    }
 }
-////////////////////////////////////////////////////////////////////////////
-// muevePieza
-//
-// Mueve una pieza desde una casilla origen a una casilla destino
-void muevePieza (AJD_TableroPtr tablero, uint8_t casilla_origen, uint8_t casilla_destino)
-{
-   AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
-   AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;   
 
-   tablero->casilla[casilla_origen].pieza        = NONE;
-   tablero->casilla[casilla_destino].pieza       = pieza_a_mover;
-   tablero->casilla[casilla_destino].color_pieza = color_pieza;
-}
 ////////////////////////////////////////////////////////////////////////////
 // INTERFAZ PRIVADA
 ////////////////////////////////////////////////////////////////////////////

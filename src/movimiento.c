@@ -3,21 +3,93 @@
 #include <stdlib.h>
 
 // el uso de ncurses es temporal, mientras se depuran los movimientos
-//#include <ncurses.h>
+#include <ncurses.h>
 #ifndef NULL
 #define NULL 0
 #endif
 
 // FUNCIONES PRIVADAS (forward declarations)
-int _longitud2 (int dx, int dy);
-int _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
-int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int distancia);
-int _compruebaMovEnL (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
-void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
-                    AJD_MovInfo* mov_info);
+int  _compruebaDiagonales (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+int  _compruebaHorzVert   (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int distancia);
+int  _compruebaEnroque    (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
+                            AJD_MovInfo* mov_info);
+int  _compruebaMovEnL     (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+void _obtenMovInfo        (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
+                            AJD_MovInfo* mov_info);
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PUBLICAS 
 ////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// muevePieza
+//
+// Mueve una pieza desde una casilla origen a una casilla destino
+//
+// void muevePieza (AJD_TableroPtr tablero, uint8_t casilla_origen, uint8_t casilla_destino)
+void muevePieza (AJD_TableroPtr tablero, AJD_Estado* estado_juego) 
+{
+   //AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
+   //AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;
+    AJD_idCasilla casilla_origen = estado_juego->casilla_origen;
+    AJD_idCasilla casilla_destino = estado_juego->casilla_destino;
+    AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
+    AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;
+
+   // marcar torre y/o rey movido si es necesario
+   switch (pieza_a_mover)
+   {
+      case TORRE:
+      {
+        AJD_MovInfo mov_info;
+        _obtenMovInfo (tablero, estado_juego, &mov_info);
+        int enroque = _compruebaEnroque (tablero, estado_juego, &mov_info);
+        
+        if (color_pieza == BLANCO)
+        {
+            if (!estado_juego->torre_1a_movida) 
+            {
+               estado_juego->torre_1a_movida = 
+                  (casilla_origen == ENROQUE_LARGO_ORIGEN_T_BLANCA);
+            }
+            else if (!estado_juego->torre_1h_movida) 
+            {
+               estado_juego->torre_1h_movida = 
+                  (casilla_origen == ENROQUE_CORTO_ORIGEN_T_BLANCA);
+            }            
+        }
+        else 
+        {
+            if (!estado_juego->torre_8a_movida) 
+            {
+               estado_juego->torre_8a_movida = 
+                  (casilla_origen == ENROQUE_LARGO_ORIGEN_T_NEGRA);
+            }         
+            else if (!estado_juego->torre_8a_movida)
+            {
+               estado_juego->torre_8h_movida = 
+               (casilla_origen == ENROQUE_CORTO_ORIGEN_T_NEGRA);  
+           }
+        }
+
+        mvprintw (50, 0, "%s", enroque ? "O-O" : "   "); 
+        break;
+    }
+    case REY:
+        if (color_pieza == BLANCO) {
+            if (!estado_juego->rey_blanco_movido)
+               estado_juego->rey_blanco_movido = 1;        
+        }
+        else if (!estado_juego->rey_negro_movido)
+            estado_juego->rey_negro_movido = 1;
+        break;
+
+    default:
+        break;
+    }
+
+    tablero->casilla[casilla_origen].pieza        = NONE;
+    tablero->casilla[casilla_destino].pieza       = pieza_a_mover;
+    tablero->casilla[casilla_destino].color_pieza = color_pieza;
+}
 // esMovimientoValido
 //
 // Comprueba si el movimiento de la pieza en casilla_origen hacia
@@ -41,7 +113,7 @@ int  esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estado_juego)
         case PEON:
             return compruebaPeon (tablero, &mov_info);
 
-        case TORRE:
+        case TORRE:            
             return compruebaTorre (tablero, &mov_info);
 
         case CABALLO:
@@ -134,9 +206,7 @@ int compruebaTorre (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 
     return  (seMueveHorzVert && !casillaOcupada)
          || (seMueveHorzVert && casillaOcupada && 
-            (mov_info->color_pieza_origen != mov_info->color_pieza_destino));    
-
-    //TODO: Enroque
+            (mov_info->color_pieza_origen != mov_info->color_pieza_destino));
 }
 ////////////////////////////////////////////////////////////////////////////
 // compruebaCaballo
@@ -273,6 +343,71 @@ int _compruebaHorzVert (AJD_TableroPtr tablero, AJD_MovInfo* mov_info, int dista
 
     return 0;
 }
+////////////////////////////////////////////////////////////////////////////
+// _compruebaEnroque
+// 
+// Comprueba si el movimiento de una pieza es un enroque válido
+//
+int _compruebaEnroque (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
+                       AJD_MovInfo* mov_info)
+{
+    AJD_idCasilla casilla_origen = estado_juego->casilla_origen;
+    AJD_idCasilla casilla_destino = estado_juego->casilla_destino;
+    int caminoOcupado, casillaOcupada;
+    
+    int enroquePermitidoBlancas = 
+        !(estado_juego->rey_blanco_movido || 
+          estado_juego->torre_1a_movida   || estado_juego->torre_1h_movida);
+
+    int enroquePermitidoNegras = 
+        !(estado_juego->rey_negro_movido  || 
+          estado_juego->torre_8a_movida   || estado_juego->torre_8h_movida);
+
+    // El camino y la casilla destino deben estar libres
+    caminoOcupado = hayPiezaEnTrayectoria (tablero, mov_info);
+    casillaOcupada = hayPieza (tablero, casilla_destino);
+    if (caminoOcupado || casillaOcupada) 
+        return 0;
+
+    // Juegan BLANCAS y pueden enrocar, comprobemos si el movimiento es valido
+    if (enroquePermitidoBlancas) // && juegan_blancas)
+    {
+        switch (casilla_origen) {
+            case ENROQUE_LARGO_ORIGEN_T_BLANCA:                
+                return casilla_destino == ENROQUE_LARGO_DESTINO_T_BLANCA;
+
+            case ENROQUE_CORTO_ORIGEN_T_BLANCA:
+                return casilla_destino == ENROQUE_CORTO_DESTINO_T_BLANCA;
+
+            case ENROQUE_ORIGEN_R_BLANCO:
+                return (casilla_destino == ENROQUE_LARGO_DESTINO_R_BLANCO 
+                    ||  casilla_destino == ENROQUE_CORTO_DESTINO_R_BLANCO);
+        }
+    }
+    // Juegan NEGRAS y pueden enrocar, comprobemos si el movimiento es valido
+    if (enroquePermitidoNegras) // && !juegan_blancas)
+    {
+        switch (casilla_origen) {
+            case ENROQUE_LARGO_ORIGEN_T_NEGRA:
+                return casilla_destino == ENROQUE_LARGO_DESTINO_T_NEGRA;
+
+            case ENROQUE_CORTO_ORIGEN_T_NEGRA:
+                return casilla_destino == ENROQUE_CORTO_DESTINO_T_NEGRA;
+
+            case ENROQUE_ORIGEN_R_NEGRO:
+                return (casilla_destino == ENROQUE_LARGO_DESTINO_R_NEGRO 
+                    ||  casilla_destino == ENROQUE_CORTO_DESTINO_R_NEGRO);
+        }
+    }
+
+    // Si llegamos a este punto el enroque no es valido
+    return 0;
+}
+////////////////////////////////////////////////////////////////////////////
+// _compruebaMovEnL
+// 
+// Comprueba si el movimiento de una pieza se está haciendo forma de L
+//
 int _compruebaMovEnL (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 {
     int dx, dy;
@@ -295,8 +430,8 @@ int _compruebaMovEnL (AJD_TableroPtr tablero, AJD_MovInfo* mov_info)
 void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
                     AJD_MovInfo* mov_info)
 {
-    uint8_t casilla_origen; 
-    uint8_t casilla_destino;
+    AJD_idCasilla casilla_origen; 
+    AJD_idCasilla casilla_destino;
 
     casilla_origen  = estado_juego->casilla_origen;
     casilla_destino = estado_juego->casilla_destino;

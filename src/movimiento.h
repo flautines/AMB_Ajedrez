@@ -14,9 +14,26 @@
 // Máximo número de casillas que puede moverse el REY
 #define MAX_CASILLAS_REY    1
 
+// id casillas involucrados en un enroque
+#define ENROQUE_LARGO_ORIGEN_T_BLANCA   56  // T BLANCA desde 1a
+#define ENROQUE_LARGO_DESTINO_T_BLANCA  59  // T BLANCA hacia 1d
+#define ENROQUE_CORTO_ORIGEN_T_BLANCA   63  // T BLANCA desde 1h
+#define ENROQUE_CORTO_DESTINO_T_BLANCA  61  // T BLANCA hacia 1f
+#define ENROQUE_LARGO_ORIGEN_T_NEGRA     0  // T NEGA   desde 8a
+#define ENROQUE_LARGO_DESTINO_T_NEGRA    3  // T NEGA   hacia 8d
+#define ENROQUE_CORTO_ORIGEN_T_NEGRA     7  // T NEGA   desde 8h
+#define ENROQUE_CORTO_DESTINO_T_NEGRA    5  // T NEGA   hacia 8f
+#define ENROQUE_ORIGEN_R_BLANCO         60  // R BLANCO desde 1e
+#define ENROQUE_LARGO_DESTINO_R_BLANCO  58  // R BLANCO hacia 1c
+#define ENROQUE_CORTO_DESTINO_R_BLANCO  62  // R BLANCO hacia 1h
+#define ENROQUE_ORIGEN_R_NEGRO           4  // R NEGRO  desde 8e
+#define ENROQUE_LARGO_DESTINO_R_NEGRO    2  // R NEGRO  hacia 8c
+#define ENROQUE_CORTO_DESTINO_R_NEGRO    6  // R NEGRO  hacia 8h
+
+
 typedef struct _AJD_MovInfo {
-    uint8_t casilla_origen:6;
-    uint8_t casilla_destino:6;
+    AJD_idCasilla casilla_origen;
+    AJD_idCasilla casilla_destino;
     AJD_Color color_pieza_origen;
     AJD_Color color_pieza_destino;
     uint8_t srcY:3;
@@ -26,6 +43,12 @@ typedef struct _AJD_MovInfo {
     int dy:4;
     int dx:4;
 } AJD_MovInfo;
+////////////////////////////////////////////////////////////////////////////
+// muevePieza
+//
+// Mueve una pieza desde una casilla origen a una casilla destino
+//
+void muevePieza (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
 ////////////////////////////////////////////////////////////////////////////
 // esMovimientoValido
 //
