@@ -240,14 +240,14 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado_juego)
     printw ("Juegan %s", estado_juego->juegan_blancas ? "blancas" : "negras ");
 
     // Debug info
-    mvprintw (MARCADOR_LAST_ROW+2, 0, "ttr | TTR");
-    mvprintw (MARCADOR_LAST_ROW+3, 0, "%c%c%c | %c%c%c",
-        estado_juego->torre_8a_movida ? 'X' : '.',
-        estado_juego->torre_8h_movida ? 'X' : '.',
-        estado_juego->rey_negro_movido ? 'X' : '.',
-        estado_juego->torre_1a_movida ? 'X' : '.',
-        estado_juego->torre_1h_movida ? 'X' : '.',
-        estado_juego->rey_blanco_movido ? 'X' : '.');
+    mvprintw (MARCADOR_LAST_ROW+2, 0, "Enroque largo permitido (BLANCAS): %s", 
+              estado_juego->enroque_largo_blanco_invalidado ? "NO" : "SI");
+    mvprintw (MARCADOR_LAST_ROW+3, 0, "Enroque corto permitido (BLANCAS): %s", 
+              estado_juego->enroque_corto_blanco_invalidado ? "NO" : "SI");
+    mvprintw (MARCADOR_LAST_ROW+4, 0, "Enroque largo permitido (NEGRAS): %s",
+              estado_juego->enroque_largo_negro_invalidado ? "NO" : "SI");
+    mvprintw (MARCADOR_LAST_ROW+5, 0, "Enroque corto permitido (NEGRAS): %s", 
+              estado_juego->enroque_corto_negro_invalidado ? "NO" : "SI");
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaCursor Dibuja el cursor de seleccion

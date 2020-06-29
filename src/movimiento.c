@@ -16,6 +16,8 @@ int  _compruebaEnroque    (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
 int  _compruebaMovEnL     (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
 void _obtenMovInfo        (AJD_TableroPtr tablero, AJD_Estado* estado_juego, 
                             AJD_MovInfo* mov_info);
+void _efectuaMovimiento   (AJD_TableroPtr tablero, AJD_idCasilla desde, AJD_idCasilla hacia, 
+                           AJD_Pieza pieza, AJD_Color color_pieza);
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PUBLICAS 
 ////////////////////////////////////////////////////////////////////////////
@@ -27,68 +29,115 @@ void _obtenMovInfo        (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
 // void muevePieza (AJD_TableroPtr tablero, uint8_t casilla_origen, uint8_t casilla_destino)
 void muevePieza (AJD_TableroPtr tablero, AJD_Estado* estado_juego) 
 {
-   //AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
-   //AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;
+    int enroque;
     AJD_idCasilla casilla_origen = estado_juego->casilla_origen;
     AJD_idCasilla casilla_destino = estado_juego->casilla_destino;
     AJD_Pieza pieza_a_mover = tablero->casilla[casilla_origen].pieza;   
     AJD_Color color_pieza   = tablero->casilla[casilla_origen].color_pieza;
 
-   // marcar torre y/o rey movido si es necesario
-   switch (pieza_a_mover)
-   {
-      case TORRE:
-      {
+    // invalidar enroque largo/corto si se mueve el REY o TORRE de cada lado.
+    if (pieza_a_mover == TORRE || pieza_a_mover == REY)
+    {        
         AJD_MovInfo mov_info;
         _obtenMovInfo (tablero, estado_juego, &mov_info);
-        int enroque = _compruebaEnroque (tablero, estado_juego, &mov_info);
+        enroque = _compruebaEnroque (tablero, estado_juego, &mov_info);
         
         if (color_pieza == BLANCO)
-        {
-            if (!estado_juego->torre_1a_movida) 
+        {            
+            if (pieza_a_mover == REY)
             {
-               estado_juego->torre_1a_movida = 
-                  (casilla_origen == ENROQUE_LARGO_ORIGEN_T_BLANCA);
+                estado_juego->enroque_largo_blanco_invalidado = 1;
+                estado_juego->enroque_corto_blanco_invalidado = 1;
+
+                if (enroque)
+                {
+                    // Mueve la otra pieza (el rey se moverá cuando actualicemos la seleccionada)
+                    if (casilla_destino == ENROQUE_LARGO_DESTINO_R_BLANCO)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_LARGO_ORIGEN_T_BLANCA, ENROQUE_LARGO_DESTINO_T_BLANCA,
+                            TORRE,
+                            BLANCO);
+
+                    else if (casilla_destino == ENROQUE_CORTO_DESTINO_R_BLANCO)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_CORTO_ORIGEN_T_BLANCA, ENROQUE_CORTO_DESTINO_T_BLANCA,
+                            TORRE,
+                            BLANCO);
+                }
+
             }
-            else if (!estado_juego->torre_1h_movida) 
+            if (pieza_a_mover == TORRE) 
             {
-               estado_juego->torre_1h_movida = 
-                  (casilla_origen == ENROQUE_CORTO_ORIGEN_T_BLANCA);
-            }            
+                estado_juego->enroque_largo_blanco_invalidado |= (casilla_origen == ENROQUE_LARGO_ORIGEN_T_BLANCA)||enroque;
+                estado_juego->enroque_corto_blanco_invalidado |= (casilla_origen == ENROQUE_CORTO_ORIGEN_T_BLANCA)||enroque;
+                if (enroque)
+                {
+                    // Mueve la otra pieza (el rey se moverá cuando actualicemos la seleccionada)
+                    if (casilla_destino == ENROQUE_LARGO_DESTINO_T_BLANCA)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_ORIGEN_R_BLANCO, ENROQUE_LARGO_DESTINO_R_BLANCO,
+                            REY,
+                            BLANCO);
+                    else if (casilla_destino == ENROQUE_CORTO_DESTINO_T_BLANCA)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_ORIGEN_R_BLANCO, ENROQUE_CORTO_DESTINO_R_BLANCO,
+                            REY,
+                            BLANCO);
+                }                
+            }
         }
-        else 
+        else // pieza a mover es NEGRA
+        {         
+            if (pieza_a_mover == REY)
+            {
+                estado_juego->enroque_largo_negro_invalidado = 1;
+                estado_juego->enroque_corto_negro_invalidado = 1;
+                if (enroque)
+                {
+                    // Mueve la otra pieza (el rey se moverá cuando actualicemos la seleccionada)
+                    if (casilla_destino == ENROQUE_LARGO_DESTINO_R_NEGRO)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_LARGO_ORIGEN_T_NEGRA, ENROQUE_LARGO_DESTINO_T_NEGRA,
+                            TORRE,
+                            NEGRO);
+                    
+                    else if (casilla_destino == ENROQUE_CORTO_DESTINO_R_NEGRO)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_CORTO_ORIGEN_T_NEGRA, ENROQUE_CORTO_DESTINO_T_NEGRA,
+                            TORRE,
+                            NEGRO);
+                }                
+            }
+            if (pieza_a_mover == TORRE) 
+            {
+                estado_juego->enroque_largo_negro_invalidado |= (casilla_origen == ENROQUE_LARGO_ORIGEN_T_NEGRA)||enroque;
+                estado_juego->enroque_corto_negro_invalidado |= (casilla_origen == ENROQUE_CORTO_ORIGEN_T_NEGRA)||enroque;
+                if (enroque)
+                {
+                    // Mueve la otra pieza (el rey se moverá cuando actualicemos la seleccionada)
+                    if (casilla_destino == ENROQUE_LARGO_DESTINO_T_BLANCA)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_ORIGEN_R_NEGRO, ENROQUE_LARGO_DESTINO_R_NEGRO,
+                            REY,
+                            NEGRO);
+                    else if (casilla_destino == ENROQUE_CORTO_DESTINO_T_NEGRA)
+                        _efectuaMovimiento (tablero, 
+                            ENROQUE_ORIGEN_R_NEGRO, ENROQUE_CORTO_DESTINO_R_NEGRO,
+                            REY,
+                            NEGRO);
+                }                
+            }
+        }
+        if (enroque)
         {
-            if (!estado_juego->torre_8a_movida) 
-            {
-               estado_juego->torre_8a_movida = 
-                  (casilla_origen == ENROQUE_LARGO_ORIGEN_T_NEGRA);
-            }         
-            else if (!estado_juego->torre_8a_movida)
-            {
-               estado_juego->torre_8h_movida = 
-               (casilla_origen == ENROQUE_CORTO_ORIGEN_T_NEGRA);  
-           }
+            mvprintw (50,0, "Enroque (%s)", color_pieza ? "BLANCAS" : "NEGRAS");
         }
+    } // Movimiento TORRE o REY
 
-        mvprintw (50, 0, "%s", enroque ? "O-O" : "   "); 
-        break;
-    }
-    case REY:
-        if (color_pieza == BLANCO) {
-            if (!estado_juego->rey_blanco_movido)
-               estado_juego->rey_blanco_movido = 1;        
-        }
-        else if (!estado_juego->rey_negro_movido)
-            estado_juego->rey_negro_movido = 1;
-        break;
+    _efectuaMovimiento (tablero, casilla_origen, casilla_destino, pieza_a_mover, color_pieza);
 
-    default:
-        break;
-    }
+    // TODO: Movimiento enroque segunda pieza
 
-    tablero->casilla[casilla_origen].pieza        = NONE;
-    tablero->casilla[casilla_destino].pieza       = pieza_a_mover;
-    tablero->casilla[casilla_destino].color_pieza = color_pieza;
 }
 // esMovimientoValido
 //
@@ -355,14 +404,6 @@ int _compruebaEnroque (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
     AJD_idCasilla casilla_destino = estado_juego->casilla_destino;
     int caminoOcupado, casillaOcupada;
     
-    int enroquePermitidoBlancas = 
-        !(estado_juego->rey_blanco_movido || 
-          estado_juego->torre_1a_movida   || estado_juego->torre_1h_movida);
-
-    int enroquePermitidoNegras = 
-        !(estado_juego->rey_negro_movido  || 
-          estado_juego->torre_8a_movida   || estado_juego->torre_8h_movida);
-
     // El camino y la casilla destino deben estar libres
     caminoOcupado = hayPiezaEnTrayectoria (tablero, mov_info);
     casillaOcupada = hayPieza (tablero, casilla_destino);
@@ -370,7 +411,7 @@ int _compruebaEnroque (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
         return 0;
 
     // Juegan BLANCAS y pueden enrocar, comprobemos si el movimiento es valido
-    if (enroquePermitidoBlancas) // && juegan_blancas)
+    if (!(estado_juego->enroque_largo_blanco_invalidado && estado_juego->enroque_corto_blanco_invalidado))
     {
         switch (casilla_origen) {
             case ENROQUE_LARGO_ORIGEN_T_BLANCA:                
@@ -385,7 +426,7 @@ int _compruebaEnroque (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
         }
     }
     // Juegan NEGRAS y pueden enrocar, comprobemos si el movimiento es valido
-    if (enroquePermitidoNegras) // && !juegan_blancas)
+    if (!(estado_juego->enroque_largo_negro_invalidado && estado_juego->enroque_corto_negro_invalidado))
     {
         switch (casilla_origen) {
             case ENROQUE_LARGO_ORIGEN_T_NEGRA:
@@ -447,3 +488,18 @@ void _obtenMovInfo (AJD_TableroPtr tablero, AJD_Estado* estado_juego,
     mov_info->dy = mov_info->dstY - mov_info->srcY;
     mov_info->dx = mov_info->dstX - mov_info->srcX;
 }
+
+
+////////////////////////////////////////////////////////////////////////////
+// _efecturaMovimiento
+// 
+// Realiza un movimiento de la pieza indicada desde la casilla origen
+// a casilla destino indicada por 'estado_juego'. 
+// 
+void _efectuaMovimiento   (AJD_TableroPtr tablero, AJD_idCasilla desde, AJD_idCasilla hacia, 
+                           AJD_Pieza pieza_a_mover, AJD_Color color_pieza)
+{
+    tablero->casilla[desde].pieza        = NONE;
+    tablero->casilla[hacia].pieza       = pieza_a_mover;
+    tablero->casilla[hacia].color_pieza = color_pieza;
+}                               

@@ -9,12 +9,12 @@ typedef struct _AJD_Estado
    uint8_t juegan_blancas      : 1; 
    uint8_t negro_jaque         : 1; 
    uint8_t blanco_jaque        : 1; 
-   uint8_t torre_8a_movida     : 1; // T NEGRA  izq
-   uint8_t torre_8h_movida     : 1; // T NEGRA  der
-   uint8_t torre_1a_movida     : 1; // T BLANCA izq
-   uint8_t torre_1h_movida     : 1; // T BLANCA der
-   uint8_t rey_negro_movido    : 1; 
-   uint8_t rey_blanco_movido   : 1; 
+   uint8_t enroque_largo_blanco_invalidado  : 1;
+   uint8_t enroque_corto_blanco_invalidado  : 1;
+   uint8_t enroque_largo_negro_invalidado  : 1;
+   uint8_t enroque_corto_negro_invalidado  : 1;
+   //uint8_t rey_negro_movido    : 1; 
+   //uint8_t rey_blanco_movido   : 1; 
    uint8_t turno_jugador       : 1; 
    uint8_t casilla_seleccionada: 2; // 00: Ninguna casilla seleccionada
                                     // 01: Celda origen seleccionada
