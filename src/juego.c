@@ -12,7 +12,6 @@ void _colocaPiezas (AJD_TableroPtr tablero);
 
 ////////////////////////////////////////////////////////////////////////////
 // VARIABLES PRIVADAS AL MÓDULO
-uint16_t   turno;        // Cuántos turnos se han jugado ya
 AJD_Estado estado_juego;   // Estado del juego
 
 ////////////////////////////////////////////////////////////////////////////
@@ -27,15 +26,8 @@ AJD_Estado estado_juego;   // Estado del juego
 //
 void inicializa(AJD_TableroPtr tablero)
 {
-   // El cursor movil es visible y sin flash
-   // El cursor de pieza seleccionada no es visible y con flash
-   tablero->cursorMovil.visible = 1;
-   tablero->cursorPiezaSeleccionada.visible = 0;
-   tablero->cursorMovil.flash = 0;
-   tablero->cursorPiezaSeleccionada.flash = 1;
-
    AJD_Color color = NEGRO;
-   AJD_idCasilla indice = 0;
+   AJD_idCasilla id = 0;
 
    for (int i=0; i<8; i++) 
    {      
@@ -43,25 +35,18 @@ void inicializa(AJD_TableroPtr tablero)
       for (int j=0; j<8; j++)    
       {
          // puntero a casilla actual, mejora legibilidad codigo
-         AJD_Casilla* casilla = &(tablero->casilla[i*8+j]);
+         AJD_CasillaPtr casilla = &(tablero->casilla[i*8+j]);
 
          casilla->color = color;
          color ^= 1; // Alterna entre blanco/negro       
          
-         // La esquina superior izquierda es 'a8', hacia la derecha se 
-         // incrementa la letra hasta la 'h' y de arriba a abajo 
-         // decrementa el número.
-         //casilla->notacion[0] = 'a' + j;
-         //casilla->notacion[1] = '8'-i;
-         //casilla->notacion[2] = '\0';  // NULL terminated string
-
          // Inicialmente el tablero está vacío
          // El color de la pieza cuando la casilla está vacía es irrelevante
          casilla->pieza = NONE;
          casilla->color_pieza = BLANCO;
-         casilla->indice = indice++;
+         casilla->id = id++;
       }
-   }   
+   }
    //printf("sizeof(AJD_Tablero) = %ld\n", sizeof (AJD_Tablero));
 
    // Inicializa la UI
@@ -95,14 +80,19 @@ void nuevoJuego(AJD_TableroPtr tablero)
    estado_juego.juegan_blancas = 1;
 
    // Turno
-   turno = 1;
+   estado_juego.turno = 1;
 
    // Coloca las piezas
    _colocaPiezas (tablero);
 
-   // Posicion inicial del cursor de selección de pieza
-   tablero->cursorMovil.idCasilla = 8*6+3; //(d2)
-   tablero->cursorPiezaSeleccionada.idCasilla = 8*6+3; // (d2)
+   // El cursor movil y de pieza seleccionada se posicionan a d2
+   // El cursor movil es visible y sin flash
+   // El cursor de pieza seleccionada no es visible y con flash
+   tablero->cursorMovil.casilla = tablero->cursorPiezaSeleccionada.casilla = &tablero->casilla[d2];   
+   tablero->cursorMovil.visible = 1;
+   tablero->cursorPiezaSeleccionada.visible = 0;
+   tablero->cursorMovil.flash = 0;
+   tablero->cursorPiezaSeleccionada.flash = 1;
 }
 ////////////////////////////////////////////////////////////////////////////
 // actualizaJuego
@@ -112,16 +102,13 @@ void actualizaJuego (AJD_TableroPtr tablero)
 {
    procesaTeclado (tablero, &estado_juego);
 
-   // Aseguramos que el cursor movil se mantiene en los límites del tablero
-   tablero->cursorMovil.idCasilla &= 63;
-
    switch (estado_juego.casilla_seleccionada)
    {   
-   case 1:
+   case ORIGEN_SELECCIONADO:
       if (!hayPiezaValida(tablero, estado_juego.casilla_origen, &estado_juego))
       {
-         estado_juego.casilla_origen = 0;
-         estado_juego.casilla_seleccionada = 0;
+         estado_juego.casilla_origen = NULL;
+         estado_juego.casilla_seleccionada = NO_SELECCION;
       }
       else
       {
@@ -129,26 +116,52 @@ void actualizaJuego (AJD_TableroPtr tablero)
          tablero->cursorPiezaSeleccionada.visible = 1;
       }
       break;
-   case 2:
+
+   case DESTINO_SELECCIONADO:
       if (esMovimientoValido (tablero, &estado_juego))
       {
          muevePieza (tablero, &estado_juego);
 
          estado_juego.turno_jugador ^= 1;
          estado_juego.juegan_blancas ^= 1;
-         estado_juego.casilla_seleccionada = 0;
-         turno += estado_juego.juegan_blancas;
-         estado_juego.casilla_origen = estado_juego.casilla_destino = 0;
+         estado_juego.casilla_seleccionada = NO_SELECCION;
+         estado_juego.turno += estado_juego.juegan_blancas;
+         estado_juego.casilla_origen = estado_juego.casilla_destino = NULL;
 
          // movimiento efectuado, oculta el cursor fijo
          tablero->cursorPiezaSeleccionada.visible = 0;
       }
       else
       {
-         estado_juego.casilla_destino = 0;
-         estado_juego.casilla_seleccionada = 1;
+         estado_juego.casilla_destino = NULL;
+         estado_juego.casilla_seleccionada = ORIGEN_SELECCIONADO;
       }
       break;
+
+   default:
+      break;
+   }
+
+}
+////////////////////////////////////////////////////////////////////////////
+// menu
+// 
+// Ejecuta los diferentes menus previos al comienzo
+void menu()
+{
+   menuJuego (&estado_juego);
+}
+////////////////////////////////////////////////////////////////////////////
+//
+// Bucle principal, se ejecuta hasta que termina la partida.
+//
+void ejecutaPartida (AJD_TableroPtr tablero)
+{
+   for (;;)
+   {
+      dibujaJuego (tablero, &estado_juego);
+
+      actualizaJuego (tablero);
    }
 }
 

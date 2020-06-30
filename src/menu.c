@@ -32,13 +32,13 @@ menu_t menuColorJugador =
 /////////////////////////////////////////////////////////////////////
 // menuJuego Elección de tipo de jugadores, humano vs cpu y color
 //
-void menuJuego(AJD_Estado* estado)
+void menuJuego(AJD_EstadoPtr estado_juego)
 {
 	if (muestraMenu (5, 7, &menuJugadores))
 	{
 		if ( muestraMenu (5, 7, &menuColorJugador) )
 		{
-			estado->turno_jugador = menuColorJugador.selected-1;
+			estado_juego->turno_jugador = menuColorJugador.selected-1;
 		}
 	}
 

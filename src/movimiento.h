@@ -44,66 +44,22 @@ typedef struct _AJD_MovInfo {
     int dx:4;
 } AJD_MovInfo;
 ////////////////////////////////////////////////////////////////////////////
-// muevePieza
-//
-// Mueve una pieza desde una casilla origen a una casilla destino
-//
-void muevePieza (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
-////////////////////////////////////////////////////////////////////////////
 // esMovimientoValido
 //
-// Comprueba si el movimiento de la pieza en casilla_origen hacia
-// casilla_destino es válido.
+//  Comprueba si un movimiento desde una casilla origen a destino
+// es válido.
 //
-int esMovimientoValido (AJD_TableroPtr tablero, AJD_Estado* estdo_juego);
+int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
-// compruebaPeon
-// 
-// Comprueba si el movimiento de un peon en casilla_origen hacia
-// casilla_destino es válido.
+// muevePieza
 //
-int compruebaPeon (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
-////////////////////////////////////////////////////////////////////////////
-// compruebaAlfil
-// 
-// Comprueba si el movimiento de un alfil en casilla_origen hacia
-// casilla_destino es válido.
+//  Mueve una pieza desde una casilla origen a una casilla destino determinado
+// en estado_juego
 //
-int compruebaAlfil (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
-////////////////////////////////////////////////////////////////////////////
-// compruebaTorre
-// 
-// Comprueba si el movimiento de una torre en casilla_origen hacia
-// casilla_destino es válido.
-//
-int compruebaTorre (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
-////////////////////////////////////////////////////////////////////////////
-// compruebaCaballo
-// 
-// Comprueba si el movimiento de un caballo en casilla_origen hacia
-// casilla_destino es válido.
-//
-int compruebaCaballo (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
 // hayPiezaValida
 //
-// Comprueba si la casilla seleccionada por el cursor contiene una pieza
-// válida para mover
-//
-// Devuelve 1 si lo es, 0 en caso contrario.
-//
-int hayPiezaValida (AJD_TableroPtr tablero, AJD_idCasilla idCasilla, AJD_Estado* estado_juego);
-////////////////////////////////////////////////////////////////////////////
-// hayPieza
-//
-// Comprueba si en la casilla indicada hay alguna pieza (1) o esta libre (0)
-//
-int hayPieza (AJD_TableroPtr tablero, AJD_idCasilla idCasilla);
-////////////////////////////////////////////////////////////////////////////
-// hayPiezaEnTrayectoria
-//
-// Comprueba si alguna de las casillas desde una casilla origen hasta una 
-// casilla destino está ocupada (1) o libre (0). 
-// Las casillas origen/destino se infican en una estructura AJD_MovInfo.
-// 
-int hayPiezaEnTrayectoria (AJD_TableroPtr tablero, AJD_MovInfo* mov_info);
+//  Comprueba si en la casilla indicada hay una pieza del jugador que 
+// efectua la jugada actual.
+int hayPiezaValida (AJD_TableroPtr tablero, AJD_CasillaPtr casilla, AJD_EstadoPtr estado_juego);

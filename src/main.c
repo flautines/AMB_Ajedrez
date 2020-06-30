@@ -11,15 +11,10 @@ int main()
 
    inicializa (&tablero);
 
+   menu();
    nuevoJuego (&tablero);
-   menuJuego (&estado_juego);
    
-   for (;;)
-   {
-      dibujaJuego (&tablero);
-
-      actualizaJuego (&tablero);
-   }
+   ejecutaPartida (&tablero);
    
    
    liberaRecursos();

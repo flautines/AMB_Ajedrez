@@ -126,10 +126,10 @@ void liberaPantalla()
 //
 // Dibuja todos los elementos del juego
 //
-void dibujaJuego(AJD_TableroPtr tablero)
+void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
     dibujaTablero (tablero);
-    dibujaMarcadores (turno, &estado_juego);
+    dibujaMarcadores (estado_juego);
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaTablero
@@ -209,7 +209,7 @@ void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color)
 ////////////////////////////////////////////////////////////////////////////
 // dibujaMarcadores Dibuja los marcadores de tiempo, turno, etc.
 //
-void dibujaMarcadores(uint16_t turno, AJD_Estado* estado_juego)
+void dibujaMarcadores(AJD_EstadoPtr estado_juego)
 {
     int x,y;
 
@@ -233,7 +233,7 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado_juego)
 
     y = MARCADOR_LAST_ROW - 1;
     move (y,x);
-    printw ("Turno %02d (Jugador %c)", turno, estado_juego->turno_jugador+'1');
+    printw ("Turno %02d (Jugador %c)", estado_juego->turno, estado_juego->turno_jugador+'1');
 
     y += 1;
     move (y,x);
@@ -255,18 +255,19 @@ void dibujaMarcadores(uint16_t turno, AJD_Estado* estado_juego)
 void dibujaCursor (AJD_Cursor cursor)
 {
     int y, x, flash;
+    AJD_CasillaPtr casillaCursor = cursor.casilla;
     
-    y = TABLERO_ROW_START + (cursor.idCasilla/8) * ALTO_CASILLA;
-    x = TABLERO_COL_START + (cursor.idCasilla & 7) * ANCHO_CASILLA;
+    y = TABLERO_ROW_START + (casillaCursor->id/8) * ALTO_CASILLA;
+    x = TABLERO_COL_START + (casillaCursor->id & 7) * ANCHO_CASILLA;
 
-    flash = cursor.flash;    
+    flash = cursor.flash;
 
     if (flash)
         attron (A_BLINK);
     else
         attroff (A_BLINK);
 
-    if (cursor.color_casilla == BLANCO)
+    if (casillaCursor->color == BLANCO)
         attron (A_REVERSE);
     else
         attroff (A_REVERSE);
@@ -412,57 +413,75 @@ int obtenJugada (int* celda_origen, int* celda_destino)
 //
 int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
 {
-    int ch;
+    int ch;    
+    AJD_Cursor*  cursorMovil;
+    AJD_idCasilla idCasilla;
 
-    ch = getch();
-
+    cursorMovil = &tablero->cursorMovil;
+    idCasilla = cursorMovil->casilla->id;
+    
+    ch = getch();    
     switch (ch)
     {
-        case KEY_UP:    tablero->cursorMovil.idCasilla -= 8; break;
-        case KEY_DOWN:  tablero->cursorMovil.idCasilla += 8; break;
-        case KEY_LEFT:  tablero->cursorMovil.idCasilla -= 1; break;
-        case KEY_RIGHT: tablero->cursorMovil.idCasilla += 1; break;
+        case KEY_UP:    
+            idCasilla -= 8;
+            // Aseguramos que el cursor movil se mantiene en los límites del tablero
+            idCasilla &= 63;
+            cursorMovil->casilla = &tablero->casilla[idCasilla];
+            break;
+
+        case KEY_DOWN:  
+            idCasilla += 8;
+            // Aseguramos que el cursor movil se mantiene en los límites del tablero
+            idCasilla &= 63;
+            cursorMovil->casilla = &tablero->casilla[idCasilla];
+            break;
+
+        case KEY_LEFT:  
+            idCasilla -= 1;
+            // Aseguramos que el cursor movil se mantiene en los límites del tablero
+            idCasilla &= 63;
+            cursorMovil->casilla = &tablero->casilla[idCasilla];
+            break;
+
+        case KEY_RIGHT: 
+            idCasilla += 1;
+            // Aseguramos que el cursor movil se mantiene en los límites del tablero
+            idCasilla &= 63;            
+            cursorMovil->casilla = &tablero->casilla[idCasilla];
+            break;
+
         case '\n':
-        {            
-            if (!estado->casilla_seleccionada)
+            if (estado->casilla_seleccionada == NONE)
             {                
-                estado->casilla_seleccionada = 1;
-                estado->casilla_origen = tablero->cursorMovil.idCasilla;
-                tablero->cursorPiezaSeleccionada.idCasilla = tablero->cursorMovil.idCasilla;
-                tablero->cursorPiezaSeleccionada.color_casilla = tablero->cursorMovil.color_casilla;
+                estado->casilla_seleccionada = ORIGEN_SELECCIONADO;
+                estado->casilla_origen = cursorMovil->casilla;
+                tablero->cursorPiezaSeleccionada.casilla = cursorMovil->casilla;
             }
             else
             {
                 // Si se selecciona como casilla destino la misma casilla
                 // origen se cancela la selección.
-                estado->casilla_destino = tablero->cursorMovil.idCasilla;
+                estado->casilla_destino = cursorMovil->casilla;
                 if (estado->casilla_destino == estado->casilla_origen)
                 {
-                    estado->casilla_seleccionada = 0;
+                    estado->casilla_seleccionada = NO_SELECCION;
                     tablero->cursorPiezaSeleccionada.visible = 0;
                 }
                 else
-                    estado->casilla_seleccionada = 2;
+                    estado->casilla_seleccionada = DESTINO_SELECCIONADO;
                 
-                mvprintw (4,0, "Moviendo desde %d hasta %d", estado->casilla_origen, estado->casilla_destino);
+                mvprintw (4,0, "Moviendo desde %d hasta %d", estado->casilla_origen->id, estado->casilla_destino->id);
             }
             break;
-        }
-        case '\x1b':    // ESC
-        {
-            if (estado->casilla_seleccionada == 1)
-                estado->casilla_seleccionada = 0;
-        }
-    }
-
-    tablero->cursorMovil.color_casilla = tablero->casilla[tablero->cursorMovil.idCasilla].color;
+    }    
     
-    mvprintw (0,0, "cursorMovil.idCasilla: %2d", tablero->cursorMovil.idCasilla);
+    mvprintw (0,0, "cursorMovil.id: %2d", cursorMovil->casilla->id);
     mvprintw (0,25, "Pieza de color: %s", 
-              tablero->casilla[tablero->cursorMovil.idCasilla].color_pieza 
+              cursorMovil->casilla->color_pieza
               ? "BLANCO" : "NEGRO ");
     mvprintw (0,50, "Casilla de color: %s", 
-              tablero->cursorMovil.color_casilla
+              cursorMovil->casilla->color
               ? "BLANCO" : "NEGRO ");    
     mvprintw (1,0, "casilla_seleccionada: %d", estado->casilla_seleccionada);
     return 0;
