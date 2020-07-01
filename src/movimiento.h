@@ -32,16 +32,16 @@
 
 
 typedef struct _AJD_MovInfo {
-    AJD_idCasilla casilla_origen;
-    AJD_idCasilla casilla_destino;
-    AJD_Color color_pieza_origen;
-    AJD_Color color_pieza_destino;
+    AJD_CasillaPtr origen;
+    AJD_CasillaPtr destino;
     uint8_t srcY:3;
     uint8_t srcX:3;
     uint8_t dstY:3;
     uint8_t dstX:3;
     int dy:4;
-    int dx:4;
+    int dx:4;  
+    int distY:3;
+    int distX:3;
 } AJD_MovInfo;
 ////////////////////////////////////////////////////////////////////////////
 // esMovimientoValido
@@ -51,6 +51,12 @@ typedef struct _AJD_MovInfo {
 //
 int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
+// compruebaMovimientoPieza
+//
+//  Comprueba si la pieza a mover lo hace segun sus reglas
+//
+int compruebaMovimientoPieza (AJD_MovInfo* movInfo);
+////////////////////////////////////////////////////////////////////////////
 // muevePieza
 //
 //  Mueve una pieza desde una casilla origen a una casilla destino determinado
@@ -58,8 +64,22 @@ int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 //
 void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
+// casillaLibre
+//
+//  Comprueba si en la casilla indicada hay una pieza sin importar color
+//
+int casillaOcupada (AJD_CasillaPtr casilla);
+////////////////////////////////////////////////////////////////////////////
 // hayPiezaValida
 //
 //  Comprueba si en la casilla indicada hay una pieza del jugador que 
 // efectua la jugada actual.
+//
 int hayPiezaValida (AJD_TableroPtr tablero, AJD_CasillaPtr casilla, AJD_EstadoPtr estado_juego);
+////////////////////////////////////////////////////////////////////////////
+// obtenMovInfo
+//
+//  Obtiene detalles necesarios para realizar comprobaciones posteriores
+// respecto las casillas origen y destino de un movimiento.
+//
+AJD_MovInfo obtenMovInfo (AJD_EstadoPtr estado_juego);

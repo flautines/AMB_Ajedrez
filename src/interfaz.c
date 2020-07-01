@@ -205,6 +205,7 @@ void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color)
     attron (COLOR_PAIR (1));
     move (posy, posx);
     printw("%c", sprite);
+    attroff (COLOR_PAIR (1));
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaMarcadores Dibuja los marcadores de tiempo, turno, etc.
@@ -469,9 +470,7 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
                     tablero->cursorPiezaSeleccionada.visible = 0;
                 }
                 else
-                    estado->casilla_seleccionada = DESTINO_SELECCIONADO;
-                
-                mvprintw (4,0, "Moviendo desde %d hasta %d", estado->casilla_origen->id, estado->casilla_destino->id);
+                    estado->casilla_seleccionada = DESTINO_SELECCIONADO;                
             }
             break;
     }    
@@ -485,4 +484,20 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
               ? "BLANCO" : "NEGRO ");    
     mvprintw (1,0, "casilla_seleccionada: %d", estado->casilla_seleccionada);
     return 0;
+}
+////////////////////////////////////////////////////////////////////////////
+// FUNCIONES VISUALIZACION PARA DEPURACION
+////////////////////////////////////////////////////////////////////////////
+// muestraMovInfo
+//
+void muestraMovInfo (AJD_MovInfo* movInfo)
+{
+    dibujaPieza (1, 25, movInfo->origen->pieza, movInfo->origen->color_pieza);
+    mvprintw (1, 27, "src:%2d dst:%2d dy:%2d dx:%2d distY:%2d distX:%2d",        
+        movInfo->origen->id,
+        movInfo->destino->id,
+        movInfo->dy,
+        movInfo->dx,
+        movInfo->distY,
+        movInfo->distX);
 }
