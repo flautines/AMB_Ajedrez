@@ -40,8 +40,8 @@ typedef struct _AJD_MovInfo {
     uint8_t dstX:3;
     int dy:4;
     int dx:4;  
-    int distY:3;
-    int distX:3;
+    int distY:4;
+    int distX:4;
 } AJD_MovInfo;
 ////////////////////////////////////////////////////////////////////////////
 // esMovimientoValido
