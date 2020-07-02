@@ -76,10 +76,4 @@ int casillaOcupada (AJD_CasillaPtr casilla);
 // efectua la jugada actual.
 //
 int hayPiezaValida (AJD_TableroPtr tablero, AJD_CasillaPtr casilla, AJD_EstadoPtr estado_juego);
-////////////////////////////////////////////////////////////////////////////
-// obtenMovInfo
-//
-//  Obtiene detalles necesarios para realizar comprobaciones posteriores
-// respecto las casillas origen y destino de un movimiento.
-//
-AJD_MovInfo obtenMovInfo (AJD_EstadoPtr estado_juego);
+

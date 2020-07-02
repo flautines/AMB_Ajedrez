@@ -4,20 +4,25 @@
 
 #include <stdlib.h>
 ////////////////////////////////////////////////////////////////////////////
+// Variable privada con informacion adicional del movimiento
+AJD_MovInfo movInfo;
+////////////////////////////////////////////////////////////////////////////
 // FORWARD DECLARATIONS (INTERFAZ PRIVADA)
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasComer             (AJD_TableroPtr tablero, AJD_MovInfo* movInfo);
-int cumpleReglasMovimiento        (AJD_TableroPtr tablero, AJD_MovInfo* movInfo);
-int cumpleReglasComerPeon         (AJD_MovInfo* movInfo);
-int cumpleReglasMovimientoPeon    (AJD_MovInfo* movInfo);
-int cumpleReglasMovimientoCaballo (AJD_MovInfo* movInfo);
-int cumpleReglasMovimientoTorre   (AJD_TableroPtr tablero, AJD_MovInfo* movInfo);
-int caminoLibre                   (AJD_TableroPtr tablero, AJD_MovInfo* movInfo);
+void obtenMovInfo (AJD_EstadoPtr estado_juego);
+int cumpleReglasComer             (AJD_TableroPtr tablero);
+int cumpleReglasMovimiento        (AJD_TableroPtr tablero);
+int cumpleReglasComerPeon         ();
+int cumpleReglasMovimientoPeon    ();
+int cumpleReglasMovimientoCaballo ();
+int seMueveEnVertHorz             (AJD_TableroPtr tablero);
+int seMueveEnDiagonal             (AJD_TableroPtr tablero);
+int caminoLibre                   (AJD_TableroPtr tablero);
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
-    AJD_MovInfo movInfo = obtenMovInfo (estado_juego);
+    obtenMovInfo (estado_juego);
     muestraMovInfo (&movInfo);
     
     // Si la casilla destino está ocupada, descartar el movimiento
@@ -31,10 +36,10 @@ int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
         if (movInfo.destino->color_pieza == movInfo.origen->color_pieza)
             return 0;
         else        
-            return cumpleReglasComer (tablero, &movInfo);
+            return cumpleReglasComer (tablero);
     }
     else
-        return cumpleReglasMovimiento (tablero, &movInfo);
+        return cumpleReglasMovimiento (tablero);
 }
 ////////////////////////////////////////////////////////////////////////////
 void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
@@ -59,9 +64,16 @@ int hayPiezaValida (AJD_TableroPtr tablero, AJD_CasillaPtr casilla, AJD_EstadoPt
         && casilla->color_pieza == estado_juego->juegan_blancas;
 }
 ////////////////////////////////////////////////////////////////////////////
-AJD_MovInfo obtenMovInfo (AJD_EstadoPtr estado_juego)
+////////////////////////////////////////////////////////////////////////////
+// INTERFAZ PRIVADA
+////////////////////////////////////////////////////////////////////////////
+// obtenMovInfo
+//
+//  Obtiene detalles necesarios para realizar comprobaciones posteriores
+// respecto las casillas origen y destino de un movimiento.
+//
+void obtenMovInfo (AJD_EstadoPtr estado_juego)
 {
-    AJD_MovInfo info;
     AJD_CasillaPtr origen, destino;
     int dir;
     
@@ -72,79 +84,74 @@ AJD_MovInfo obtenMovInfo (AJD_EstadoPtr estado_juego)
     dir = origen->color_pieza ? -1 : 1;
     mvprintw (3,0, "dir: %2d", dir);
     
-    info.origen  = origen;
-    info.destino = destino;    
-    info.srcY    = origen->id /8;
-    info.srcX    = origen->id &7;
-    info.dstY    = destino->id /8;
-    info.dstX    = destino->id &7;    
-    info.dy      = info.dstY - info.srcY;
-    info.dx      = info.dstX - info.srcX;
+    movInfo.origen  = origen;
+    movInfo.destino = destino;    
+    movInfo.srcY    = origen->id /8;
+    movInfo.srcX    = origen->id &7;
+    movInfo.dstY    = destino->id /8;
+    movInfo.dstX    = destino->id &7;    
+    movInfo.dy      = movInfo.dstY - movInfo.srcY;
+    movInfo.dx      = movInfo.dstX - movInfo.srcX;
     // Multiplicando dy * dir nos da la "distancia" en vertical.
     // Realmente no se trata de distancia en el sentido matemático, ya que
     // tiene signo, dependiendo de si la pieza se ha movido hacia adelante (positivo)
     // o hacia atrás (negativo)
-    info.distY = info.dy * dir;
+    movInfo.distY = movInfo.dy * dir;
     // Distancia en horizontal (en el sentido matematico, 
     // (siempre positivo, nunca negativo) del movimiento
-    info.distX = abs (info.dx);
-
-    return info;
+    movInfo.distX = abs (movInfo.dx);
 }
 ////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-// INTERFAZ PRIVADA
-////////////////////////////////////////////////////////////////////////////
-int cumpleReglasMovimiento (AJD_TableroPtr tablero, AJD_MovInfo* movInfo)
+int cumpleReglasMovimiento (AJD_TableroPtr tablero)
 {
-    AJD_Pieza pieza = movInfo->origen->pieza;
+    AJD_Pieza pieza = movInfo.origen->pieza;
 
     switch (pieza)
     {
         case PEON:
-            return cumpleReglasMovimientoPeon (movInfo);
+            return cumpleReglasMovimientoPeon ();
 
         case CABALLO:
-            return cumpleReglasMovimientoCaballo (movInfo);
+            return cumpleReglasMovimientoCaballo ();
 
         case TORRE:
-            return cumpleReglasMovimientoTorre (tablero, movInfo);
+            return seMueveEnVertHorz (tablero);
         default:
             return 0;
     }
 }
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasComer (AJD_TableroPtr tablero, AJD_MovInfo* movInfo)
+int cumpleReglasComer (AJD_TableroPtr tablero)
 {
-    AJD_Pieza pieza = movInfo->origen->pieza;
+    AJD_Pieza pieza = movInfo.origen->pieza;
 
     switch (pieza)
     {
         case PEON:
-            return cumpleReglasComerPeon (movInfo);
+            return cumpleReglasComerPeon ();
             break;
 
         case CABALLO:
-            return cumpleReglasMovimientoCaballo (movInfo);            
+            return cumpleReglasMovimientoCaballo ();            
 
         case TORRE:
-            return cumpleReglasMovimientoTorre (tablero, movInfo);
+            return seMueveEnVertHorz (tablero);
 
         default:
             return 0;
     }
 }
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasComerPeon (AJD_MovInfo* movInfo)
+int cumpleReglasComerPeon ()
 {
-    return movInfo->distX == 1 && movInfo->distY == 1;
+    return movInfo.distX == 1 && movInfo.distY == 1;
 }
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasMovimientoPeon (AJD_MovInfo* movInfo)
+int cumpleReglasMovimientoPeon ()
 {
-    AJD_Color colorPiezaOrigen = movInfo->origen->color_pieza;
-    int distY = movInfo->distY;
-    int distX = movInfo->distX;
+    AJD_Color colorPiezaOrigen = movInfo.origen->color_pieza;
+    int distY = movInfo.distY;
+    int distX = movInfo.distX;
     int filaInicioPeones = colorPiezaOrigen ? 6 : 1;    
 
     if (distX == 0)
@@ -152,45 +159,44 @@ int cumpleReglasMovimientoPeon (AJD_MovInfo* movInfo)
         // Movimiento vertical de dos casillas, sólo es válido si 
         // es 1er movimiento o lo que es lo mismo, si se parte de 
         // las filas de inicio de PEON.
-        return (distY == 2 && movInfo->srcY == filaInicioPeones)
+        return (distY == 2 && movInfo.srcY == filaInicioPeones)
         // Movimiento vertical de una casilla
             || distY == 1;
     }
     return 0;
 }
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasMovimientoTorre (AJD_TableroPtr tablero, AJD_MovInfo* movInfo)
+int seMueveEnVertHorz (AJD_TableroPtr tablero)
 {         
-    return (movInfo->dy == 0 || movInfo->dx == 0) 
-        && caminoLibre (tablero, movInfo);
+    return (movInfo.dy == 0 || movInfo.dx == 0) 
+        && caminoLibre (tablero);
 }
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasMovimientoCaballo (AJD_MovInfo* movInfo)
+int cumpleReglasMovimientoCaballo ()
 {
-    // La "distancia" movInfo->distY es un tanto especial, ya que tiene
+    // La "distancia" movInfo.distY es un tanto especial, ya que tiene
     // signo para poder saber si la pieza se desplaza hacia adelante o atrás.
     // Necesitamos el valor absoluto para obtener la distancia en el sentido
     // matemático.
-    int distY = abs(movInfo->distY);
-    int distX = movInfo->distX;
+    int distY = abs(movInfo.distY);
+    int distX = movInfo.distX;
 
     // Movmiento en "L"
     return (distY == 2 && distX == 1) || (distX == 2 && distY == 1);
 }
 ////////////////////////////////////////////////////////////////////////////
-int caminoLibre (AJD_TableroPtr tablero, AJD_MovInfo* movInfo)
+int caminoLibre (AJD_TableroPtr tablero)
 {
     int dx, dy;    
-    AJD_CasillaPtr origen   = movInfo->origen;
-    AJD_CasillaPtr destino  = movInfo->destino;
+    AJD_CasillaPtr origen   = movInfo.origen;
+    AJD_CasillaPtr destino  = movInfo.destino;
     AJD_idCasilla idOrigen  = origen->id;
     AJD_idCasilla idDestino = destino->id;    
     dx = dy = 0;
 
-    dx = sign (movInfo->dx);
-    dy = sign (movInfo->dy) * 8;
+    dx = sign (movInfo.dx);
+    dy = sign (movInfo.dy) * 8;
 
-    int posY = 3;
     for (AJD_idCasilla idCasilla = idOrigen+dy+dx; idCasilla != idDestino; idCasilla += dy+dx)
     {
         AJD_CasillaPtr casilla = &tablero->casilla[idCasilla];
