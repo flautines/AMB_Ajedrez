@@ -10,14 +10,13 @@ AJD_MovInfo movInfo;
 // FORWARD DECLARATIONS (INTERFAZ PRIVADA)
 ////////////////////////////////////////////////////////////////////////////
 void obtenMovInfo (AJD_EstadoPtr estado_juego);
-int cumpleReglasComer             (AJD_TableroPtr tablero);
-int cumpleReglasMovimiento        (AJD_TableroPtr tablero);
-int cumpleReglasComerPeon         ();
-int cumpleReglasMovimientoPeon    ();
+int cumpleReglasMovimiento     (AJD_TableroPtr tablero);
+int cumpleReglasComerPeon      ();
+int cumpleReglasMovimientoPeon (AJD_TableroPtr tablero);
 int cumpleReglasMovimientoCaballo ();
-int seMueveEnVertHorz             (AJD_TableroPtr tablero);
-int seMueveEnDiagonal             (AJD_TableroPtr tablero);
-int caminoLibre                   (AJD_TableroPtr tablero);
+int seMueveEnVertHorz          (AJD_TableroPtr tablero);
+int seMueveEnDiagonal          (AJD_TableroPtr tablero);
+int caminoLibre                (AJD_TableroPtr tablero);
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
@@ -25,21 +24,26 @@ int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
     obtenMovInfo (estado_juego);
     muestraMovInfo (&movInfo);
     
-    // Si la casilla destino está ocupada, descartar el movimiento
-    // si hay una pieza del mismo color. Si la pieza es de distino
-    // color, aun hay la posibilidad de que sea un movimiento valido
-    // de comer.
-    // Finalmente, si la casilla está libre, comprobar si la pieza
-    // se mueve según sus reglas.
-    if (casillaOcupada (movInfo.destino))
+    // Primero que cumpla las reglas de movimiento especifico de la pieza.
+    // Si lo cumple, mira si la casilla destino está ocupada.
+    // Si la pieza ocupada es del mismo "bando", el movimiento no es valido 
+    // Si la casilla es del mismo color, come la pieza. 
+    // Si la casilla está libre, es un movimiento valido.
+    // El PEON es la única pieza que come de forma diferente, así que se 
+    // comprueba en un caso aparte si se detecta movimiento de pieza no válido.
+    if (cumpleReglasMovimiento (tablero))
     {
-        if (movInfo.destino->color_pieza == movInfo.origen->color_pieza)
-            return 0;
-        else        
-            return cumpleReglasComer (tablero);
-    }
-    else
-        return cumpleReglasMovimiento (tablero);
+        if (casillaOcupada (movInfo.destino))
+        {               
+            if (movInfo.origen->pieza != PEON)
+                return  (movInfo.destino->color_pieza != movInfo.origen->color_pieza);
+        }           
+        else            
+            return 1;
+    }    
+    if (movInfo.origen->pieza == PEON)
+        return cumpleReglasComerPeon() && casillaOcupada (movInfo.destino);
+    return 0;
 }
 ////////////////////////////////////////////////////////////////////////////
 void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
@@ -109,7 +113,7 @@ int cumpleReglasMovimiento (AJD_TableroPtr tablero)
     switch (pieza)
     {
         case PEON:
-            return cumpleReglasMovimientoPeon ();
+            return cumpleReglasMovimientoPeon (tablero);
 
         case CABALLO:
             return cumpleReglasMovimientoCaballo ();
@@ -119,30 +123,6 @@ int cumpleReglasMovimiento (AJD_TableroPtr tablero)
 
         case TORRE:
             return seMueveEnVertHorz (tablero);
-        default:
-            return 0;
-    }
-}
-////////////////////////////////////////////////////////////////////////////
-int cumpleReglasComer (AJD_TableroPtr tablero)
-{
-    AJD_Pieza pieza = movInfo.origen->pieza;
-
-    switch (pieza)
-    {
-        case PEON:
-            return cumpleReglasComerPeon ();
-            break;
-
-        case CABALLO:
-            return cumpleReglasMovimientoCaballo ();
-
-        case ALFIL:
-            return seMueveEnDiagonal (tablero);
-
-        case TORRE:
-            return seMueveEnVertHorz (tablero);
-
         default:
             return 0;
     }
@@ -153,7 +133,7 @@ int cumpleReglasComerPeon ()
     return movInfo.distX == 1 && movInfo.distY == 1;
 }
 ////////////////////////////////////////////////////////////////////////////
-int cumpleReglasMovimientoPeon ()
+int cumpleReglasMovimientoPeon (AJD_TableroPtr tablero)
 {
     AJD_Color colorPiezaOrigen = movInfo.origen->color_pieza;
     int distY = movInfo.distY;
@@ -165,7 +145,7 @@ int cumpleReglasMovimientoPeon ()
         // Movimiento vertical de dos casillas, sólo es válido si 
         // es 1er movimiento o lo que es lo mismo, si se parte de 
         // las filas de inicio de PEON.
-        return (distY == 2 && movInfo.srcY == filaInicioPeones)
+        return (distY == 2 && movInfo.srcY == filaInicioPeones && caminoLibre (tablero))
         // Movimiento vertical de una casilla
             || distY == 1;
     }
