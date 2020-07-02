@@ -114,6 +114,9 @@ int cumpleReglasMovimiento (AJD_TableroPtr tablero)
         case CABALLO:
             return cumpleReglasMovimientoCaballo ();
 
+        case ALFIL:
+            return seMueveEnDiagonal (tablero);
+
         case TORRE:
             return seMueveEnVertHorz (tablero);
         default:
@@ -132,7 +135,10 @@ int cumpleReglasComer (AJD_TableroPtr tablero)
             break;
 
         case CABALLO:
-            return cumpleReglasMovimientoCaballo ();            
+            return cumpleReglasMovimientoCaballo ();
+
+        case ALFIL:
+            return seMueveEnDiagonal (tablero);
 
         case TORRE:
             return seMueveEnVertHorz (tablero);
@@ -169,6 +175,12 @@ int cumpleReglasMovimientoPeon ()
 int seMueveEnVertHorz (AJD_TableroPtr tablero)
 {         
     return (movInfo.dy == 0 || movInfo.dx == 0) 
+        && caminoLibre (tablero);
+}
+////////////////////////////////////////////////////////////////////////////
+int seMueveEnDiagonal (AJD_TableroPtr tablero)
+{
+    return (abs(movInfo.dy) == abs(movInfo.dx))
         && caminoLibre (tablero);
 }
 ////////////////////////////////////////////////////////////////////////////
