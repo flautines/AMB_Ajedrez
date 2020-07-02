@@ -123,6 +123,19 @@ int cumpleReglasMovimiento (AJD_TableroPtr tablero)
 
         case TORRE:
             return seMueveEnVertHorz (tablero);
+
+        case DAMA:
+            return seMueveEnDiagonal (tablero)
+                || seMueveEnVertHorz (tablero);
+
+        case REY:
+        {
+            int dx = abs (movInfo.dx);
+            int dy = abs (movInfo.dy);
+            return (dx==1 && dy==1) 
+                || (dx==0 && dy==1)
+                || (dx==1 && dy==0);
+        }
         default:
             return 0;
     }
