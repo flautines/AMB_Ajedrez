@@ -232,6 +232,14 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
     move (y,x);
     printw ("Negras 00:00");
 
+    y += 2;
+    if (estado_juego->enroque_efectuado)
+    {
+        mvprintw (y,x, 
+                  estado_juego->enroque_efectuado == ENROQUE_LARGO ? 
+                  "O-O-O" : "O-O");
+    }   
+
     y = MARCADOR_LAST_ROW - 1;
     move (y,x);
     printw ("Turno %02d (Jugador %c)", estado_juego->turno, estado_juego->turno_jugador+'1');
@@ -249,6 +257,8 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
               estado_juego->enroque_largo_negro_invalidado ? "NO" : "SI");
     mvprintw (MARCADOR_LAST_ROW+5, 0, "Enroque corto permitido (NEGRAS): %s", 
               estado_juego->enroque_corto_negro_invalidado ? "NO" : "SI");
+
+
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaCursor Dibuja el cursor de seleccion

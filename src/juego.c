@@ -120,13 +120,17 @@ void actualizaJuego (AJD_TableroPtr tablero)
    case DESTINO_SELECCIONADO:
       if (esMovimientoValido (tablero, &estado_juego))
       {
-         muevePieza (tablero, &estado_juego);
+         if (estado_juego.enroque_efectuado)
+            efectuaEnroque (tablero, &estado_juego);
+         else
+            muevePieza (tablero, &estado_juego);
 
          estado_juego.turno_jugador ^= 1;
          estado_juego.juegan_blancas ^= 1;
          estado_juego.casilla_seleccionada = NO_SELECCION;
          estado_juego.turno += estado_juego.juegan_blancas;
          estado_juego.casilla_origen = estado_juego.casilla_destino = NULL;
+         estado_juego.enroque_efectuado = NO_ENROQUE;
 
          // movimiento efectuado, oculta el cursor fijo
          tablero->cursorPiezaSeleccionada.visible = 0;

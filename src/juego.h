@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 typedef enum {NO_SELECCION, ORIGEN_SELECCIONADO, DESTINO_SELECCIONADO} AJD_Seleccion;
-
+typedef enum { NO_ENROQUE, ENROQUE_LARGO, ENROQUE_CORTO } AJD_Enroque;
 // Tipo para representar el estado
 typedef struct _AJD_Estado
 {
@@ -16,8 +16,7 @@ typedef struct _AJD_Estado
    uint8_t enroque_corto_blanco_invalidado  : 1;
    uint8_t enroque_largo_negro_invalidado  : 1;
    uint8_t enroque_corto_negro_invalidado  : 1;
-   //uint8_t rey_negro_movido    : 1; 
-   //uint8_t rey_blanco_movido   : 1; 
+   uint8_t enroque_efectuado   : 2; 
    uint8_t turno_jugador       : 1; 
    AJD_Seleccion casilla_seleccionada: 2; 
    AJD_CasillaPtr casilla_origen;  // casilla origen de la pieza a mover

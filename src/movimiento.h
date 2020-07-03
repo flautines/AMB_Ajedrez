@@ -15,21 +15,20 @@
 #define MAX_CASILLAS_REY    1
 
 // id casillas involucrados en un enroque
-#define ENROQUE_LARGO_ORIGEN_T_BLANCA   56  // T BLANCA desde 1a
-#define ENROQUE_LARGO_DESTINO_T_BLANCA  59  // T BLANCA hacia 1d
-#define ENROQUE_CORTO_ORIGEN_T_BLANCA   63  // T BLANCA desde 1h
-#define ENROQUE_CORTO_DESTINO_T_BLANCA  61  // T BLANCA hacia 1f
-#define ENROQUE_LARGO_ORIGEN_T_NEGRA     0  // T NEGA   desde 8a
-#define ENROQUE_LARGO_DESTINO_T_NEGRA    3  // T NEGA   hacia 8d
-#define ENROQUE_CORTO_ORIGEN_T_NEGRA     7  // T NEGA   desde 8h
-#define ENROQUE_CORTO_DESTINO_T_NEGRA    5  // T NEGA   hacia 8f
-#define ENROQUE_ORIGEN_R_BLANCO         60  // R BLANCO desde 1e
-#define ENROQUE_LARGO_DESTINO_R_BLANCO  58  // R BLANCO hacia 1c
-#define ENROQUE_CORTO_DESTINO_R_BLANCO  62  // R BLANCO hacia 1h
-#define ENROQUE_ORIGEN_R_NEGRO           4  // R NEGRO  desde 8e
-#define ENROQUE_LARGO_DESTINO_R_NEGRO    2  // R NEGRO  hacia 8c
-#define ENROQUE_CORTO_DESTINO_R_NEGRO    6  // R NEGRO  hacia 8h
-
+#define EL_ORIGEN_TORRE_BLANCA   a1
+#define EL_DESTINO_TORRE_BLANCA  d1
+#define EC_ORIGEN_TORRE_BLANCA   h1
+#define EC_DESTINO_TORRE_BLANCA  f1
+#define EL_ORIGEN_TORRE_NEGRA    a8
+#define EL_DESTINO_TORRE_NEGRA   d8
+#define EC_ORIGEN_TORRE_NEGRA    h8
+#define EC_DESTINO_TORRE_NEGRA   f8
+#define INICIO_REY_BLANCO        e1
+#define EL_DESTINO_REY_BLANCO    c1
+#define EC_DESTINO_REY_BLANCO    h1
+#define INICIO_REY_NEGRO         e8
+#define EL_DESTINO_REY_NEGRO     c8
+#define EC_DESTINO_REY_NEGRO     h8
 
 typedef struct _AJD_MovInfo {
     AJD_CasillaPtr origen;
@@ -56,6 +55,11 @@ int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 //  Comprueba si la pieza a mover lo hace segun sus reglas
 //
 int compruebaMovimientoPieza (AJD_MovInfo* movInfo);
+// puedeEnrocar
+//
+//  Comprueba si el jugador que mueve puede realizar enroque
+//
+int puedeEnrocar (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego, AJD_Enroque enroque);
 ////////////////////////////////////////////////////////////////////////////
 // muevePieza
 //
@@ -63,6 +67,12 @@ int compruebaMovimientoPieza (AJD_MovInfo* movInfo);
 // en estado_juego
 //
 void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
+////////////////////////////////////////////////////////////////////////////
+// efectuaEnroque
+//
+//  Realiza el movimiento de enroque
+//
+void efectuaEnroque (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
 // casillaLibre
 //
