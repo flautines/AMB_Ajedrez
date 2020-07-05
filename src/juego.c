@@ -58,8 +58,9 @@ void inicializa(AJD_TableroPtr tablero)
 //
 // Libera los recursos usados por el programa, incluída la UI
 void liberaRecursos()
-{
+{   
    liberaPantalla();
+   puts ("ncurses finalizado");
 }
 ////////////////////////////////////////////////////////////////////////////
 // nuevoJuego
@@ -161,7 +162,7 @@ void menu()
 //
 void ejecutaPartida (AJD_TableroPtr tablero)
 {
-   for (;;)
+   while (!estado_juego.fin_juego)
    {
       dibujaJuego (tablero, &estado_juego);
 

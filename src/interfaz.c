@@ -422,7 +422,7 @@ int obtenJugada (int* celda_origen, int* celda_destino)
 // procesaTeclado Lectura del teclado y actualizacion de cursor
 //             Devuelve celda origen y destino de la pieza a mover.
 //
-int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado)
+int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
     int ch;    
     AJD_Cursor*  cursorMovil;
@@ -463,26 +463,29 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado)
             break;
 
         case '\n':
-            if (estado->casilla_seleccionada == NONE)
+            if (estado_juego->casilla_seleccionada == NONE)
             {                
-                estado->casilla_seleccionada = ORIGEN_SELECCIONADO;
-                estado->casilla_origen = cursorMovil->casilla;
+                estado_juego->casilla_seleccionada = ORIGEN_SELECCIONADO;
+                estado_juego->casilla_origen = cursorMovil->casilla;
                 tablero->cursorPiezaSeleccionada.casilla = cursorMovil->casilla;
             }
             else
             {
                 // Si se selecciona como casilla destino la misma casilla
                 // origen se cancela la selección.
-                estado->casilla_destino = cursorMovil->casilla;
-                if (estado->casilla_destino == estado->casilla_origen)
+                estado_juego->casilla_destino = cursorMovil->casilla;
+                if (estado_juego->casilla_destino == estado_juego->casilla_origen)
                 {
-                    estado->casilla_seleccionada = NO_SELECCION;
+                    estado_juego->casilla_seleccionada = NO_SELECCION;
                     tablero->cursorPiezaSeleccionada.visible = 0;
                 }
                 else
-                    estado->casilla_seleccionada = DESTINO_SELECCIONADO;                
+                    estado_juego->casilla_seleccionada = DESTINO_SELECCIONADO;                
             }
             break;
+
+        case '\033':  // ESC
+            estado_juego->fin_juego = 1;    // Salir del juego
     }    
     
     mvprintw (0,0, "cursorMovil.id: %2d", cursorMovil->casilla->id);
@@ -492,7 +495,7 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado)
     mvprintw (0,50, "Casilla de color: %s", 
               cursorMovil->casilla->color
               ? "BLANCO" : "NEGRO ");    
-    mvprintw (1,0, "casilla_seleccionada: %d", estado->casilla_seleccionada);
+    mvprintw (1,0, "casilla_seleccionada: %d", estado_juego->casilla_seleccionada);
     return 0;
 }
 ////////////////////////////////////////////////////////////////////////////

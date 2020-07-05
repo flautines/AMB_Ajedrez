@@ -21,6 +21,7 @@ typedef struct
    AJD_Seleccion casilla_seleccionada: 2; 
    AJD_CasillaPtr casilla_origen;  // casilla origen de la pieza a mover
    AJD_CasillaPtr casilla_destino; // casilla destino de la pieza a mover   
+   uint8_t fin_juego : 1;          // Salir del juego?
 } AJD_Estado, *AJD_EstadoPtr;
 /////////////////////////////////////////////////////////////////////
 // INTERFAZ PUBLICA
