@@ -6,7 +6,7 @@
 typedef enum {NO_SELECCION, ORIGEN_SELECCIONADO, DESTINO_SELECCIONADO} AJD_Seleccion;
 typedef enum { NO_ENROQUE, ENROQUE_LARGO, ENROQUE_CORTO } AJD_Enroque;
 // Tipo para representar el estado
-typedef struct _AJD_Estado
+typedef struct
 {
    uint16_t turno;                     // Cuántos turnos se han jugado ya
    uint8_t juegan_blancas      : 1; 
@@ -21,9 +21,7 @@ typedef struct _AJD_Estado
    AJD_Seleccion casilla_seleccionada: 2; 
    AJD_CasillaPtr casilla_origen;  // casilla origen de la pieza a mover
    AJD_CasillaPtr casilla_destino; // casilla destino de la pieza a mover   
-} AJD_Estado;
-
-typedef struct _AJD_Estado* AJD_EstadoPtr;
+} AJD_Estado, *AJD_EstadoPtr;
 /////////////////////////////////////////////////////////////////////
 // INTERFAZ PUBLICA
 //

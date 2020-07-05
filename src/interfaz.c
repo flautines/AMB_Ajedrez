@@ -422,7 +422,7 @@ int obtenJugada (int* celda_origen, int* celda_destino)
 // procesaTeclado Lectura del teclado y actualizacion de cursor
 //             Devuelve celda origen y destino de la pieza a mover.
 //
-int procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado)
+int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado)
 {
     int ch;    
     AJD_Cursor*  cursorMovil;

@@ -36,20 +36,20 @@ enum {
 //
 
 typedef uint8_t AJD_idCasilla ;
-typedef struct _AJD_Casilla
+typedef struct
 {
    AJD_Color     color:1;      // Color de la casilla (BLANCO o NEGRO)
    AJD_Pieza     pieza:3;      // Tipo de pieza en la casilla
    AJD_Color     color_pieza:1;// Color de la pieza en esta casilla
    AJD_idCasilla id;       // Indice en el array de casillas (0..63)
-} AJD_Casilla;
-
-typedef struct _AJD_Casilla* AJD_CasillaPtr;
+} AJD_Casilla, *AJD_CasillaPtr;
 
 ////////////////////////////////////////////////////////////////////////////
 // Cursor de selección de pieza
 #define NCHARS_IN_SPRITE 9
-typedef struct _AJD_Sprite {
+
+typedef struct 
+{
    chtype ch[NCHARS_IN_SPRITE];
 } AJD_Sprite;
 
@@ -62,12 +62,10 @@ typedef struct
 } AJD_Cursor;
 
 //AJD_Cursor _cursorSeleccion;
-typedef struct _AJD_Tablero
+typedef struct
 {
    AJD_Casilla casilla[8*8];
    AJD_Cursor cursorPiezaSeleccionada;
    AJD_Cursor cursorMovil;
-} AJD_Tablero;
-
-typedef struct _AJD_Tablero* AJD_TableroPtr;
+} AJD_Tablero, *AJD_TableroPtr;
 

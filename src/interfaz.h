@@ -24,7 +24,7 @@ void dibujaCursor (AJD_Cursor cursor);
 void dibujaMenu (int y, int x, menu_t* menu);
 int  muestraMenu (int x, int y, menu_t* menu);
 int  obtenJugada (int* celda_origen, int* celda_destino);
-int  procesaTeclado (AJD_TableroPtr tablero, AJD_Estado* estado_juego);
+int  procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 
 // Visualizaciones para depuracion 
-void muestraMovInfo (AJD_MovInfo* movInfo);
+void muestraMovInfo (AJD_MovInfoPtr movInfo);

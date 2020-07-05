@@ -30,7 +30,7 @@
 #define EL_DESTINO_REY_NEGRO     c8
 #define EC_DESTINO_REY_NEGRO     h8
 
-typedef struct _AJD_MovInfo {
+typedef struct {
     AJD_CasillaPtr origen;
     AJD_CasillaPtr destino;
     uint8_t srcY:3;
@@ -41,7 +41,8 @@ typedef struct _AJD_MovInfo {
     int dx:4;  
     int distY:4;
     int distX:4;
-} AJD_MovInfo;
+} AJD_MovInfo, *AJD_MovInfoPtr;
+
 ////////////////////////////////////////////////////////////////////////////
 // esMovimientoValido
 //
@@ -50,11 +51,6 @@ typedef struct _AJD_MovInfo {
 //
 int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
-// compruebaMovimientoPieza
-//
-//  Comprueba si la pieza a mover lo hace segun sus reglas
-//
-int compruebaMovimientoPieza (AJD_MovInfo* movInfo);
 // puedeEnrocar
 //
 //  Comprueba si el jugador que mueve puede realizar enroque
