@@ -126,6 +126,9 @@ void actualizaJuego (AJD_TableroPtr tablero)
          else
             muevePieza (tablero, &estado_juego);
 
+         if (peonUltimaFila (tablero, &estado_juego))
+            promocionaPeon (tablero, estado_juego.casilla_destino);
+
          estado_juego.turno_jugador ^= 1;
          estado_juego.juegan_blancas ^= 1;
          estado_juego.casilla_seleccionada = NO_SELECCION;

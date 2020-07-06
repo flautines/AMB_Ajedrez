@@ -70,6 +70,18 @@ void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 //
 void efectuaEnroque (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 ////////////////////////////////////////////////////////////////////////////
+// promocionaPeon
+//
+//  Promociona el peon en la casilla indicada
+//
+void promocionaPeon (AJD_TableroPtr tablero, AJD_CasillaPtr casilla);
+////////////////////////////////////////////////////////////////////////////
+// peonUltimafila
+//
+//  Comprueba si un peon ha efectuado un movimiento a la ultima fila
+//
+int peonUltimaFila (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
+////////////////////////////////////////////////////////////////////////////
 // casillaLibre
 //
 //  Comprueba si en la casilla indicada hay una pieza sin importar color
