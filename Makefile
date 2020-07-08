@@ -13,7 +13,7 @@ CFLAGS 	:= -Wall -Werror -pedantic -std=c99 -I ${INCDIRS} -finput-charset=UTF-8
 LDFLAGS := -lncurses
 
 ${APP}: ${SOURCES}
-	${CC} ${LDFLAGS} $^ -o $@
+	${CC} ${LDFLAGS} -v $^ -o $@
 
 ${OBJDIR}/%.o : ${SRCDIR}/%.c
 	${CC} -c ${CFLAGS} $^ -o $@

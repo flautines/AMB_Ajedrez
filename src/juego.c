@@ -4,15 +4,18 @@
 #include <juego.h>
 #include <tablero.h>
 #include <movimiento.h>
-//#include <ncurses.h>
+
+#include <time.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PRIVADAS forward declarations
 void _colocaPiezas (AJD_TableroPtr tablero);
+void actualizaCrono ();
 
 ////////////////////////////////////////////////////////////////////////////
 // VARIABLES PRIVADAS AL MÓDULO
 AJD_Estado estado_juego;   // Estado del juego
+static time_t crono;       // Temporizador para contar tiempo
 
 ////////////////////////////////////////////////////////////////////////////
 // INTERFAZ PÚBLICA
@@ -83,6 +86,10 @@ void nuevoJuego(AJD_TableroPtr tablero)
    // Turno
    estado_juego.turno = 1;
 
+   // Restablecer tiempos de ambos jugadores 
+   estado_juego.segundos_blancas = 0;
+   estado_juego.segundos_negras  = 0;
+
    // Coloca las piezas
    _colocaPiezas (tablero);
 
@@ -101,6 +108,7 @@ void nuevoJuego(AJD_TableroPtr tablero)
 // Actualiza el estado del juego
 void actualizaJuego (AJD_TableroPtr tablero)
 {
+   actualizaCrono ();
    procesaTeclado (tablero, &estado_juego);
 
    switch (estado_juego.casilla_seleccionada)
@@ -138,6 +146,9 @@ void actualizaJuego (AJD_TableroPtr tablero)
 
          // movimiento efectuado, oculta el cursor fijo
          tablero->cursorPiezaSeleccionada.visible = 0;
+
+         // Restablece contadores de tiempo
+         time (&crono);
       }
       else
       {
@@ -197,5 +208,18 @@ void _colocaPiezas(AJD_TableroPtr tablero)
       
       tablero->casilla[6*8 + col].pieza         = PEON;               // fils 7: peones blancos
       //tablero->casilla[6*8 + col].color_pieza   = BLANCO;          
+   }
+}
+
+void actualizaCrono()
+{
+    // Actualización del cronometro
+   if (difftime (time(NULL), crono) >= 1.0)
+   {
+     if (estado_juego.juegan_blancas)
+         estado_juego.segundos_blancas++;
+     else
+         estado_juego.segundos_negras++;
+     time(&crono);
    }
 }

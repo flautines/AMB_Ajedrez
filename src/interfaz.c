@@ -1,4 +1,6 @@
 #include <interfaz.h>
+#include <utils.h>
+
 #include <string.h>
 
 #define TABLERO_ROW_START   10
@@ -8,6 +10,8 @@
 #define MARCADOR_LAST_ROW   TABLERO_ROW_START + 8 * 3 - 1
 AJD_Sprite sprCursorPiezaSeleccionada;
 AJD_Sprite sprCursorMovil;
+
+void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime);
 ////////////////////////////////////////////////////////////////////////////
 // _dibujaCasilla
 //
@@ -212,25 +216,22 @@ void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color)
 //
 void dibujaMarcadores(AJD_EstadoPtr estado_juego)
 {
+    char buff[6];
     int x,y;
 
     x = MARCADOR_COL_START;
     y = MARCADOR_ROW_START + 1;
     attron (COLOR_PAIR (2));
-    move (y,x);
-    printw ("AJEDREZ 1.0");
+    mvprintw (y,x, "AJEDREZ 1.0");
 
     y += 1;
-    move (y,x);
-    printw ("(c) Jun 2020 Andres Mata");
+    mvprintw (y,x, "(c) Jun 2020 Andres Mata");
 
     y += 4;
-    move (y,x);
-    printw ("Blancas 00:00");
+    mvprintw (y,x, "Blancas %s", strSegundos (buff, estado_juego->segundos_blancas));
 
     y += 2;
-    move (y,x);
-    printw ("Negras 00:00");
+    mvprintw (y,x, "Negras %s", strSegundos (buff, estado_juego->segundos_negras));
 
     y += 2;
     if (estado_juego->enroque_efectuado)
@@ -241,12 +242,10 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
     }   
 
     y = MARCADOR_LAST_ROW - 1;
-    move (y,x);
-    printw ("Turno %02d (Jugador %c)", estado_juego->turno, estado_juego->turno_jugador+'1');
+    mvprintw (y,x, "Turno %02d (Jugador %c)", estado_juego->turno, estado_juego->turno_jugador+'1');
 
     y += 1;
-    move (y,x);
-    printw ("Juegan %s", estado_juego->juegan_blancas ? "blancas" : "negras ");
+    mvprintw (y,x, "Juegan %s", estado_juego->juegan_blancas ? "blancas" : "negras ");
 
     // Debug info
     mvprintw (MARCADOR_LAST_ROW+2, 0, "Enroque largo permitido (BLANCAS): %s", 
@@ -314,24 +313,21 @@ void dibujaMenu(int y, int x, menu_t* menu)
     while (nitems--)
     {
         y += 2;
-        menuItem_t* menu_item = &(menu->items[item_id]);
-
-        move (y,x);
+        menuItem_t* menu_item = &(menu->items[item_id]);        
         attron (COLOR_PAIR (2) );
 
         // Resaltar la opcion actual del menu
         if (item_id == menu->selected)
             attron (COLOR_PAIR (1) );
 
-        printw (menu_item->menuString);
+        mvprintw (y,x, menu_item->menuString);
 
         item_id++;
     }
 
     y += 3;
     attron (COLOR_PAIR (2));
-    move (y,x);
-    printw ("Cursores selecciona opcion, ENTER confirmar");
+    mvprintw (y,x, "Cursores selecciona opcion, ENTER confirmar");
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -430,8 +426,8 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 
     cursorMovil = &tablero->cursorMovil;
     idCasilla = cursorMovil->casilla->id;
-    
-    ch = getch();    
+ 
+    ch = getch();
     switch (ch)
     {
         case KEY_UP:    
@@ -513,4 +509,14 @@ void muestraMovInfo (AJD_MovInfo* movInfo)
         movInfo->dx,
         movInfo->distY,
         movInfo->distX);
+}
+
+void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime)
+{
+    if (juegan_blancas)
+        mvprintw (MARCADOR_ROW_START+5, MARCADOR_COL_START, 
+            "Blancas 00:%d", itime);
+    else
+        mvprintw (MARCADOR_ROW_START+7, MARCADOR_COL_START,
+            "Negras 00:%d", itime);
 }
