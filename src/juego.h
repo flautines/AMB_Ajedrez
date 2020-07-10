@@ -19,7 +19,7 @@ typedef struct
    uint8_t        enroque_corto_blanco_invalidado  : 1;
    uint8_t        enroque_largo_negro_invalidado  : 1;
    uint8_t        enroque_corto_negro_invalidado  : 1;
-   uint8_t        enroque_efectuado   : 2; 
+   AJD_Enroque    enroque_efectuado   : 2; 
    uint8_t        turno_jugador       : 1; 
    AJD_Seleccion  casilla_seleccionada: 2; 
    AJD_CasillaPtr casilla_origen;  // casilla origen de la pieza a mover
