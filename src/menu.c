@@ -1,3 +1,4 @@
+#include <juego.h>
 #include <menu.h>
 #include <interfaz.h>
 

@@ -8,12 +8,18 @@
 #define MARCADOR_ROW_START  TABLERO_ROW_START
 #define MARCADOR_COL_START  TABLERO_COL_START + 8 * 3 + 2
 #define MARCADOR_LAST_ROW   TABLERO_ROW_START + 8 * 3 - 1
+/////////////////////////////////////////////////////////////////////////////////////////
+// VARIABLES GLOBALES
 AJD_Sprite sprCursorPiezaSeleccionada;
 AJD_Sprite sprCursorMovil;
-
+/////////////////////////////////////////////////////////////////////////////////////////
+// FUNCIONES PRIVADAS (forward declarations)
 void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime);
-////////////////////////////////////////////////////////////////////////////
-// _dibujaCasilla
+void dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy);
+/////////////////////////////////////////////////////////////////////////////////////////
+// INTERFAZ PRIVADA (Implementación)
+/////////////////////////////////////////////////////////////////////////////////////////
+// dibujaCasilla
 //
 // Dibuja una casilla del tablero con su pieza si la tuviera.
 //
@@ -21,7 +27,7 @@ void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime);
 // .p.###
 // ...###
 //
-void _dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy)
+void dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy)
 {
     // columna y fila correspondientes a esta casilla en el tablero
     int nrow = ncasilla / 8;
@@ -48,7 +54,10 @@ void _dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy)
         attron(COLOR_PAIR (color));
     }
 }
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+// INTERFAZ PÚBLICA (Implementación)
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // inicializaPantalla
 //
 // Inicializa libreria ncurses y la interfaz de usuario en general.
@@ -92,7 +101,13 @@ void inicializaPantalla()
 
     clear();
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////
+// inicializaSprites
+//
+// Establece los sprites necesarios para los cursores de selección y pieza seleccionada.
+// Por ahora estos 'sprites' estan formados de caracteres especiales de recuadro. Se
+// utilizan constantes ACS_ de la librería ncurses para conseguir mayor portabilidad.
+//
 void inicializaSprites(AJD_TableroPtr tablero)
 {
     // Definicion de los cursores
@@ -116,7 +131,7 @@ void inicializaSprites(AJD_TableroPtr tablero)
     tablero->cursorMovil.sprite = &sprCursorMovil;
     tablero->cursorPiezaSeleccionada.sprite = &sprCursorPiezaSeleccionada;
 }
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // liberaPantalla
 //
 // Libera los recursos de ncurses.
@@ -125,7 +140,7 @@ void liberaPantalla()
 {
     endwin();
 }
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // dibujaJuego
 //
 // Dibuja todos los elementos del juego
@@ -135,7 +150,7 @@ void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
     dibujaTablero (tablero);
     dibujaMarcadores (estado_juego);
 }
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // dibujaTablero
 //
 // Dibuja el tablero en pantalla según su estado actual.
@@ -148,7 +163,7 @@ void dibujaTablero(AJD_TableroPtr tablero)
     for (row=0; row < 8; row++)
     for (col=0; col < 8; col++)
     {
-        _dibujaCasilla (tablero, idCasilla, 
+        dibujaCasilla (tablero, idCasilla, 
             TABLERO_COL_START + col * ANCHO_CASILLA,
             TABLERO_ROW_START + row * ALTO_CASILLA);
 
@@ -163,8 +178,7 @@ void dibujaTablero(AJD_TableroPtr tablero)
     x = TABLERO_COL_START-2;
     while (row)
     {
-        move (y, x);
-        printw("%d", row);
+        mprintw (y, x, "%d", row);
         y += 3;
         row--;
     }
@@ -175,8 +189,7 @@ void dibujaTablero(AJD_TableroPtr tablero)
     y = TABLERO_ROW_START - 2;
     while (col)
     {
-        move (y, x);
-        printw ("%c", col+'a'-1);
+        mvprintw (y, x, "%c", col+'a'-1);
         x -= 3;
         col--;
     }
@@ -207,8 +220,7 @@ void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color)
 
     // Dibuja la letra de la pieza en color blanco sobre fondo negro
     attron (COLOR_PAIR (1));
-    move (posy, posx);
-    printw("%c", sprite);
+    mvprintw (posy, posx, "%c", sprite);
     attroff (COLOR_PAIR (1));
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -218,6 +230,7 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
 {
     char buff[6];
     int x,y;
+    AJD_TurnoPtr turno_actual = &(estado_juego->turno_actual);
 
     x = MARCADOR_COL_START;
     y = MARCADOR_ROW_START + 1;
@@ -234,28 +247,35 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
     mvprintw (y,x, "Negras %s", strSegundos (buff, estado_juego->segundos_negras));
 
     y += 2;
-    if (estado_juego->enroque_efectuado)
+    if (turno_actual->enroque)
     {
-        mvprintw (y,x, 
-                  estado_juego->enroque_efectuado == ENROQUE_LARGO ? 
-                  "O-O-O" : "O-O");
+        mvprintw (y,x, turno_actual->enroque == ENROQUE_LARGO 
+                        ? "O-O-O" : "O-O");
     }   
 
     y = MARCADOR_LAST_ROW - 1;
-    mvprintw (y,x, "Turno %02d (Jugador %c)", estado_juego->turno, estado_juego->turno_jugador+'1');
+    mvprintw (y,x, "Turno %02d (Jugador %c)", 
+                    estado_juego->nturno, turno_actual->njugador+'1');
 
     y += 1;
     mvprintw (y,x, "Juegan %s", estado_juego->juegan_blancas ? "blancas" : "negras ");
 
     // Debug info
-    mvprintw (MARCADOR_LAST_ROW+2, 0, "Enroque largo permitido (BLANCAS): %s", 
-              estado_juego->enroque_largo_blanco_invalidado ? "NO" : "SI");
-    mvprintw (MARCADOR_LAST_ROW+3, 0, "Enroque corto permitido (BLANCAS): %s", 
-              estado_juego->enroque_corto_blanco_invalidado ? "NO" : "SI");
-    mvprintw (MARCADOR_LAST_ROW+4, 0, "Enroque largo permitido (NEGRAS): %s",
-              estado_juego->enroque_largo_negro_invalidado ? "NO" : "SI");
-    mvprintw (MARCADOR_LAST_ROW+5, 0, "Enroque corto permitido (NEGRAS): %s", 
-              estado_juego->enroque_corto_negro_invalidado ? "NO" : "SI");
+    mvprintw (MARCADOR_LAST_ROW+2, 0, "O-O-O (BLANCAS) %s", 
+              estado_juego->enroque_permitido &ERLARGO_PROHIBIDO_B 
+              ? "PROH" : "PERM");
+
+    mvprintw (MARCADOR_LAST_ROW+3, 0, "O-O (BLANCAS) %s", 
+              estado_juego->enroque_permitido &ERCORTO_PROHIBIDO_B 
+              ? "PROH" : "PERM");
+
+    mvprintw (MARCADOR_LAST_ROW+4, 0, "O-O-O (NEGRAS) %s",
+              estado_juego->enroque_permitido &ERLARGO_PROHIBIDO_N 
+              ? "PROH" : "PERM");
+
+    mvprintw (MARCADOR_LAST_ROW+5, 0, "O-O (NEGRAS) %s", 
+              estado_juego->enroque_permitido &ERCORTO_PROHIBIDO_N
+              ? "PROH" : "PERM");
 
 
 }
@@ -264,7 +284,8 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
 //
 void dibujaCursor (AJD_Cursor cursor)
 {
-    int y, x, flash;
+    int y, x;
+    AJD_Bool flash = FALSE;
     AJD_CasillaPtr casillaCursor = cursor.casilla;
     
     y = TABLERO_ROW_START + (casillaCursor->id/8) * ALTO_CASILLA;
@@ -307,8 +328,7 @@ void dibujaMenu(int y, int x, menu_t* menu)
 
     // Menu Title
     attron ( COLOR_PAIR (3) );  
-    move (y, x);
-    printw (menu->items[0].menuString);
+    mvprintw (y, x, menu->items[0].menuString);
 
     while (nitems--)
     {
@@ -320,8 +340,7 @@ void dibujaMenu(int y, int x, menu_t* menu)
         if (item_id == menu->selected)
             attron (COLOR_PAIR (1) );
 
-        mvprintw (y,x, menu_item->menuString);
-
+        mvprintw (y, x, menu_item->menuString);
         item_id++;
     }
 
@@ -329,12 +348,11 @@ void dibujaMenu(int y, int x, menu_t* menu)
     attron (COLOR_PAIR (2));
     mvprintw (y,x, "Cursores selecciona opcion, ENTER confirmar");
 }
-
 ////////////////////////////////////////////////////////////////////////////
 // muestraMenu Muestra un menu y espera selección.
 //             Devuelve true cuando se ha seleccionado una opción del menu
 //
-int muestraMenu (int x, int y, menu_t* menu)
+AJD_Bool muestraMenu (int x, int y, menu_t* menu)
 {   
     int ch;
 
@@ -353,79 +371,19 @@ int muestraMenu (int x, int y, menu_t* menu)
     clear();
     return true;
 }
-
-////////////////////////////////////////////////////////////////////////////
-// obtenJugada Introducción por teclado de la pieza a mover.
-//   Devuelve celda origen y destino de la pieza a mover.
-//   Actualmente no se usa, en su lugar se utiliza  'procesaTeclado' 
-//   para mover la pieza con los cursores, pero se deja por si en un futuro 
-//   se desease introducir jugadas directamente.
-//
-int obtenJugada (int* celda_origen, int* celda_destino)
-{
-    // columna/fila
-    int columna, fila;
-    int ch;
-
-    int y = MARCADOR_ROW_START + 11;
-    move (y, MARCADOR_COL_START);
-    printw ("Instroduzca casilla ORIGEN");
-    move (y+=1, MARCADOR_COL_START);
-    printw ("Columna:");
-    move (y+=1, MARCADOR_COL_START);    
-    printw ("Fila:");
-
-    // Activar que se muestren caracteres tecleados
-    curs_set (1);
-    echo ();
-    nodelay(stdscr, 0);
-
-    move (MARCADOR_ROW_START + 12, MARCADOR_COL_START + 9);
-    ch = getch();
-    columna = ch - 'a';
-
-    move (MARCADOR_ROW_START + 13, MARCADOR_COL_START + 6);
-    ch = getch();
-    fila = 8 -  ch + '0';
-    *celda_origen = 8 * fila + columna;
-
-    move (0,0);
-    printw ("Celda Origen %d", *celda_origen);
-
-    move (y+=2, MARCADOR_COL_START);
-    printw ("Instroduzca casilla DESTINO");
-    move (y+=1, MARCADOR_COL_START);
-    printw ("Columna:");
-    move (y+=1, MARCADOR_COL_START);    
-    printw ("Fila:");
-
-    move (MARCADOR_ROW_START + 16, MARCADOR_COL_START + 10);
-    
-    ch = getch();
-    columna = ch - 'a';
-
-    move (MARCADOR_ROW_START + 17, MARCADOR_COL_START + 6);
-    ch = getch();
-    fila = 8 - ch + '0';
-    *celda_destino = 8 * fila + columna;
-
-    move (1,0);
-    printw ("Celda Destino %d", *celda_destino);
-
-    return true;
-}
 ////////////////////////////////////////////////////////////////////////////
 // procesaTeclado Lectura del teclado y actualizacion de cursor
 //             Devuelve celda origen y destino de la pieza a mover.
 //
-int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
     int ch;    
-    AJD_Cursor*  cursorMovil;
+    AJD_Cursor*   cursorMovil;
     AJD_idCasilla idCasilla;
+    AJD_TurnoPtr  turno_actual;
 
     cursorMovil = &tablero->cursorMovil;
-    idCasilla = cursorMovil->casilla->id;
+    turno_actual = &(estado_juego->turno_actual);
  
     ch = getch();
     switch (ch)
@@ -459,38 +417,50 @@ int procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
             break;
 
         case '\n':
+            // Si no hay ninguna seleccion previa, la selección actual corresponde al origen
             if (estado_juego->casilla_seleccionada == NONE)
             {                
                 estado_juego->casilla_seleccionada = ORIGEN_SELECCIONADO;
-                estado_juego->casilla_origen = cursorMovil->casilla;
+                
+                // Rellenar la información de casilla_origen con los datos de la
+                // casilla seleccionada.
+                memcpy (&(turno_actual->casilla_origen), 
+                        cursorMovil->casilla, 
+                        sizeof (AJD_Casilla));
+
                 tablero->cursorPiezaSeleccionada.casilla = cursorMovil->casilla;
             }
+            // Si había seleccion previa, la selección actual corresponde al destino
             else
             {
+                // Rellenar la información de casilla_destino con los datos de la
+                // casilla seleccionada.
+                memcpy (&(turno_actual->casilla_destino), 
+                        cursorMovil->casilla, 
+                        sizeof (AJD_Casilla));
+
                 // Si se selecciona como casilla destino la misma casilla
                 // origen se cancela la selección.
-                estado_juego->casilla_destino = cursorMovil->casilla;
-                if (estado_juego->casilla_destino == estado_juego->casilla_origen)
+                if (turno_actual->casilla_destino.id == turno_actual->casilla_origen.id)
                 {
                     estado_juego->casilla_seleccionada = NO_SELECCION;
                     tablero->cursorPiezaSeleccionada.visible = 0;
                 }
+                // Si no, hemos acabado con la seleccion de origen y destino
                 else
                     estado_juego->casilla_seleccionada = DESTINO_SELECCIONADO;                
             }
             break;
 
         case '\033':  // ESC
-            estado_juego->fin_juego = 1;    // Salir del juego
+            estado_juego->fin_juego = TRUE;    // Salir del juego
     }    
     
     mvprintw (0,0, "cursorMovil.id: %2d", cursorMovil->casilla->id);
-    mvprintw (0,25, "Pieza de color: %s", 
-              cursorMovil->casilla->color_pieza
-              ? "BLANCO" : "NEGRO ");
-    mvprintw (0,50, "Casilla de color: %s", 
-              cursorMovil->casilla->color
-              ? "BLANCO" : "NEGRO ");    
+    mvprintw (0,25, "Pieza de color: %s", cursorMovil->casilla->color_pieza
+                                            ? "BLANCO" : "NEGRO ");
+    mvprintw (0,50, "Casilla de color: %s", cursorMovil->casilla->color
+                                            ? "BLANCO" : "NEGRO ");
     mvprintw (1,0, "casilla_seleccionada: %d", estado_juego->casilla_seleccionada);
     return 0;
 }

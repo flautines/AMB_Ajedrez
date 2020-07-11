@@ -1,15 +1,15 @@
-#include <stdio.h>
-#include <string.h>
 #include <interfaz.h>
 #include <juego.h>
 #include <tablero.h>
 #include <movimiento.h>
 
 #include <time.h>
+#include <stdio.h>
+#include <string.h>
 
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PRIVADAS forward declarations
-void _colocaPiezas (AJD_TableroPtr tablero);
+void tableroDisposicionInicial (AJD_TableroPtr tablero);
 void actualizaCrono ();
 
 ////////////////////////////////////////////////////////////////////////////
@@ -33,8 +33,9 @@ void inicializa(AJD_TableroPtr tablero)
    AJD_idCasilla id = 0;
 
    for (int i=0; i<8; i++) 
-   {      
-      color ^= 1; // Alterna entre blanco/negro       
+   {
+      // Alterna entre blanco/negro
+      color ^= 1; 
       for (int j=0; j<8; j++)    
       {
          // puntero a casilla actual, mejora legibilidad codigo
@@ -50,7 +51,6 @@ void inicializa(AJD_TableroPtr tablero)
          casilla->id = id++;
       }
    }
-   //printf("sizeof(AJD_Tablero) = %ld\n", sizeof (AJD_Tablero));
 
    // Inicializa la UI
    inicializaPantalla();
@@ -81,17 +81,13 @@ void nuevoJuego(AJD_TableroPtr tablero)
 {
    // Estado del juego
    memset(&estado_juego, 0, sizeof (AJD_Estado));
-   estado_juego.juegan_blancas = 1;
-
-   // Turno
-   estado_juego.turno = 1;
-
+   
    // Restablecer tiempos de ambos jugadores 
    estado_juego.segundos_blancas = 0;
    estado_juego.segundos_negras  = 0;
 
    // Coloca las piezas
-   _colocaPiezas (tablero);
+   tableroDisposicionInicial (tablero);
 
    // El cursor movil y de pieza seleccionada se posicionan a d2
    // El cursor movil es visible y sin flash
@@ -101,6 +97,10 @@ void nuevoJuego(AJD_TableroPtr tablero)
    tablero->cursorPiezaSeleccionada.visible = 0;
    tablero->cursorMovil.flash = 0;
    tablero->cursorPiezaSeleccionada.flash = 1;
+
+   // Turno actual   
+   estado_juego.turno_actual.nturno = 1;
+   estado_juego.turno_actual.juegan_blancas = TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////
 // actualizaJuego
@@ -114,9 +114,11 @@ void actualizaJuego (AJD_TableroPtr tablero)
    switch (estado_juego.casilla_seleccionada)
    {   
    case ORIGEN_SELECCIONADO:
-      if (!hayPiezaValida(tablero, estado_juego.casilla_origen, &estado_juego))
+   {
+      AJD_CasillaPtr casilla_origen = &estado_juego.turno_actual.casilla_origen;
+      if (!hayPiezaValida(tablero, casilla_origen, &estado_juego))
       {
-         estado_juego.casilla_origen = NULL;
+         //estado_juego.casilla_origen = NULL;
          estado_juego.casilla_seleccionada = NO_SELECCION;
       }
       else
@@ -125,11 +127,16 @@ void actualizaJuego (AJD_TableroPtr tablero)
          tablero->cursorPiezaSeleccionada.visible = 1;
       }
       break;
-
+   }
    case DESTINO_SELECCIONADO:
+   {
+      AJD_TurnoPtr turno_actual = &(estado_juego.turno_actual);
+
+      // Si se ha seleccionado un movimiento valido efectuar las correspondientes
+      // acciones y actualizar información para el siguiente turno.
       if (esMovimientoValido (tablero, &estado_juego))
       {
-         if (estado_juego.enroque_efectuado)
+         if (estado_juego.turno_actual.enroque)
             efectuaEnroque (tablero, &estado_juego);
          else
             muevePieza (tablero, &estado_juego);
@@ -137,12 +144,17 @@ void actualizaJuego (AJD_TableroPtr tablero)
          if (peonUltimaFila (tablero, &estado_juego))
             promocionaPeon (tablero, estado_juego.casilla_destino);
 
-         estado_juego.turno_jugador ^= 1;
-         estado_juego.juegan_blancas ^= 1;
+         // Siguiente turno
          estado_juego.casilla_seleccionada = NO_SELECCION;
-         estado_juego.turno += estado_juego.juegan_blancas;
-         estado_juego.casilla_origen = estado_juego.casilla_destino = NULL;
-         estado_juego.enroque_efectuado = NO_ENROQUE;
+         turno_actual->njugador ^= 1;
+         turno_actual->juegan_blancas ^= 1;         
+         turno_actual->nturno += turno_actual->juegan_blancas;
+         
+         // Resetea los datos de las casillas origen y destino para el siguiente turno
+         memset (&(turno_actual->casilla_origen),  0, sizeof (AJD_Casilla));
+         memset (&(turno_actual->casilla_destino), 0, sizeof (AJD_Casilla));
+
+         turno_actual->enroque_efectuado = NO_ENROQUE;
 
          // movimiento efectuado, oculta el cursor fijo
          tablero->cursorPiezaSeleccionada.visible = 0;
@@ -150,13 +162,16 @@ void actualizaJuego (AJD_TableroPtr tablero)
          // Restablece contadores de tiempo
          time (&crono);
       }
+      // Si no es un movimiento valido
+      // Resetea los datos de casilla destino de este turno y marcar que no se ha 
+      // seleccionado un destino con el cursor.
       else
       {
-         estado_juego.casilla_destino = NULL;
+         memset (turno_actual->casilla_destino, 0, sizeof (AJD_Casilla));
          estado_juego.casilla_seleccionada = ORIGEN_SELECCIONADO;
       }
       break;
-
+   }
    default:
       break;
    }
@@ -187,11 +202,11 @@ void ejecutaPartida (AJD_TableroPtr tablero)
 ////////////////////////////////////////////////////////////////////////////
 // INTERFAZ PRIVADA
 ////////////////////////////////////////////////////////////////////////////
-// _colocaPiezas
+// tableroDisposicionInicial
 //
 // Dispone las piezas en el tablero para una partida nueva
 //
-void _colocaPiezas(AJD_TableroPtr tablero)
+void tableroDisposicionInicial (AJD_TableroPtr tablero)
 {   
    AJD_Pieza piezasMayores[8] = { TORRE, CABALLO, ALFIL, DAMA, REY, ALFIL, CABALLO, TORRE };
    for (int col=0; col < 8; col++)
@@ -201,13 +216,11 @@ void _colocaPiezas(AJD_TableroPtr tablero)
       tablero->casilla[col].color_pieza         = NEGRO;
 
       tablero->casilla[7*8 + col].pieza         = piezasMayores[col]; // fila 8: piezas mayores blancas
-      //tablero->casilla[7*8 + col].color_pieza   = BLANCO;
 
       tablero->casilla[8 + col].pieza           = PEON;               // fila 2: peones negros
       tablero->casilla[8 + col].color_pieza     = NEGRO;
       
       tablero->casilla[6*8 + col].pieza         = PEON;               // fils 7: peones blancos
-      //tablero->casilla[6*8 + col].color_pieza   = BLANCO;          
    }
 }
 

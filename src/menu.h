@@ -22,7 +22,7 @@ typedef struct
 typedef struct 
 {
 	int 		nitems;	
-	int 		selected;
+	AJD_Bool	selected;
 	menuItem_t 	items[10];
 } menu_t;
 
