@@ -1,8 +1,8 @@
 #pragma once 
-
+/*
 #include <tablero.h>
 #include <juego.h>
-
+*/
 // Máximo número de casillas que pueden moverse la TORRE
 #define MAX_CASILLAS_TORRE 7  
 // Máximo número de casillas que pueden moverse el ALFIL

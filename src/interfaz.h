@@ -47,6 +47,16 @@ void dibujaTablero(AJD_TableroPtr tablero);
 // dibujaPieza Dibuja una pieza del ajedrez en la posición indicada
 //
 void dibujaPieza (int posy, int posx, AJD_Pieza pieza, AJD_Color color);
+/////////////////////////////////////////////////////////////////////////////////////////
+// dibujaCasilla
+//
+// Dibuja una casilla del tablero con su pieza si la tuviera.
+//
+// ...###
+// .p.###
+// ...###
+//
+void dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy);
 ////////////////////////////////////////////////////////////////////////////
 // dibujaMarcadores Dibuja los marcadores de tiempo, turno, etc.
 //

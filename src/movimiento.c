@@ -1,5 +1,4 @@
-#include <movimiento.h>
-#include <interfaz.h>
+#include <common.h>
 #include <utils.h>
 
 #include <stdlib.h>
@@ -11,7 +10,7 @@
 // Variable privada con informacion adicional del movimiento
 AJD_MovInfo movInfo;
 /////////////////////////////////////////////////////////////////////////////////////////
-void obtenMovInfo (AJD_EstadoPtr estado_juego);
+void obtenMovInfo (AJD_TurnoPtr turno);
 int cumpleReglasMovimiento (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
 int cumpleReglasComerPeon ();
 int cumpleReglasMovimientoPeon (AJD_TableroPtr tablero);
@@ -27,13 +26,13 @@ void actualizaOpcionesDeEnroque (AJD_CasillaPtr origen, AJD_EstadoPtr estado_jue
 //  Obtiene detalles necesarios para realizar comprobaciones posteriores
 // respecto las casillas origen y destino de un movimiento.
 //
-void obtenMovInfo (AJD_EstadoPtr estado_juego)
+void obtenMovInfo (AJD_TurnoPtr turno)
 {
     AJD_CasillaPtr origen, destino;
     int dir;
     
-    origen = estado_juego->casilla_origen;
-    destino = estado_juego->casilla_destino;
+    origen  = &(turno->origen);
+    destino = &(turno->destino);
     // Si el color de la pieza es BLANCO se mueven 1 hacia arriba (-1), si no,
     // se mueven 1 hacia abajo (+1)
     dir = origen->color_pieza ? -1 : 1;

@@ -1,7 +1,4 @@
-#include <interfaz.h>
-#include <juego.h>
-#include <menu.h>
-#include <tablero.h>
+#include <common.h>
 ///////////////////////////////////////////////////////////////////////////////
 // MAIN
 //

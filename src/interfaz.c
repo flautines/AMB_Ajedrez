@@ -1,4 +1,4 @@
-#include <interfaz.h>
+#include <common.h>
 #include <utils.h>
 
 #include <string.h>
@@ -15,45 +15,6 @@ AJD_Sprite sprCursorMovil;
 /////////////////////////////////////////////////////////////////////////////////////////
 // FUNCIONES PRIVADAS (forward declarations)
 void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime);
-void dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy);
-/////////////////////////////////////////////////////////////////////////////////////////
-// INTERFAZ PRIVADA (Implementación)
-/////////////////////////////////////////////////////////////////////////////////////////
-// dibujaCasilla
-//
-// Dibuja una casilla del tablero con su pieza si la tuviera.
-//
-// ...###
-// .p.###
-// ...###
-//
-void dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy)
-{
-    // columna y fila correspondientes a esta casilla en el tablero
-    int nrow = ncasilla / 8;
-    int ncol = ncasilla & 7;
-
-    // Puntero a la casilla a dibujar
-    AJD_CasillaPtr casilla = &(tablero->casilla[nrow * 8 + ncol]);
-
-    // Color principal/fondo a usar dependiendo de la casilla
-    int color = casilla->color == BLANCO ? 1 : 2;   
-    attron(COLOR_PAIR (color));
-
-    for (nrow = 0; nrow < ALTO_CASILLA; nrow++)
-    {       
-        move (posy+nrow, posx);
-        printw("   ");  // 3 espacios
-
-        // Dibuja pieza si es que hay alguna en la casilla actual
-        if (casilla->pieza)
-        {           
-            dibujaPieza (posy+1, posx+1, casilla->pieza, casilla->color_pieza);
-        }
-
-        attron(COLOR_PAIR (color));
-    }
-}
 /////////////////////////////////////////////////////////////////////////////////////////
 // INTERFAZ PÚBLICA (Implementación)
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +139,7 @@ void dibujaTablero(AJD_TableroPtr tablero)
     x = TABLERO_COL_START-2;
     while (row)
     {
-        mprintw (y, x, "%d", row);
+        mvprintw (y, x, "%d", row);
         y += 3;
         row--;
     }
@@ -204,6 +165,42 @@ void dibujaTablero(AJD_TableroPtr tablero)
         dibujaCursor(tablero->cursorPiezaSeleccionada);
     }
 
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+// dibujaCasilla
+//
+// Dibuja una casilla del tablero con su pieza si la tuviera.
+//
+// ...###
+// .p.###
+// ...###
+//
+void dibujaCasilla(AJD_TableroPtr tablero, int ncasilla, int posx, int posy)
+{
+    // columna y fila correspondientes a esta casilla en el tablero
+    int nrow = ncasilla / 8;
+    int ncol = ncasilla & 7;
+
+    // Puntero a la casilla a dibujar
+    AJD_CasillaPtr casilla = &(tablero->casilla[nrow * 8 + ncol]);
+
+    // Color principal/fondo a usar dependiendo de la casilla
+    int color = casilla->color == BLANCO ? 1 : 2;   
+    attron(COLOR_PAIR (color));
+
+    for (nrow = 0; nrow < ALTO_CASILLA; nrow++)
+    {       
+        move (posy+nrow, posx);
+        printw("   ");  // 3 espacios
+
+        // Dibuja pieza si es que hay alguna en la casilla actual
+        if (casilla->pieza)
+        {           
+            dibujaPieza (posy+1, posx+1, casilla->pieza, casilla->color_pieza);
+        }
+
+        attron(COLOR_PAIR (color));
+    }
 }
 ////////////////////////////////////////////////////////////////////////////
 // dibujaPieza Dibuja una pieza del ajedrez en la posición indicada
@@ -258,7 +255,7 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
                     estado_juego->nturno, turno_actual->njugador+'1');
 
     y += 1;
-    mvprintw (y,x, "Juegan %s", estado_juego->juegan_blancas ? "blancas" : "negras ");
+    mvprintw (y,x, "Juegan %s", turno_actual->juegan_blancas ? "blancas" : "negras ");
 
     // Debug info
     mvprintw (MARCADOR_LAST_ROW+2, 0, "O-O-O (BLANCAS) %s", 
@@ -382,8 +379,10 @@ void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
     AJD_idCasilla idCasilla;
     AJD_TurnoPtr  turno_actual;
 
-    cursorMovil = &tablero->cursorMovil;
+    cursorMovil  = &tablero->cursorMovil;
+    idCasilla    = cursorMovil->casilla->id;
     turno_actual = &(estado_juego->turno_actual);
+    
  
     ch = getch();
     switch (ch)
@@ -424,7 +423,7 @@ void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
                 
                 // Rellenar la información de casilla_origen con los datos de la
                 // casilla seleccionada.
-                memcpy (&(turno_actual->casilla_origen), 
+                memcpy (&(turno_actual->origen), 
                         cursorMovil->casilla, 
                         sizeof (AJD_Casilla));
 
@@ -435,13 +434,13 @@ void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
             {
                 // Rellenar la información de casilla_destino con los datos de la
                 // casilla seleccionada.
-                memcpy (&(turno_actual->casilla_destino), 
+                memcpy (&(turno_actual->destino), 
                         cursorMovil->casilla, 
                         sizeof (AJD_Casilla));
 
                 // Si se selecciona como casilla destino la misma casilla
                 // origen se cancela la selección.
-                if (turno_actual->casilla_destino.id == turno_actual->casilla_origen.id)
+                if (turno_actual->destino.id == turno_actual->origen.id)
                 {
                     estado_juego->casilla_seleccionada = NO_SELECCION;
                     tablero->cursorPiezaSeleccionada.visible = 0;
@@ -462,7 +461,6 @@ void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
     mvprintw (0,50, "Casilla de color: %s", cursorMovil->casilla->color
                                             ? "BLANCO" : "NEGRO ");
     mvprintw (1,0, "casilla_seleccionada: %d", estado_juego->casilla_seleccionada);
-    return 0;
 }
 ////////////////////////////////////////////////////////////////////////////
 // FUNCIONES VISUALIZACION PARA DEPURACION
@@ -480,7 +478,7 @@ void muestraMovInfo (AJD_MovInfo* movInfo)
         movInfo->distY,
         movInfo->distX);
 }
-
+/*
 void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime)
 {
     if (juegan_blancas)
@@ -490,3 +488,4 @@ void actualizaTiempoGUI (AJD_Color juegan_blancas, int itime)
         mvprintw (MARCADOR_ROW_START+7, MARCADOR_COL_START,
             "Negras 00:%d", itime);
 }
+*/

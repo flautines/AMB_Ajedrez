@@ -44,6 +44,8 @@ typedef struct
    AJD_idCasilla id;       // Indice en el array de casillas (0..63)
 } AJD_Casilla, *AJD_CasillaPtr;
 
+// variable global con datos para una casilla 'NULL' (sin nada)
+extern AJD_Casilla casilla_null;
 ////////////////////////////////////////////////////////////////////////////
 // Cursor de selección de pieza
 #define NCHARS_IN_SPRITE 9

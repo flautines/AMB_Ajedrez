@@ -1,6 +1,4 @@
-#include <juego.h>
-#include <menu.h>
-#include <interfaz.h>
+#include <common.h>
 
 /////////////////////////////////////////////////////////////////////
 // strings y posicion del menu eleccion del tipo de jugador
@@ -39,7 +37,7 @@ void menuJuego(AJD_EstadoPtr estado_juego)
 	{
 		if ( muestraMenu (5, 7, &menuColorJugador) )
 		{
-			estado_juego->turno_jugador = menuColorJugador.selected-1;
+			estado_juego->turno_actual.njugador = menuColorJugador.selected-1;
 		}
 	}
 
