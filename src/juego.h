@@ -55,6 +55,7 @@ typedef struct {
    AJD_Bool    come_pieza     : 1;
    AJD_Bool    jaque          : 1;
    AJD_Bool    mate           : 1;
+   AJD_Bool    promocion      : 1;
 } AJD_Turno, *AJD_TurnoPtr;
 /////////////////////////////////////////////////////////////////////////////////////////
 // Tipo para representar un nodo en la lista de turnos a guardar

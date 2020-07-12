@@ -116,8 +116,8 @@ void actualizaJuego (AJD_TableroPtr tablero)
    {   
    case ORIGEN_SELECCIONADO:
    {
-      AJD_CasillaPtr casilla_origen = &estado_juego.turno_actual.origen;
-      if (!hayPiezaValida(tablero, casilla_origen, &estado_juego))
+      AJD_CasillaPtr casilla_origen = &(estado_juego.turno_actual.origen);
+      if (!hayPiezaValida(tablero, casilla_origen, turno_actual))
       {
          turno_actual->origen = casilla_null;
          estado_juego.casilla_seleccionada = NO_SELECCION;
@@ -142,8 +142,8 @@ void actualizaJuego (AJD_TableroPtr tablero)
          else
             muevePieza (tablero, &estado_juego);
 
-         if (peonUltimaFila (tablero, &estado_juego))
-            promocionaPeon (tablero, &(turno_actual->destino));
+         if (peonUltimaFila (tablero, turno_actual))
+            promocionaPeon (tablero, turno_actual);
 
          // Siguiente turno
          estado_juego.casilla_seleccionada = NO_SELECCION;

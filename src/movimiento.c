@@ -10,16 +10,16 @@
 // Variable privada con informacion adicional del movimiento
 AJD_MovInfo movInfo;
 /////////////////////////////////////////////////////////////////////////////////////////
-void obtenMovInfo (AJD_TurnoPtr turno);
-int cumpleReglasMovimiento (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
-int cumpleReglasComerPeon ();
-int cumpleReglasMovimientoPeon (AJD_TableroPtr tablero);
-int cumpleReglasMovimientoCaballo ();
-int cumpleReglasMovimientoRey (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
-int seMueveEnVertHorz (AJD_TableroPtr tablero);
-int seMueveEnDiagonal (AJD_TableroPtr tablero);
-int caminoLibre (AJD_TableroPtr tablero, AJD_CasillaPtr origen, AJD_CasillaPtr destino);
-void actualizaOpcionesDeEnroque (AJD_CasillaPtr origen, AJD_EstadoPtr estado_juego);
+void     obtenMovInfo (AJD_TurnoPtr);
+AJD_Bool cumpleReglasMovimiento (AJD_TableroPtr, AJD_EstadoPtr);
+AJD_Bool cumpleReglasComerPeon ();
+AJD_Bool cumpleReglasMovimientoPeon (AJD_TableroPtr);
+AJD_Bool cumpleReglasMovimientoCaballo ();
+AJD_Bool cumpleReglasMovimientoRey (AJD_TableroPtr, AJD_EstadoPtr);
+AJD_Bool seMueveEnVertHorz (AJD_TableroPtr);
+AJD_Bool seMueveEnDiagonal (AJD_TableroPtr);
+AJD_Bool caminoLibre (AJD_TableroPtr, AJD_CasillaPtr, AJD_CasillaPtr);
+void     actualizaOpcionesDeEnroque (AJD_Casilla, AJD_EstadoPtr);
 /////////////////////////////////////////////////////////////////////////////////////////
 // obtenMovInfo
 //
@@ -57,7 +57,7 @@ void obtenMovInfo (AJD_TurnoPtr turno)
 /////////////////////////////////////////////////////////////////////////////////////////
 // cumpleReglasMovimiento
 //
-int cumpleReglasMovimiento (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+AJD_Bool cumpleReglasMovimiento (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
     AJD_Pieza pieza = movInfo.origen->pieza;
 
@@ -90,14 +90,14 @@ int cumpleReglasMovimiento (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 /////////////////////////////////////////////////////////////////////////////////////////
 // cumpleReglasComerPeon
 //
-int cumpleReglasComerPeon ()
+AJD_Bool cumpleReglasComerPeon ()
 {
     return movInfo.distX == 1 && movInfo.distY == 1;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 // cumpleReglasMovimientoPeon
 //
-int cumpleReglasMovimientoPeon (AJD_TableroPtr tablero)
+AJD_Bool cumpleReglasMovimientoPeon (AJD_TableroPtr tablero)
 {
     AJD_Color colorPiezaOrigen = movInfo.origen->color_pieza;
     int distY = movInfo.distY;
@@ -119,7 +119,7 @@ int cumpleReglasMovimientoPeon (AJD_TableroPtr tablero)
 /////////////////////////////////////////////////////////////////////////////////////////
 // seMueveEnVertHorz
 //
-int seMueveEnVertHorz (AJD_TableroPtr tablero)
+AJD_Bool seMueveEnVertHorz (AJD_TableroPtr tablero)
 {         
     return (movInfo.dy == 0 || movInfo.dx == 0) 
         && caminoLibre (tablero, movInfo.origen, movInfo.destino);
@@ -127,7 +127,7 @@ int seMueveEnVertHorz (AJD_TableroPtr tablero)
 /////////////////////////////////////////////////////////////////////////////////////////
 // seMueveEnDiagonal
 //
-int seMueveEnDiagonal (AJD_TableroPtr tablero)
+AJD_Bool seMueveEnDiagonal (AJD_TableroPtr tablero)
 {
     return (abs(movInfo.dy) == abs(movInfo.dx))
         && caminoLibre (tablero, movInfo.origen, movInfo.destino);
@@ -135,7 +135,7 @@ int seMueveEnDiagonal (AJD_TableroPtr tablero)
 /////////////////////////////////////////////////////////////////////////////////////////
 // cumpleReglasMovimientoCaballo
 //
-int cumpleReglasMovimientoCaballo ()
+AJD_Bool cumpleReglasMovimientoCaballo ()
 {
     // La "distancia" movInfo.distY es un tanto especial, ya que tiene
     // signo para poder saber si la pieza se desplaza hacia adelante o atrás.
@@ -150,7 +150,7 @@ int cumpleReglasMovimientoCaballo ()
 /////////////////////////////////////////////////////////////////////////////////////////
 // cumpleReglasMovimientoRey
 //
-int cumpleReglasMovimientoRey (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+AJD_Bool cumpleReglasMovimientoRey (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
     int dx = movInfo.dx;
     int dy = abs (movInfo.dy);
@@ -162,7 +162,7 @@ int cumpleReglasMovimientoRey (AJD_TableroPtr tablero, AJD_EstadoPtr estado_jueg
         {            
             if (puedeEnrocar (tablero, estado_juego, ENROQUE_LARGO))
             {
-                estado_juego->enroque_efectuado = ENROQUE_LARGO;
+                estado_juego->turno_actual.enroque = ENROQUE_LARGO;
                 return 1;
             }
 
@@ -171,7 +171,7 @@ int cumpleReglasMovimientoRey (AJD_TableroPtr tablero, AJD_EstadoPtr estado_jueg
         {
             if (puedeEnrocar (tablero, estado_juego, ENROQUE_CORTO))
             {
-                estado_juego->enroque_efectuado = ENROQUE_CORTO;
+                estado_juego->turno_actual.enroque = ENROQUE_CORTO;
                 return 1;
             }
         }
@@ -185,7 +185,7 @@ int cumpleReglasMovimientoRey (AJD_TableroPtr tablero, AJD_EstadoPtr estado_jueg
 /////////////////////////////////////////////////////////////////////////////////////////
 // caminoLibre
 //
-int caminoLibre (AJD_TableroPtr tablero, AJD_CasillaPtr origen, AJD_CasillaPtr destino)
+AJD_Bool caminoLibre (AJD_TableroPtr tablero, AJD_CasillaPtr origen, AJD_CasillaPtr destino)
 {
     int dx, dy;    
     AJD_idCasilla idOrigen  = origen->id;
@@ -206,30 +206,30 @@ int caminoLibre (AJD_TableroPtr tablero, AJD_CasillaPtr origen, AJD_CasillaPtr d
 ////////////////////////////////////////////////////////////////////////////
 // actualizaOpcionesDeEnroque
 //
-void actualizaOpcionesDeEnroque (AJD_CasillaPtr origen, AJD_EstadoPtr estado_juego)
+void actualizaOpcionesDeEnroque (AJD_Casilla origen, AJD_EstadoPtr estado_juego)
 {    
-    // Invalidar enroque largo o corto si se ha movido torre o rey
-    if (origen->pieza == REY)
+    // Si se mueve el rey queda prohibido cualquier enroque
+    if (origen.pieza == REY)
     {
-        if (estado_juego->juegan_blancas)
+        if (estado_juego->turno_actual.juegan_blancas)
         {
-            estado_juego->enroque_largo_blanco_invalidado = 
-            estado_juego->enroque_corto_blanco_invalidado = 1;
+            estado_juego->enroque_permitido |= ERLARGO_PROHIBIDO_B | ERCORTO_PROHIBIDO_B;
         }
         else
         {
-            estado_juego->enroque_largo_negro_invalidado = 
-            estado_juego->enroque_corto_negro_invalidado = 1;
+            estado_juego->enroque_permitido |= ERLARGO_PROHIBIDO_N | ERCORTO_PROHIBIDO_N;
         }
     }
-    else if (origen->pieza == TORRE)
+    // Si se mueve una torre se prohibe el enroque corto o largo dependiendo 
+    // de la torre movida
+    else if (origen.pieza == TORRE)
     {
-        switch (origen->id)
+        switch (origen.id)
         {
-            case a1: estado_juego->enroque_largo_blanco_invalidado = 1; break;
-            case a8: estado_juego->enroque_largo_negro_invalidado  = 1; break;
-            case h1: estado_juego->enroque_corto_blanco_invalidado = 1; break;
-            case h8: estado_juego->enroque_corto_negro_invalidado  = 1; break;
+            case a1: estado_juego->enroque_permitido |= ERLARGO_PROHIBIDO_B;break;
+            case a8: estado_juego->enroque_permitido |= ERLARGO_PROHIBIDO_N;break;
+            case h1: estado_juego->enroque_permitido |= ERCORTO_PROHIBIDO_B;break;
+            case h8: estado_juego->enroque_permitido |= ERCORTO_PROHIBIDO_N;break;
             default: break;
         }
         
@@ -243,9 +243,9 @@ void actualizaOpcionesDeEnroque (AJD_CasillaPtr origen, AJD_EstadoPtr estado_jue
 /////////////////////////////////////////////////////////////////////////////////////////
 // esMovimientoValido
 //
-int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+AJD_Bool esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
-    obtenMovInfo (estado_juego);
+    obtenMovInfo (&(estado_juego->turno_actual));
     muestraMovInfo (&movInfo);
     
     // Primero que cumpla las reglas de movimiento especifico de la pieza.
@@ -272,20 +272,20 @@ int esMovimientoValido (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 /////////////////////////////////////////////////////////////////////////////////////////
 // puedeEnrocar
 //
-int puedeEnrocar (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego, AJD_Enroque enroque)
+AJD_Bool puedeEnrocar (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego, AJD_Enroque enroque)
 {
     AJD_CasillaPtr destino, casillaRey;
-    AJD_Color juegan_blancas;
+    AJD_Bool juegan_blancas;
 
-    juegan_blancas = estado_juego->juegan_blancas;
+    juegan_blancas = estado_juego->turno_actual.juegan_blancas;
     destino = casillaRey = NULL;
-// El enroque sólo es admisible si todos cumplen las siguientes condiciones:
-//
-// Ninguna de las piezas que intervienen en el enroque puede haber sido movido previamente.
-// No debe haber ninguna pieza entre el rey y la torre;
-// El rey no puede estar en jaque, ni tampoco podrá pasar a través de casillas que están 
-// bajo ataque por parte de las piezas enemigas. Al igual que con cualquier movimiento, 
-// el enroque es ilegal si pusiera al rey en jaque.    
+    // El enroque sólo es admisible si todos cumplen las siguientes condiciones:
+    //
+    // Ninguna de las piezas que intervienen en el enroque puede haber sido movido previamente.
+    // No debe haber ninguna pieza entre el rey y la torre;
+    // El rey no puede estar en jaque, ni tampoco podrá pasar a través de casillas que están 
+    // bajo ataque por parte de las piezas enemigas. Al igual que con cualquier movimiento, 
+    // el enroque es ilegal si pusiera al rey en jaque.    
     casillaRey = juegan_blancas ? 
         &(tablero->casilla[INICIO_REY_BLANCO]) :
         &(tablero->casilla[INICIO_REY_NEGRO]);
@@ -294,19 +294,19 @@ int puedeEnrocar (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego, AJD_Enroqu
     {
         case ENROQUE_LARGO:
             if (juegan_blancas)
-                if (estado_juego->enroque_largo_blanco_invalidado) return 0;
+                if (estado_juego->enroque_permitido&ERLARGO_PROHIBIDO_B) return 0;
                 else destino = &(tablero->casilla[EL_ORIGEN_TORRE_BLANCA]);
             else
-                if (estado_juego->enroque_largo_negro_invalidado) return 0;
+                if (estado_juego->enroque_permitido&ERLARGO_PROHIBIDO_N) return 0;
                 else destino = &(tablero->casilla[EL_ORIGEN_TORRE_NEGRA]);
             break;
             
         case ENROQUE_CORTO:
             if (juegan_blancas)
-                if (estado_juego->enroque_corto_blanco_invalidado) return 0;
+                if (estado_juego->enroque_permitido&ERCORTO_PROHIBIDO_B) return 0;
                 else destino = &(tablero->casilla[EC_ORIGEN_TORRE_BLANCA]);
             else
-                if (estado_juego->enroque_corto_negro_invalidado) return 0;
+                if (estado_juego->enroque_permitido&ERCORTO_PROHIBIDO_N) return 0;
                 else destino = &(tablero->casilla[EC_ORIGEN_TORRE_NEGRA]);
             break;
 
@@ -320,36 +320,46 @@ int puedeEnrocar (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego, AJD_Enroqu
 //
 void muevePieza (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
-    AJD_CasillaPtr origen, destino;    
-    origen = estado_juego->casilla_origen;    
-    destino = estado_juego->casilla_destino;
-
+    AJD_TurnoPtr turno = &estado_juego->turno_actual;
     // Si el movimiento es de alguna de las dos TORRES o el REY, invalidar la opción
     // de enroque correspondiente.
-    actualizaOpcionesDeEnroque (origen, estado_juego);
+    actualizaOpcionesDeEnroque (estado_juego->turno_actual.origen, estado_juego);
 
-    destino->pieza = origen->pieza;
-    destino->color_pieza = origen->color_pieza;        
-    origen->pieza = NONE;
+    // Actualiza el turno actual con el movimiento realizado
+    turno->destino.pieza        = turno->origen.pieza;
+    turno->destino.color_pieza  = turno->origen.color_pieza;
+    
+    // Actualiza el tablero
+    tablero->casilla[turno->origen.id].pieza = NONE;
+    tablero->casilla[turno->destino.id].pieza = turno->destino.pieza;
+    tablero->casilla[turno->destino.id].color_pieza = turno->destino.color_pieza;
 }
 ////////////////////////////////////////////////////////////////////////////
 // promocionaPeon
 //
 //  Promociona el peon en la casilla indicada
 //
-void promocionaPeon (AJD_TableroPtr tablero, AJD_CasillaPtr casilla)
+void promocionaPeon (AJD_TableroPtr tablero, AJD_TurnoPtr turno)
 {
+    AJD_Pieza promocion_seleccionada = DAMA;
     mvprintw (3,63, "Promocionando PEON      ");
     // TODO: De momento siempre promociona a DAMA, queda pendiente
     //       poder seleccionar (con cursores p.ej.) el tipo de pieza
-    casilla->pieza = DAMA;
+
+    // Registramos la promoción en 'turno' para luego añadirlo al log
+    // de la partida.
+    turno->destino.pieza = promocion_seleccionada;
+    turno->promocion     = TRUE;
+
+    // Actualizamos el tablero con la nueva promoción
+    tablero->casilla[turno->destino.id].pieza = promocion_seleccionada;
 }
 ////////////////////////////////////////////////////////////////////////////
 // peonUltimafila
 //
 //  Comprueba si un peon ha efectuado un movimiento a la ultima fila
 //
-int peonUltimaFila (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+AJD_Bool peonUltimaFila (AJD_TableroPtr tablero, AJD_TurnoPtr turno)
 {
     AJD_idCasilla limites[2][2] = { 
     // 1a y ultima casilla fila promocion NEGRAS
@@ -358,14 +368,14 @@ int peonUltimaFila (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
         {a8, h8}
     };
     AJD_idCasilla idCasilla;
-    AJD_Color juegan_blancas;    
+    AJD_Bool juegan_blancas;    
 
     // Si no es un peon no hagas más nada
-    if (estado_juego->casilla_destino->pieza != PEON) return 0;
+    if (turno->destino.pieza != PEON) return 0;
 
 
-    idCasilla = estado_juego->casilla_destino->id;    
-    juegan_blancas = estado_juego->juegan_blancas;
+    idCasilla = turno->destino.id;    
+    juegan_blancas = turno->juegan_blancas;
 
     mvprintw (3,63, "[%d] in [%d]..[%d]?     ", 
               idCasilla, 
@@ -385,58 +395,62 @@ int peonUltimaFila (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 //
 void efectuaEnroque (AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
 {
-    AJD_idCasilla origen, destino;
+    AJD_idCasilla idOrigen, idDestino;
+    AJD_TurnoPtr turno = &estado_juego->turno_actual;
 
     mvprintw (3, 62, "ENROCANDO!!!");
     // Mueve primero el rey
     muevePieza (tablero, estado_juego);
 
-    origen = destino = 0;
+    idOrigen = idDestino = 0;
     // Selecciona la torre origen/destino correspondiente al enroque
-    if (estado_juego->juegan_blancas)
+    if (turno->juegan_blancas)
     {
-        if (estado_juego->enroque_efectuado == ENROQUE_LARGO)
+        if (turno->enroque == ENROQUE_LARGO)
         {
-            origen = EL_ORIGEN_TORRE_BLANCA;
-            destino = EL_DESTINO_TORRE_BLANCA;
+            idOrigen = EL_ORIGEN_TORRE_BLANCA;
+            idDestino = EL_DESTINO_TORRE_BLANCA;
         }
-        else if (estado_juego->enroque_efectuado == ENROQUE_CORTO)
+        else if (turno->enroque == ENROQUE_CORTO)
         {
-            origen = EC_ORIGEN_TORRE_BLANCA;
-            destino = EC_DESTINO_TORRE_BLANCA;
+            idOrigen = EC_ORIGEN_TORRE_BLANCA;
+            idDestino = EC_DESTINO_TORRE_BLANCA;
         }
     }
     else
     {
-        if (estado_juego->enroque_efectuado == ENROQUE_LARGO)
+        if (turno->enroque == ENROQUE_LARGO)
         {
-            origen = EL_ORIGEN_TORRE_NEGRA;
-            destino = EL_DESTINO_TORRE_NEGRA;
+            idOrigen = EL_ORIGEN_TORRE_NEGRA;
+            idDestino = EL_DESTINO_TORRE_NEGRA;
         }
-        else if (estado_juego->enroque_efectuado == ENROQUE_CORTO)
+        else if (turno->enroque == ENROQUE_CORTO)
         {
-            origen = EC_ORIGEN_TORRE_NEGRA;
-            destino = EC_DESTINO_TORRE_NEGRA;
+            idOrigen = EC_ORIGEN_TORRE_NEGRA;
+            idDestino = EC_DESTINO_TORRE_NEGRA;
         }
     }
-    // ... y realiza su movimiento correspondiente
-    estado_juego->casilla_origen = &(tablero->casilla[origen]);
-    estado_juego->casilla_destino = &(tablero->casilla[destino]);
+    // Actualiza la información de las casillas involucradas en el enroque...
+    turno->origen  = tablero->casilla[idOrigen];
+    turno->destino = tablero->casilla[idDestino];
+    
+    // ... y realiza su movimiento correspondiente    
     muevePieza (tablero, estado_juego);
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 // casillaOcupada
 //
-int casillaOcupada (AJD_CasillaPtr casilla)
+AJD_Bool casillaOcupada (AJD_CasillaPtr casilla)
 {
     return casilla->pieza != NONE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 // hayPiezaValida
 //
-int hayPiezaValida (AJD_TableroPtr tablero, AJD_CasillaPtr casilla, AJD_EstadoPtr estado_juego)
+AJD_Bool hayPiezaValida (AJD_TableroPtr tablero, AJD_CasillaPtr casilla, AJD_TurnoPtr turno)
 {
+    AJD_Color color_jugador = turno->juegan_blancas ? BLANCO : NEGRO;
     return casillaOcupada (casilla)
-        && casilla->color_pieza == estado_juego->juegan_blancas;
+        && casilla->color_pieza == color_jugador;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
