@@ -1,20 +1,13 @@
-#include <common.h>
-///////////////////////////////////////////////////////////////////////////////
-// MAIN
-//
+#include <stdint.h>
+#include <ajd_types.h>
+#include <tablero.h>
+#include <interfaz.h>
+#include <juego.h>
+
 int main()
 {
-   AJD_Tablero tablero;
+	inicializa();
 
-   inicializa (&tablero);
-
-   menu();
-   nuevoJuego (&tablero);
-   
-   ejecutaPartida (&tablero);
-   
-   
-   liberaRecursos();
-
-   return 0;
+	tableroDisposicionInicial();
+	dibujaTablero(obtenTableroPtr());
 }

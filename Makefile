@@ -1,16 +1,13 @@
 APP		:= ajedrez
 SRCDIR  := src
 OBJDIR  := obj
-SOURCES := 	${OBJDIR}/main.o 	 \
-			${OBJDIR}/tablero.o  \
-			${OBJDIR}/juego.o    \
-			${OBJDIR}/menu.o     \
-			${OBJDIR}/interfaz.o \
-		   	${OBJDIR}/movimiento.o \
-		   	${OBJDIR}/utils.o
+SOURCES := ${OBJDIR}/main.o 	\
+		   ${OBJDIR}/tablero.o  \
+		   ${OBJDIR}/interfaz.o \
+		   ${OBJDIR}/juego.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
-CFLAGS 	:= -Wall -Werror -pedantic -std=c99 -I ${INCDIRS} -finput-charset=UTF-8
+CFLAGS 	:= -Wall -Werror -pedantic -std=c89 -I ${INCDIRS} -finput-charset=UTF-8
 LDFLAGS := -lncurses
 
 ${APP}: ${SOURCES}
