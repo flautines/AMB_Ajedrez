@@ -74,14 +74,14 @@ void inicializaPantalla()
  ***************************************************************************************/
 void dibujaTablero(AJD_TableroPtr tablero)
 {
-    int idCasilla = 0;
+    AJD_idCasilla idCasilla = h1;
     int ch;
 
-    while (idCasilla < 64) 
-    {
-        dibujaCasilla (idCasilla);
-        idCasilla++;
-    }
+    /* Dibuja la primera casilla */
+    dibujaCasilla (a8);
+    /* Dibuja el resto de casillas */
+    while (idCasilla)
+        dibujaCasilla (idCasilla--);
 
     dibujaEncabezados ();
 /*

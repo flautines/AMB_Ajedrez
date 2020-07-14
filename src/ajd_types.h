@@ -14,7 +14,7 @@ typedef enum { NEGRO, BLANCO } AJD_Color;
 
 /**  Tipo de enroques
  ***************************************************************************************/
-typedef enum { ER_NONE, ER_LARGO, ER_CORTO } AJD_ERTipo;
+typedef enum { ER_NONE, ER_LARGO, ER_CORTO } AJD_Enroque;
 
 /**  Tipo de pieza+color
  ***************************************************************************************/
@@ -27,11 +27,11 @@ typedef enum {
 
 /**  Tipo indice de casilla (0..63)
  ***************************************************************************************/
-typedef uint8_t AJD_idCasilla;
+/*typedef uint8_t AJD_idCasilla;*/
 
 /** Constantes en notacion algebraica de cada indice de casilla
  ***************************************************************************************/
-enum { 
+typedef enum { 
    a8, b8, c8, d8, e8, f8, g8, h8,
    a7, b7, c7, d7, e7, f7, g7, h7,
    a6, b6, c6, d6, e6, f6, g6, h6,
@@ -40,13 +40,13 @@ enum {
    a3, b3, c3, d3, e3, f3, g3, h3,
    a2, b2, c2, d2, e2, f2, g2, h2,
    a1, b1, c1, d1, e1, f1, g1, h1
-};
+} AJD_idCasilla;
 
 /** Informacion de cada casilla [color casilla, pieza en esa casilla]
  ***************************************************************************************/
 typedef struct {
-	AJD_Color     color;
-	AJD_Pieza	  pieza;
+	AJD_Color   color:1;
+	AJD_Pieza	  pieza:4;
 } AJD_Casilla, *AJD_CasillaPtr;
 
 /** Tipo para representar un tablero de ajedrez
@@ -58,10 +58,10 @@ typedef struct {
 /** Información mínima imprescindible para almacenar un turno
  ***************************************************************************************/
 typedef struct {
-    AJD_idCasilla   idOrigen;
-    AJD_idCasilla   idDestino;
-    AJD_Bool        come_pieza : 1;
-    AJD_Bool        jaque : 1;
-    AJD_ERTipo      enroque : 1;
-    AJD_Bool        mate : 1;
+    AJD_idCasilla   idOrigen   :6;
+    AJD_idCasilla   idDestino  :6;
+    AJD_Bool        come_pieza :1;
+    AJD_Bool        jaque      :1;
+    AJD_Enroque     enroque    :2;
+    AJD_Bool        mate       :1;
 } AJD_Turno, *AJD_TurnoPtr;

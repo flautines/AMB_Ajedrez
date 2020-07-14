@@ -62,10 +62,10 @@ void tableroDisposicionInicial ()
    AJD_Pieza piezasMayoresN[8] = { TORRE_N, CABALLO_N, ALFIL_N, DAMA_N, REY_N, ALFIL_N, CABALLO_N, TORRE_N };
    for (col=0; col < 8; col++)
    { 
-      tablero.casillas[col].pieza       = piezasMayoresN[col];  /* fila 1: piezas mayores negras  */
-      tablero.casillas[7*8 + col].pieza = piezasMayoresB[col];  /* fila 8: piezas mayores blancas */
+      tablero.casillas[a8 + col].pieza = piezasMayoresN[col];  /* piezas mayores negras  */
+      tablero.casillas[a1 + col].pieza = piezasMayoresB[col];  /* piezas mayores blancas */
 
-      tablero.casillas[8 + col].pieza   = PEON_N;               /* fila 2: peones negros      */
-      tablero.casillas[6*8 + col].pieza = PEON_B;               /* fils 7: peones blancos     */
+      tablero.casillas[a7 + col].pieza   = PEON_N;             /* peones negros      */
+      tablero.casillas[a2 + col].pieza = PEON_B;               /* peones blancos     */
    }
 }
