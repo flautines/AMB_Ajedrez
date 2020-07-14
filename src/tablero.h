@@ -26,8 +26,6 @@ enum {
    a2, b2, c2, d2, e2, f2, g2, h2,
    a1, b1, c1, d1, e1, f1, g1, h1,
 };
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Casilla
 //
@@ -71,3 +69,15 @@ typedef struct
    AJD_Cursor cursorMovil;
 } AJD_Tablero, *AJD_TableroPtr;
 
+///////////////////////////////////////////////////////////////////////////
+// strToIdCasilla
+//
+// Convierte una casilla en formato string (p.ej: "a8") a idCasilla
+//
+AJD_idCasilla strToIdCasilla (char *strCasilla);
+///////////////////////////////////////////////////////////////////////////
+// idCasillaToString
+//
+// Devuelve idCasilla en formato string (p.ej: 0 -> "a8")
+//
+char *idCasillaToString (AJD_idCasilla idCasilla);
