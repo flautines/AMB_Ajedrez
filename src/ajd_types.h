@@ -3,8 +3,8 @@
 /**  Tipo booleano
 ***************************************************************************************/
 #ifdef TRUE
-	#undef TRUE
-	#undef FALSE
+   #undef TRUE
+   #undef FALSE
 #endif
 typedef enum { FALSE, TRUE } AJD_Bool;
 
@@ -19,9 +19,9 @@ typedef enum { ER_NONE, ER_LARGO, ER_CORTO } AJD_Enroque;
 /**  Tipo de pieza+color
  ***************************************************************************************/
 typedef enum { 
-    NO_PIEZA,
-    PEON_B, TORRE_B, CABALLO_B, ALFIL_B, DAMA_B, REY_B,
-    PEON_N, TORRE_N, CABALLO_N, ALFIL_N, DAMA_N, REY_N
+      NO_PIEZA,
+      PEON_B, TORRE_B, CABALLO_B, ALFIL_B, DAMA_B, REY_B,
+      PEON_N, TORRE_N, CABALLO_N, ALFIL_N, DAMA_N, REY_N
 
 } AJD_Pieza;
 
@@ -45,23 +45,31 @@ typedef enum {
 /** Informacion de cada casilla [color casilla, pieza en esa casilla]
  ***************************************************************************************/
 typedef struct {
-	AJD_Color   color:1;
-	AJD_Pieza	  pieza:4;
+   AJD_Color   color:1;
+   AJD_Pieza     pieza:4;
 } AJD_Casilla, *AJD_CasillaPtr;
 
 /** Tipo para representar un tablero de ajedrez
  ***************************************************************************************/
 typedef struct {
-    AJD_Casilla casillas[8*8];    
+      AJD_Casilla casillas[8*8];    
 } AJD_Tablero, *AJD_TableroPtr;
 
-/** Información mínima imprescindible para almacenar un turno
+/** Información mínima imprescindible para almacenar un movimiento
  ***************************************************************************************/
 typedef struct {
-    AJD_idCasilla   idOrigen   :6;
-    AJD_idCasilla   idDestino  :6;
-    AJD_Bool        come_pieza :1;
-    AJD_Bool        jaque      :1;
-    AJD_Enroque     enroque    :2;
-    AJD_Bool        mate       :1;
-} AJD_Turno, *AJD_TurnoPtr;
+      AJD_idCasilla   idOrigen   :6;
+      AJD_idCasilla   idDestino  :6;
+      AJD_Bool        captura    :1;
+      AJD_Bool        jaque      :1;
+      AJD_Enroque     enroque    :2;
+      AJD_Bool        mate       :1;
+} AJD_Movimiento, *AJD_MovimientoPtr;
+
+/** Información de cada jugada
+ ***************************************************************************************/
+typedef struct {
+   int            nturno;
+   AJD_Movimiento movBlancas;
+   AJD_Movimiento movNnegras;
+} AJD_Jugada, *AJD_JugadaPtr;

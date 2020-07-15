@@ -8,6 +8,7 @@ int main()
 {
 	inicializa();
 
-	tableroDisposicionInicial();
+    nuevoJuego();
+	
 	dibujaTablero(obtenTableroPtr());
 }
