@@ -1,14 +1,16 @@
+#include <common.h>
+#include <utils.h>
 #include <ncurses.h>
-#include <ajd_types.h>
-#include <tablero.h>
-#include <interfaz.h>
 #include <string.h>
 
-#define TABLERO_ROW_START   9
-#define TABLERO_COL_START   10
-#define MARCADOR_ROW_START  TABLERO_ROW_START
-#define MARCADOR_COL_START  TABLERO_COL_START + 8 * 3 + 2
-#define MARCADOR_LAST_ROW   TABLERO_ROW_START + 8 * 3 - 1
+#define TABLERO_ROW_START       9
+#define TABLERO_COL_START       10
+#define MARCADOR_ROW_START      TABLERO_ROW_START
+#define MARCADOR_COL_START      TABLERO_COL_START + 8 * 3 + 2
+#define MARCADOR_ROW_END        TABLERO_ROW_START + 8 * 3 - 1
+#define MARCADOR_ROW_SEGUNDOS_B MARCADOR_ROW_START + 5
+#define MARCADOR_ROW_SEGUNDOS_N MARCADOR_ROW_SEGUNDOS_B + 2
+#define MARCADOR_JUGADOR_ACTUAL MARCADOR_ROW_END - 1
 /*
 AJD_Sprite sprCursorPiezaSeleccionada;
 AJD_Sprite sprCursorMovil;
@@ -68,6 +70,16 @@ void inicializaPantalla()
     clear();
 }
 /****************************************************************************************
+ * dibujaJuego
+ *
+ * Dibuja todos los elementos del juego
+ ***************************************************************************************/
+void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+{
+    dibujaTablero (tablero);
+    dibujaMarcadores (estado_juego);
+}
+/****************************************************************************************
  * dibujaTablero
  *
  * Dibuja el tablero en pantalla según su estado actual.
@@ -75,7 +87,6 @@ void inicializaPantalla()
 void dibujaTablero(AJD_TableroPtr tablero)
 {
     AJD_idCasilla idCasilla = h1;
-    int ch;
 
     /* Dibuja la primera casilla */
     dibujaCasilla (a8);
@@ -96,7 +107,65 @@ void dibujaTablero(AJD_TableroPtr tablero)
     }
 */
     
+}
+/****************************************************************************************
+ * dibujaMarcadores 
+ *
+ * Dibuja los marcadores de tiempo, turno, etc.
+ ***************************************************************************************/
+void dibujaMarcadores(AJD_EstadoPtr estado_juego)
+{
+    char buff[6];
+    int x,y;
+    int ch;
+
+    x = MARCADOR_COL_START;
+    y = MARCADOR_ROW_START + 1;
+    attron (COLOR_PAIR (COLOR_TEXTO_NORMAL));
+    mvprintw (y,x, "AJEDREZ 1.0");
+
+    y += 1;
+    mvprintw (y,x, "(c) Jul 2020 Andres Mata");
+
+    y = MARCADOR_ROW_SEGUNDOS_B;
+    mvprintw (y,x, "Blancas %s", strSegundos (buff, estado_juego->segundosBlancas));
+
+    y = MARCADOR_ROW_SEGUNDOS_N;
+    mvprintw (y,x, "Negras %s", strSegundos (buff, estado_juego->segundosNegras));
+/*
+    y += 2;
+    if (turno_actual->enroque)
+    {
+        mvprintw (y,x, turno_actual->enroque == ENROQUE_LARGO 
+                        ? "O-O-O" : "O-O");
+    }   
+*/
+    y = MARCADOR_JUGADOR_ACTUAL;
+    mvprintw (y,x, "Turno %02d (Jugador %c)", 
+                    estado_juego->jugada.nturno, estado_juego->jugadorActual+'1');
+
+    y += 1;
+    mvprintw (y,x, "Juegan %s", estado_juego->jueganBlancas ? "blancas" : "negras ");
+/*
+    // Debug info
+    mvprintw (MARCADOR_LAST_ROW+2, 0, "O-O-O (BLANCAS) %s", 
+              estado_juego->enroque_permitido &ERLARGO_PROHIBIDO_B 
+              ? "PROH" : "PERM");
+
+    mvprintw (MARCADOR_LAST_ROW+3, 0, "O-O (BLANCAS) %s", 
+              estado_juego->enroque_permitido &ERCORTO_PROHIBIDO_B 
+              ? "PROH" : "PERM");
+
+    mvprintw (MARCADOR_LAST_ROW+4, 0, "O-O-O (NEGRAS) %s",
+              estado_juego->enroque_permitido &ERLARGO_PROHIBIDO_N 
+              ? "PROH" : "PERM");
+
+    mvprintw (MARCADOR_LAST_ROW+5, 0, "O-O (NEGRAS) %s", 
+              estado_juego->enroque_permitido &ERCORTO_PROHIBIDO_N
+              ? "PROH" : "PERM");
+*/
     while ( (ch = getch()) != '\033');
+    estado_juego->finJuego = TRUE;
     endwin();
 }
 /****************************************************************************************

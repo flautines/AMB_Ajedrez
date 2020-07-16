@@ -1,8 +1,5 @@
-#include <stdint.h>
-#include <ajd_types.h>
-#include <tablero.h>
-#include <interfaz.h>
-#include <juego.h>
+#include <common.h>
+
 /****************************************************************************************
  * Variables PRIVADAS
  ***************************************************************************************/
@@ -51,3 +48,29 @@ void nuevoJuego()
 
     estadoJuego = estadoJuegoInicio;
 }
+/****************************************************************************************
+ *  ejecutaPartida
+ *
+ * Bucle principal, se ejecuta hasta que termina la partida.
+ * Devuelve TRUE si el juego ha terminado.
+ ***************************************************************************************/
+AJD_Bool ejecutaPartida()
+{
+    while (!estadoJuego.finJuego)
+    {
+        dibujaJuego(obtenTableroPtr(), &estadoJuego);
+        /*actualizaJuego();            */
+    }
+    return estadoJuego.finJuego;
+}
+/****************************************************************************************
+ * obtenEstadoPtr
+ *
+ * Obten el puntero al estado de juego
+ ***************************************************************************************/
+/*
+AJD_EstadoPtr obtenEstadoPtr ()
+{
+    return &estadoJuego;
+}
+*/

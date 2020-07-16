@@ -4,7 +4,8 @@ OBJDIR  := obj
 SOURCES := ${OBJDIR}/main.o 	\
 		   ${OBJDIR}/tablero.o  \
 		   ${OBJDIR}/interfaz.o \
-		   ${OBJDIR}/juego.o
+		   ${OBJDIR}/juego.o 	\
+		   ${OBJDIR}/utils.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
 CFLAGS 	:= -Wall -Werror -pedantic -std=c89 -I ${INCDIRS} -finput-charset=UTF-8

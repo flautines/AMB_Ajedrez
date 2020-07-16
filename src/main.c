@@ -1,8 +1,4 @@
-#include <stdint.h>
-#include <ajd_types.h>
-#include <tablero.h>
-#include <interfaz.h>
-#include <juego.h>
+#include <common.h>
 
 int main()
 {
@@ -10,5 +6,5 @@ int main()
 
     nuevoJuego();
 	
-	dibujaTablero(obtenTableroPtr());
+	ejecutaPartida();
 }

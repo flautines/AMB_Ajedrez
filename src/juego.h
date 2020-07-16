@@ -1,16 +1,36 @@
 #pragma once
 
-typedef struct {
-    AJD_Jugada          jugada;
-    AJD_Bool            jueganBlancas : 1;
-    uint8_t             jugadorActual : 1;
-    /*AJD_ListaJugadas    partida */
-    uint16_t            segundosBlancas;
-    uint16_t            segundosNegras;
-    /*AJD_ERPerm          enroquePermitido;
-    AJD_Seleccion       casillaSeleccionada;*/
-    AJD_Bool            finJuego;
-} AJD_Estado, *AJD_EstadoPtr;
-
+/****************************************************************************************
+ * inicializa
+ *
+ * Inicializa todos los elementos del juego: tablero, librerías de pantalla, etc.
+ *
+ ***************************************************************************************/
 void inicializa();
+/****************************************************************************************
+ * nuevoJuego
+ *
+ * Prepara el estado del juego y el tablero para una partida nueva:
+ *
+ *    - Estado del juego: ninguna pieza movida, ningún rey en jaque,
+ *      turno del jugador 1, juegan blancas, contadores a cero
+ *
+ *    - Coloca las piezas en el tablero para una partida nueva
+ *
+ *    - Comienza el turno 1
+ *
+ ***************************************************************************************/
 void nuevoJuego();
+/****************************************************************************************
+ *  ejecutaPartida
+ *
+ * Bucle principal, se ejecuta hasta que termina la partida.
+ * Devuelve TRUE si el juego ha terminado.
+ ***************************************************************************************/
+AJD_Bool ejecutaPartida();
+/****************************************************************************************
+ * obtenEstadoPtr
+ *
+ * Obten el puntero al estado de juego
+ ***************************************************************************************/
+/*AJD_EstadoPtr obtenEstadoPtr ();*/

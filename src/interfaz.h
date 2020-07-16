@@ -29,11 +29,23 @@ extern AJD_Sprite sprCursorMovil;
  ***************************************************************************************/
 void inicializaPantalla();
 /****************************************************************************************
+ * dibujaJuego
+ *
+ * Dibuja todos los elementos del juego
+ ***************************************************************************************/
+ void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
+/****************************************************************************************
  * dibujaTablero
  *
  * Dibuja el tablero en pantalla según su estado actual.
  ***************************************************************************************/
 void dibujaTablero(AJD_TableroPtr tablero);
+/****************************************************************************************
+ * dibujaMarcadores 
+ *
+ * Dibuja los marcadores de tiempo, turno, etc.
+ ***************************************************************************************/
+void dibujaMarcadores(AJD_EstadoPtr estado_juego);
 /****************************************************************************************
  * dibujaPieza
  *
