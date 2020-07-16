@@ -73,3 +73,29 @@ typedef struct {
    AJD_Movimiento movBlancas;
    AJD_Movimiento movNnegras;
 } AJD_Jugada, *AJD_JugadaPtr;
+/****************************************************************************************
+ * Estado de juego
+ *
+ * jugada .............  Registro de jugada actual (# turno, mov. blancas, mov. negras)
+ * jueganBlancas ......  TRUE si es el turno de las blancas
+ * jugadorActual ......  Mueve jugador 1 (0) / jugador 2 (1)
+ * partida ............  Registro de TODAS las jugadas
+ * segundosBlancas ....  # segundos desde inicio de juego usados por BLANCAS
+ * segundosNegras .....  # segundos desde inicio de juego usados por NEGRAS
+ * enroquePermitido ...  Enroques (largos/cortos) permitidos para blancas y negras
+ * casillaSeleccionada   Informacion de la selección de casilla efectuada con el cursor
+ * finJuego ...........  TRUE si se ha seleccionado salir del juego
+ *  
+ ***************************************************************************************/
+
+typedef struct {
+    AJD_Jugada          jugada;
+    AJD_Bool            jueganBlancas : 1;
+    uint8_t             jugadorActual : 1;
+    /*AJD_ListaJugadas    partida */
+    uint16_t            segundosBlancas;
+    uint16_t            segundosNegras;
+    /*AJD_ERPerm          enroquePermitido;
+    AJD_Seleccion       casillaSeleccionada;*/
+    AJD_Bool            finJuego;
+} AJD_Estado, *AJD_EstadoPtr;
