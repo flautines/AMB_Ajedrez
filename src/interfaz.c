@@ -11,13 +11,16 @@
 #define MARCADOR_ROW_SEGUNDOS_B MARCADOR_ROW_START + 5
 #define MARCADOR_ROW_SEGUNDOS_N MARCADOR_ROW_SEGUNDOS_B + 2
 #define MARCADOR_JUGADOR_ACTUAL MARCADOR_ROW_END - 1
-/*
-AJD_Sprite sprCursorPiezaSeleccionada;
-AJD_Sprite sprCursorMovil;
-*/
+
+/****************************************************************************************
+ * Variables privadas
+ ***************************************************************************************/
+AJD_Sprite sprCurFijo;
+AJD_Sprite sprCurMovil;
+
 /****************************************************************************************
  * Funciones PRIVADAS (forward declaration)
-***************************************************************************************/
+ ***************************************************************************************/
 void dibujaEncabezados ();
 void dibujaCasilla (AJD_idCasilla);
 
@@ -77,6 +80,39 @@ void inicializaPantalla()
 void liberaPantalla()
 {
     endwin();
+}
+/****************************************************************************************
+ * inicializaSprites
+ *
+ * Establece los sprites necesarios para los cursores de selección y pieza seleccionada.
+ * Por ahora estos 'sprites' estan formados de caracteres especiales de recuadro. Se
+ * utilizan constantes ACS_ de la librería ncurses para conseguir mayor portabilidad.
+ ****************************************************************************************/
+void inicializaSprites(AJD_TableroPtr tablero)
+{
+    /* Definicion de los cursores 
+       c89 es una mi%$$## y no permite lista de inicialización
+       con los caracteres ACS_ ya que son expresiones no constantes */
+    int i;
+    for (i=0; i<NCHARS_IN_SPRITE; i++) 
+        sprCurMovil.ch[i] = sprCurFijo.ch[i] = '.';
+
+    sprCurMovil.ch[0] = ACS_ULCORNER;
+    sprCurMovil.ch[2] = ACS_URCORNER;
+    sprCurMovil.ch[6] = ACS_LLCORNER;
+    sprCurMovil.ch[8] = ACS_LRCORNER;
+
+    sprCurFijo.ch[0] = ACS_ULCORNER;
+    sprCurFijo.ch[1] = ACS_HLINE;
+    sprCurFijo.ch[2] = ACS_URCORNER;
+    sprCurFijo.ch[3] = ACS_VLINE;
+    sprCurFijo.ch[5] = ACS_VLINE;
+    sprCurFijo.ch[6] = ACS_LLCORNER;
+    sprCurFijo.ch[7] = ACS_HLINE;
+    sprCurFijo.ch[8] = ACS_LRCORNER;
+
+    tablero->curMovil.sprite = &sprCurMovil;
+    tablero->curFijo.sprite = &sprCurFijo;
 }
 /****************************************************************************************
  * dibujaJuego

@@ -35,6 +35,14 @@ void inicializaPantalla();
  ***************************************************************************************/
 void liberaPantalla();
 /****************************************************************************************
+ * inicializaSprites
+ *
+ * Establece los sprites necesarios para los cursores de selección y pieza seleccionada.
+ * Por ahora estos 'sprites' estan formados de caracteres especiales de recuadro. Se
+ * utilizan constantes ACS_ de la librería ncurses para conseguir mayor portabilidad.
+ ****************************************************************************************/
+void inicializaSprites(AJD_TableroPtr tablero);
+/****************************************************************************************
  * dibujaJuego
  *
  * Dibuja todos los elementos del juego

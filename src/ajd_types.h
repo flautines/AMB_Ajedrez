@@ -25,9 +25,13 @@ typedef enum {
 
 } AJD_Pieza;
 
-/**  Tipo indice de casilla (0..63)
+/** Opciones posibles de selección de casilla con el cursor
  ***************************************************************************************/
-/*typedef uint8_t AJD_idCasilla;*/
+typedef enum { 
+   NO_SELECCION, 
+   ORIGEN_SELECCIONADO, 
+   DESTINO_SELECCIONADO
+} AJD_Seleccion;
 
 /** Constantes en notacion algebraica de cada indice de casilla
  ***************************************************************************************/
@@ -49,12 +53,6 @@ typedef struct {
    AJD_Pieza     pieza:4;
 } AJD_Casilla, *AJD_CasillaPtr;
 
-/** Tipo para representar un tablero de ajedrez
- ***************************************************************************************/
-typedef struct {
-      AJD_Casilla casillas[8*8];    
-} AJD_Tablero, *AJD_TableroPtr;
-
 /** Información mínima imprescindible para almacenar un movimiento
  ***************************************************************************************/
 typedef struct {
@@ -73,6 +71,36 @@ typedef struct {
    AJD_Movimiento movBlancas;
    AJD_Movimiento movNegras;
 } AJD_Jugada, *AJD_JugadaPtr;
+
+/** Bytes/chars totales en el sprite de cursor
+ ***************************************************************************************/
+#define NCHARS_IN_SPRITE 9
+
+/** Representación gráfica del cursor (por ahora son chars de texto)
+ ***************************************************************************************/
+typedef struct 
+{
+   int ch[NCHARS_IN_SPRITE];
+} AJD_Sprite;
+
+/** Datos relativos a cursores de casillas
+ ***************************************************************************************/
+typedef struct 
+{
+   AJD_CasillaPtr casilla;
+   uint8_t        visible:1;
+   uint8_t        flash:1;
+   AJD_Sprite*    sprite;
+} AJD_Cursor, *AJD_CursorPtr;
+
+/** Tipo para representar un tablero de ajedrez
+ ***************************************************************************************/
+typedef struct {
+   AJD_Casilla casillas[8*8];
+   AJD_Cursor  curFijo;
+   AJD_Cursor  curMovil;
+} AJD_Tablero, *AJD_TableroPtr;
+
 /****************************************************************************************
  * Estado de juego
  *
@@ -87,7 +115,6 @@ typedef struct {
  * finJuego ...........  TRUE si se ha seleccionado salir del juego
  *  
  ***************************************************************************************/
-
 typedef struct {
     AJD_Jugada          jugada;
     AJD_Bool            jueganBlancas : 1;
@@ -95,7 +122,7 @@ typedef struct {
     /*AJD_ListaJugadas    partida */
     uint16_t            segundosBlancas;
     uint16_t            segundosNegras;
-    /*AJD_ERPerm          enroquePermitido;
-    AJD_Seleccion       casillaSeleccionada;*/
+    /*AJD_ERPerm          enroquePermitido;*/
+    AJD_Seleccion       casillaSeleccionada;
     AJD_Bool            finJuego;
 } AJD_Estado, *AJD_EstadoPtr;
