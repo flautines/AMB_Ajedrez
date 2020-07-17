@@ -80,7 +80,7 @@ typedef struct {
  ***************************************************************************************/
 typedef struct 
 {
-   int ch[NCHARS_IN_SPRITE];
+   chtype ch[NCHARS_IN_SPRITE];
 } AJD_Sprite;
 
 /** Datos relativos a cursores de casillas
@@ -94,6 +94,10 @@ typedef struct
 } AJD_Cursor, *AJD_CursorPtr;
 
 /** Tipo para representar un tablero de ajedrez
+ *
+ * El tablero muestra hasta dos tipos de cursores: 
+ *    curMovil: Cursor de selección, se mueve con las flechas, ENTER selecciona casilla
+ *    curFijo : Cursor que resalta la casilla de origen para el movimiento.
  ***************************************************************************************/
 typedef struct {
    AJD_Casilla casillas[8*8];
@@ -101,8 +105,7 @@ typedef struct {
    AJD_Cursor  curMovil;
 } AJD_Tablero, *AJD_TableroPtr;
 
-/****************************************************************************************
- * Estado de juego
+/** Estado de juego
  *
  * jugada .............  Registro de jugada actual (# turno, mov. blancas, mov. negras)
  * jueganBlancas ......  TRUE si es el turno de las blancas

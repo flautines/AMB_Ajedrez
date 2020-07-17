@@ -30,6 +30,9 @@ void inicializa()
 {
     inicializaTablero();
     inicializaPantalla();
+
+    /* Inicializa sprites de los cursores */
+    inicializaSprites(obtenTableroPtr());
 }
 /****************************************************************************************
  * liberaRecursos
@@ -56,9 +59,22 @@ void liberaRecursos()
  ***************************************************************************************/
 void nuevoJuego()
 {
+    AJD_TableroPtr tablero;
     tableroDisposicionInicial();
 
     estadoJuego = estadoJuegoInicio;
+   
+    tablero = obtenTableroPtr();
+    /**********************************************
+     * El cursor movil y fijo se posicionan a d2
+     * El cursor movil es visible y sin flash
+     * El cursor fijo no es visible y con flash
+     **********************************************/    
+    tablero->curMovil.casilla = tablero->curFijo.casilla = &tablero->casillas[e5];
+    tablero->curMovil.visible = FALSE;
+    tablero->curFijo.visible  = TRUE;
+    tablero->curMovil.flash   = FALSE;
+    tablero->curFijo.flash    = TRUE;
 }
 /****************************************************************************************
  *  ejecutaPartida

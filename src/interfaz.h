@@ -55,6 +55,12 @@ void inicializaSprites(AJD_TableroPtr tablero);
  ***************************************************************************************/
 void dibujaTablero(const AJD_TableroPtr tablero);
 /****************************************************************************************
+ * dibujaCursor
+ *
+ * Dibuja el cursor indicado
+ ***************************************************************************************/
+void dibujaCursor (const AJD_TableroPtr tablero, AJD_Cursor cursor);
+/****************************************************************************************
  * dibujaMarcadores 
  *
  * Dibuja los marcadores de tiempo, turno, etc.

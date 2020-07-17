@@ -15,6 +15,8 @@
 /****************************************************************************************
  * Variables privadas
  ***************************************************************************************/
+/** sprites para los cursores
+ ***************************************************************************************/
 AJD_Sprite sprCurFijo;
 AJD_Sprite sprCurMovil;
 
@@ -122,7 +124,18 @@ void inicializaSprites(AJD_TableroPtr tablero)
 void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego)
 {
     dibujaTablero (tablero);
-    dibujaMarcadores (estadoJuego);    
+    dibujaMarcadores (estadoJuego);
+
+    /* Dibuja el cursor movil (seleccion de pieza) */
+    if (tablero->curMovil.visible)
+    {
+        dibujaCursor(tablero, tablero->curMovil);
+    }
+    /* Dibuja el cursor fijo (pieza seleccionada) */
+    if (tablero->curFijo.visible)
+    {
+        dibujaCursor(tablero, tablero->curFijo);
+    }
 }
 /****************************************************************************************
  * dibujaTablero
@@ -139,18 +152,56 @@ void dibujaTablero(const AJD_TableroPtr tablero)
     while (idCasilla)
         dibujaCasilla (idCasilla--);
 
-    dibujaEncabezados ();
-/*
-    Dibuja el cursor de seleccion 
-    if (tablero->cursorMovil.visible)
-    {
-        dibujaCursor(tablero->cursorMovil);
+    dibujaEncabezados ();   
+}
+/****************************************************************************************
+ * dibujaCursor
+ *
+ * Dibuja el cursor indicado
+ ***************************************************************************************/
+void dibujaCursor (const AJD_TableroPtr tablero, AJD_Cursor cursor)
+{
+    int y, x, dx, dy;
+    chtype* ch;
+    AJD_Bool flash = FALSE;
+
+    /* Las casillas son un array, por tanto están seguidas en memoria.
+     * Podemos obtener el idCasilla del cursor con aritmética de punteros
+     * (siempre que sean punteros del mismo array) 
+     */
+    AJD_CasillaPtr casillaCursor = cursor.casilla;
+    AJD_idCasilla  idCur         = casillaCursor - tablero->casillas;
+    
+    y = TABLERO_ROW_START + (idCur /8) * ALTO_CASILLA+1;
+    x = TABLERO_COL_START + (idCur &7) * ANCHO_CASILLA;
+
+    flash = cursor.flash;
+
+    if (flash)
+        attron (A_BLINK);
+    else
+        attroff (A_BLINK);
+
+    if (casillaCursor->color == BLANCO)
+        attron (A_REVERSE);
+    else
+        attroff (A_REVERSE);
+
+    ch = cursor.sprite->ch;
+    mvaddch (2,35, *ch);
+
+    for (dy=0; dy<ALTO_CASILLA; dy++)
+    {    
+        for (dx=0; dx<ANCHO_CASILLA; dx++)
+        {
+            if (*ch != '.')
+                mvaddch (y + dy, x + dx, *ch);
+            ch++;
+        }
+        
     }
-    if (tablero->cursorPiezaSeleccionada.visible)
-    {
-        dibujaCursor(tablero->cursorPiezaSeleccionada);
-    }
-*/
+    attroff (A_BLINK);
+    attroff (A_REVERSE);
     
 }
 /****************************************************************************************

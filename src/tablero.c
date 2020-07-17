@@ -1,6 +1,4 @@
-#include <stdint.h>
-#include <ajd_types.h>
-#include <tablero.h>
+#include <common.h>
 #include <stdio.h>
 /****************************************************************************************
 * Variables PRIVADAS

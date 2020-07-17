@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include <stdint.h>
 #include <ajd_types.h>
 #include <tablero.h>
