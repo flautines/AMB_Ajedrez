@@ -94,6 +94,9 @@ void actualizaEstadoJuego (AJD_TableroPtr tablero)
 {       
     estadoJuego.jueganBlancas ^= 1;
     estadoJuego.jugadorActual ^= 1;
+    
+    if (estadoJuego.jueganBlancas) 
+        estadoJuego.jugada.nturno += 1;
 }
 /****************************************************************************************
  *  efectuaJugada
