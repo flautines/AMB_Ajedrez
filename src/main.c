@@ -7,4 +7,8 @@ int main()
     nuevoJuego();
 	
 	ejecutaPartida();
+
+    liberaRecursos();
+    
+    return 0;
 }

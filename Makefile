@@ -5,6 +5,7 @@ SOURCES := ${OBJDIR}/main.o 	\
 		   ${OBJDIR}/tablero.o  \
 		   ${OBJDIR}/interfaz.o \
 		   ${OBJDIR}/juego.o 	\
+		   ${OBJDIR}/movimiento.o \
 		   ${OBJDIR}/utils.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang

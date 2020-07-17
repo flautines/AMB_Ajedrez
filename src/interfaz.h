@@ -29,26 +29,45 @@ extern AJD_Sprite sprCursorMovil;
  ***************************************************************************************/
 void inicializaPantalla();
 /****************************************************************************************
+ * liberaPantalla
+ *
+ * Libera los recursos de ncurses.
+ ***************************************************************************************/
+void liberaPantalla();
+/****************************************************************************************
  * dibujaJuego
  *
  * Dibuja todos los elementos del juego
  ***************************************************************************************/
- void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego);
+ void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego);
 /****************************************************************************************
  * dibujaTablero
  *
  * Dibuja el tablero en pantalla según su estado actual.
  ***************************************************************************************/
-void dibujaTablero(AJD_TableroPtr tablero);
+void dibujaTablero(const AJD_TableroPtr tablero);
 /****************************************************************************************
  * dibujaMarcadores 
  *
  * Dibuja los marcadores de tiempo, turno, etc.
  ***************************************************************************************/
-void dibujaMarcadores(AJD_EstadoPtr estado_juego);
+void dibujaMarcadores(const AJD_EstadoPtr estadoJuego);
 /****************************************************************************************
  * dibujaPieza
  *
  * Dibuja la pieza indicada en las coordenadas y,x
  ***************************************************************************************/
 void dibujaPieza (int y, int x, AJD_Pieza pieza);
+/****************************************************************************************
+ * dibujaFlags
+ *
+ * Muestra diferentes flags provocados por el movimiento realizado
+ ***************************************************************************************/
+void dibujaFlags (const AJD_EstadoPtr estadoJuego);
+/****************************************************************************************
+ * procesaTeclado
+ *
+ * Lectura del teclado y actualizacion de cursor
+ * Modifica estadoJuego con la celda origen y destino de la pieza a mover.
+ ***************************************************************************************/
+void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego);

@@ -1,5 +1,7 @@
 #include <common.h>
+#include <movimiento.h>
 
+#include <stdio.h>
 /****************************************************************************************
  * Variables PRIVADAS
  ***************************************************************************************/
@@ -30,6 +32,16 @@ void inicializa()
     inicializaPantalla();
 }
 /****************************************************************************************
+ * liberaRecursos
+ *
+ * Libera los recursos usados por el programa, incluída la UI
+ ***************************************************************************************/
+void liberaRecursos()
+{   
+   liberaPantalla();
+   puts ("ncurses finalizado");
+}
+/****************************************************************************************
  * nuevoJuego
  *
  * Prepara el estado del juego y el tablero para una partida nueva:
@@ -55,22 +67,61 @@ void nuevoJuego()
  * Devuelve TRUE si el juego ha terminado.
  ***************************************************************************************/
 AJD_Bool ejecutaPartida()
-{
+{    
+
+    AJD_TableroPtr ptablero = obtenTableroPtr();
     while (!estadoJuego.finJuego)
-    {
-        dibujaJuego(obtenTableroPtr(), &estadoJuego);
-        /*actualizaJuego();            */
+    {        
+        dibujaJuego(ptablero, &estadoJuego);        
+
+        procesaTeclado (ptablero, &estadoJuego);
+
+        efectuaJugada (ptablero);
+
+        dibujaFlags (&estadoJuego);
+
+        actualizaEstadoJuego(ptablero);
     }
+    
     return estadoJuego.finJuego;
+}
+/****************************************************************************************
+ *  actualizaEstadoJuego
+ *
+ *  Actualiza estado de juego
+ ***************************************************************************************/
+void actualizaEstadoJuego (AJD_TableroPtr tablero)
+{       
+    estadoJuego.jueganBlancas ^= 1;
+    estadoJuego.jugadorActual ^= 1;
+}
+/****************************************************************************************
+ *  efectuaJugada
+ *
+ *  Efectua movimiento de piezas blancas o negras
+ ***************************************************************************************/
+void efectuaJugada (AJD_TableroPtr tablero)
+{
+    AJD_MovimientoPtr movimiento;
+
+    if (estadoJuego.jueganBlancas)
+    {
+        movimiento = &estadoJuego.jugada.movBlancas;
+    }
+    else
+    {
+        movimiento = &estadoJuego.jugada.movNegras;
+    }
+
+    efectuaMovimiento (tablero, movimiento);   
 }
 /****************************************************************************************
  * obtenEstadoPtr
  *
  * Obten el puntero al estado de juego
  ***************************************************************************************/
-/*
 AJD_EstadoPtr obtenEstadoPtr ()
 {
     return &estadoJuego;
 }
-*/
+

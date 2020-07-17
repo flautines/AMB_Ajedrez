@@ -71,7 +71,7 @@ typedef struct {
 typedef struct {
    int            nturno;
    AJD_Movimiento movBlancas;
-   AJD_Movimiento movNnegras;
+   AJD_Movimiento movNegras;
 } AJD_Jugada, *AJD_JugadaPtr;
 /****************************************************************************************
  * Estado de juego

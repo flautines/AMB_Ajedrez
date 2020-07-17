@@ -70,21 +70,30 @@ void inicializaPantalla()
     clear();
 }
 /****************************************************************************************
+ * liberaPantalla
+ *
+ * Libera los recursos de ncurses.
+ ***************************************************************************************/
+void liberaPantalla()
+{
+    endwin();
+}
+/****************************************************************************************
  * dibujaJuego
  *
  * Dibuja todos los elementos del juego
  ***************************************************************************************/
-void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estado_juego)
+void dibujaJuego(AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego)
 {
     dibujaTablero (tablero);
-    dibujaMarcadores (estado_juego);
+    dibujaMarcadores (estadoJuego);    
 }
 /****************************************************************************************
  * dibujaTablero
  *
  * Dibuja el tablero en pantalla según su estado actual.
  ***************************************************************************************/
-void dibujaTablero(AJD_TableroPtr tablero)
+void dibujaTablero(const AJD_TableroPtr tablero)
 {
     AJD_idCasilla idCasilla = h1;
 
@@ -113,11 +122,10 @@ void dibujaTablero(AJD_TableroPtr tablero)
  *
  * Dibuja los marcadores de tiempo, turno, etc.
  ***************************************************************************************/
-void dibujaMarcadores(AJD_EstadoPtr estado_juego)
+void dibujaMarcadores(const AJD_EstadoPtr estadoJuego)
 {
     char buff[6];
     int x,y;
-    int ch;
 
     x = MARCADOR_COL_START;
     y = MARCADOR_ROW_START + 1;
@@ -128,10 +136,10 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
     mvprintw (y,x, "(c) Jul 2020 Andres Mata");
 
     y = MARCADOR_ROW_SEGUNDOS_B;
-    mvprintw (y,x, "Blancas %s", strSegundos (buff, estado_juego->segundosBlancas));
+    mvprintw (y,x, "Blancas %s", strSegundos (buff, estadoJuego->segundosBlancas));
 
     y = MARCADOR_ROW_SEGUNDOS_N;
-    mvprintw (y,x, "Negras %s", strSegundos (buff, estado_juego->segundosNegras));
+    mvprintw (y,x, "Negras %s", strSegundos (buff, estadoJuego->segundosNegras));
 /*
     y += 2;
     if (turno_actual->enroque)
@@ -142,31 +150,28 @@ void dibujaMarcadores(AJD_EstadoPtr estado_juego)
 */
     y = MARCADOR_JUGADOR_ACTUAL;
     mvprintw (y,x, "Turno %02d (Jugador %c)", 
-                    estado_juego->jugada.nturno, estado_juego->jugadorActual+'1');
+                    estadoJuego->jugada.nturno, estadoJuego->jugadorActual+'1');
 
     y += 1;
-    mvprintw (y,x, "Juegan %s", estado_juego->jueganBlancas ? "blancas" : "negras ");
+    mvprintw (y,x, "Juegan %s", estadoJuego->jueganBlancas ? "blancas" : "negras ");
 /*
     // Debug info
     mvprintw (MARCADOR_LAST_ROW+2, 0, "O-O-O (BLANCAS) %s", 
-              estado_juego->enroque_permitido &ERLARGO_PROHIBIDO_B 
+              estadoJuego->enroque_permitido &ERLARGO_PROHIBIDO_B 
               ? "PROH" : "PERM");
 
     mvprintw (MARCADOR_LAST_ROW+3, 0, "O-O (BLANCAS) %s", 
-              estado_juego->enroque_permitido &ERCORTO_PROHIBIDO_B 
+              estadoJuego->enroque_permitido &ERCORTO_PROHIBIDO_B 
               ? "PROH" : "PERM");
 
     mvprintw (MARCADOR_LAST_ROW+4, 0, "O-O-O (NEGRAS) %s",
-              estado_juego->enroque_permitido &ERLARGO_PROHIBIDO_N 
+              estadoJuego->enroque_permitido &ERLARGO_PROHIBIDO_N 
               ? "PROH" : "PERM");
 
     mvprintw (MARCADOR_LAST_ROW+5, 0, "O-O (NEGRAS) %s", 
-              estado_juego->enroque_permitido &ERCORTO_PROHIBIDO_N
+              estadoJuego->enroque_permitido &ERCORTO_PROHIBIDO_N
               ? "PROH" : "PERM");
 */
-    while ( (ch = getch()) != '\033');
-    estado_juego->finJuego = TRUE;
-    endwin();
 }
 /****************************************************************************************
  * dibujaPieza
@@ -184,7 +189,47 @@ void dibujaPieza (int y, int x, AJD_Pieza pieza)
     mvprintw (y, x, "%c", sprite);
     attroff (COLOR_PAIR (COLOR_TEXTO_RESALTADO));
 }
+/****************************************************************************************
+ * dibujaFlags
+ *
+ * Muestra diferentes flags provocados por el movimiento realizado
+ ***************************************************************************************/
+void dibujaFlags (const AJD_EstadoPtr estadoJuego)
+{
+    AJD_Movimiento movCausante = estadoJuego->jueganBlancas ? 
+                                    estadoJuego->jugada.movBlancas :
+                                    estadoJuego->jugada.movNegras;
+    mvprintw (0,0, 
+        "captura:%d   enroque:%d   jaque:%d   mate:%d",
+        movCausante.captura,
+        movCausante.enroque,
+        movCausante.jaque,
+        movCausante.mate);
+}
+/****************************************************************************************
+ * procesaTeclado
+ *
+ * Lectura del teclado y actualizacion de cursor
+ * Modifica estadoJuego con la celda origen y destino de la pieza a mover.
+ ***************************************************************************************/
+void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego)
+{
+    int ch;
 
+    do {
+    ch = getch();
+
+    switch (ch)
+    {
+        /* [ESC] exit current game */
+        case '\033': estadoJuego->finJuego = TRUE; return;
+
+        /* [ENTER] next move for now */
+        case '\n': return;
+    }
+    } while (TRUE);
+
+}
 
 /****************************************************************************************
  ****************************************************************************************
@@ -257,3 +302,4 @@ void dibujaEncabezados ()
         n--;
     }
 }
+
