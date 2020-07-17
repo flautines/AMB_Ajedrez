@@ -3,20 +3,21 @@ OBJDIR  := ../obj
 TESTDIR := ./
 SOURCES := ${OBJDIR}/tablero.o  \
 		   ${OBJDIR}/interfaz.o \
-		   ${OBJDIR}/juego.o \
+		   ${OBJDIR}/juego.o 	\
+		   ${OBJDIR}/movimiento.o \
 		   ${OBJDIR}/utils.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
 CFLAGS 	:= -Wall -Werror -pedantic -std=c89 -I ${INCDIRS} -finput-charset=UTF-8
 LDFLAGS := -lncurses
 
-test_mov: ${SOURCES} ${OBJDIR}/test_movimiento.o
+test_mov: ${SOURCES} test_mov.o
 	${CC} ${LDFLAGS} $^ -o $@
 
 ${OBJDIR}/%.o : ${SRCDIR}/%.c
 	${CC} -c ${CFLAGS} $^ -o $@
 
-${OBJDIR}/%.o : ${TESTDIR}/%.c
+${OBJDIR}/test_mov.o : ${TESTDIR}/test_mov.c
 	${CC} -c ${CFLAGS} $^ -o $@	
 
 .PHONY: clean
