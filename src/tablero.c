@@ -96,3 +96,36 @@ void actualizaCursor (AJD_Accion accion)
     if (pcurMovil->casilla > casillasEnd)
         pcurMovil->casilla -= offset;
 }
+
+
+AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
+{  
+    /* 
+     * Si no hay ninguna seleccion previa, la selección actual corresponde al origen,
+     * Si había una selección anterior, la selección actual corresponde al destino.
+     * Si se selecciona como destino la misma casilla de origen, se cancela la selección
+     */
+    if (accion == CUR_SELEC)
+    {
+        if (estadoJuego->casillaSeleccionada == NO_SELECCION)
+        {
+            estadoJuego->casillaSeleccionada = ORIGEN_SELECCIONADO;
+            /* Con el cursor fijo damos indicación visual de la casilla origen */
+            tablero.curFijo.casilla = tablero.curMovil.casilla;
+            tablero.curFijo.visible = TRUE;
+        }
+        else
+        {
+            if (tablero.curFijo.casilla != tablero.curMovil.casilla)
+            {
+                estadoJuego->casillaSeleccionada = DESTINO_SELECCIONADO;
+            }
+            else
+            {
+                estadoJuego->casillaSeleccionada = NO_SELECCION;
+                tablero.curFijo.visible = FALSE;
+            }            
+        }
+    }
+    return estadoJuego->casillaSeleccionada;
+}

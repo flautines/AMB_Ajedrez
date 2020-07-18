@@ -29,3 +29,5 @@ void tableroDisposicionInicial ();
  * Actualiza el cursor segun la accion indicada
  ***************************************************************************************/
 void actualizaCursor (AJD_Accion accion);
+
+AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion);

@@ -97,6 +97,7 @@ AJD_Bool ejecutaPartida()
         
         actualizaCursor (accion);
 
+        estadoJuego.casillaSeleccionada = obtenSeleccion (&estadoJuego, accion);
         if (estadoJuego.casillaSeleccionada == DESTINO_SELECCIONADO)
         {
             efectuaJugada (ptablero);
@@ -151,4 +152,3 @@ AJD_EstadoPtr obtenEstadoPtr ()
 {
     return &estadoJuego;
 }
-
