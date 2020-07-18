@@ -334,7 +334,7 @@ AJD_Accion procesaTeclado ()
  ***************************************************************************************/
 void dibujaCasilla (AJD_idCasilla id)
 {
-    AJD_Casilla casilla = obtenCasilla (id);
+    AJD_Casilla casilla = *(idToPtr (id));
 
     /* columna y fila correspondientes a esta casilla en el tablero */
     int y = (id / 8) * ANCHO_CASILLA + TABLERO_ROW_START;

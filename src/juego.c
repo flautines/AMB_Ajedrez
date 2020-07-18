@@ -70,7 +70,7 @@ void nuevoJuego()
      * El cursor movil es visible y sin flash
      * El cursor fijo no es visible y con flash
      **********************************************/    
-    tablero->curMovil.casilla = tablero->curFijo.casilla = &tablero->casillas[e2];
+    tablero->curMovil.casilla = tablero->curFijo.casilla = idToPtr(d2);
     tablero->curMovil.visible = TRUE;
     tablero->curFijo.visible  = FALSE;
     tablero->curMovil.flash   = FALSE;
@@ -102,26 +102,40 @@ AJD_Bool ejecutaPartida()
         {
             efectuaJugada (ptablero);
 
-            dibujaFlags (&estadoJuego);
+            dibujaFlags (&estadoJuego);            
 
-            actualizaEstado();
-        }
+            siguienteTurno(ptablero);
+        }        
     }
     
     return (accion == SALIR);
 }
 /****************************************************************************************
- *  actualizaEstado
+ *  siguienteTurno
  *
- *  Actualiza estado de juego
+ *  Actualiza estado de juego para el próximo turno
  ***************************************************************************************/
-void actualizaEstado ()
+void siguienteTurno(AJD_TableroPtr tablero)
 {
     estadoJuego.jueganBlancas ^= 1;
-    estadoJuego.jugadorActual ^= 1;
-    
+    estadoJuego.jugadorActual ^= 1;        
+
     if (estadoJuego.jueganBlancas) 
+    {
+        /* Blancas y negras han terminado sus movimientos */
         estadoJuego.jugada.nturno += 1;
+        /* Resetea el cursor de selección al peon de dama blanco */
+        tablero->curMovil.casilla = idToPtr (d2);
+    }
+    else
+        /* Resetea el cursor de selección al peon de dama negro */
+        tablero->curMovil.casilla = idToPtr (d7);
+
+    /* Oculta el cursor fijo */
+    tablero->curFijo.visible = FALSE;
+
+    /* Nuevo turno, no hay casilla origen/destino seleccionada */
+    estadoJuego.casillaSeleccionada = NO_SELECCION;        
 }
 /****************************************************************************************
  *  efectuaJugada

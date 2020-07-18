@@ -35,11 +35,11 @@ void nuevoJuego();
  ***************************************************************************************/
 AJD_Bool ejecutaPartida();
 /****************************************************************************************
- *  actualizaEstado
+ *  siguienteTurno
  *
- *  Actualiza estado de juego
+ *  Actualiza estado de juego para el próximo turno
  ***************************************************************************************/
-void actualizaEstado ();
+void siguienteTurno(AJD_TableroPtr tablero);
 /****************************************************************************************
  *  efectuaJugada
  *
