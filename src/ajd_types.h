@@ -25,6 +25,15 @@ typedef enum {
 
 } AJD_Pieza;
 
+/**  Diferentes acciones a realizar durante el juego
+ ***************************************************************************************/
+typedef enum { 
+      NO_ACCION,
+      CUR_DER, CUR_IZQ, CUR_ARR, CUR_ABJ,    /* Mover cursor */
+      CUR_SELEC,                             /* Seleccionar casilla */      
+      SALIR
+} AJD_Accion;
+
 /** Opciones posibles de selección de casilla con el cursor
  ***************************************************************************************/
 typedef enum { 
@@ -50,7 +59,7 @@ typedef enum {
  ***************************************************************************************/
 typedef struct {
    AJD_Color   color:1;
-   AJD_Pieza     pieza:4;
+   AJD_Pieza   pieza:4;
 } AJD_Casilla, *AJD_CasillaPtr;
 
 /** Información mínima imprescindible para almacenar un movimiento
@@ -127,5 +136,4 @@ typedef struct {
     uint16_t            segundosNegras;
     /*AJD_ERPerm          enroquePermitido;*/
     AJD_Seleccion       casillaSeleccionada;
-    AJD_Bool            finJuego;
 } AJD_Estado, *AJD_EstadoPtr;

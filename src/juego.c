@@ -70,9 +70,9 @@ void nuevoJuego()
      * El cursor movil es visible y sin flash
      * El cursor fijo no es visible y con flash
      **********************************************/    
-    tablero->curMovil.casilla = tablero->curFijo.casilla = &tablero->casillas[e5];
-    tablero->curMovil.visible = FALSE;
-    tablero->curFijo.visible  = TRUE;
+    tablero->curMovil.casilla = tablero->curFijo.casilla = &tablero->casillas[e2];
+    tablero->curMovil.visible = TRUE;
+    tablero->curFijo.visible  = FALSE;
     tablero->curMovil.flash   = FALSE;
     tablero->curFijo.flash    = TRUE;
 }
@@ -84,30 +84,38 @@ void nuevoJuego()
  ***************************************************************************************/
 AJD_Bool ejecutaPartida()
 {    
-
+    AJD_Accion accion = NO_ACCION;    
     AJD_TableroPtr ptablero = obtenTableroPtr();
-    while (!estadoJuego.finJuego)
-    {        
-        dibujaJuego(ptablero, &estadoJuego);        
 
-        procesaTeclado (ptablero, &estadoJuego);
+    while (accion != SALIR)
+    {     
+        accion = procesaTeclado (ptablero, &estadoJuego);
 
-        efectuaJugada (ptablero);
+        dibujaJuego(ptablero, &estadoJuego);
 
-        dibujaFlags (&estadoJuego);
+        if (accion == NO_ACCION) continue;
+        
+        actualizaCursor (accion);
 
-        actualizaEstadoJuego(ptablero);
+        if (estadoJuego.casillaSeleccionada == DESTINO_SELECCIONADO)
+        {
+            efectuaJugada (ptablero);
+
+            dibujaFlags (&estadoJuego);
+
+            actualizaEstado();
+        }
     }
     
-    return estadoJuego.finJuego;
+    return (accion == SALIR);
 }
 /****************************************************************************************
- *  actualizaEstadoJuego
+ *  actualizaEstado
  *
  *  Actualiza estado de juego
  ***************************************************************************************/
-void actualizaEstadoJuego (AJD_TableroPtr tablero)
-{       
+void actualizaEstado ()
+{
     estadoJuego.jueganBlancas ^= 1;
     estadoJuego.jugadorActual ^= 1;
     

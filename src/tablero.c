@@ -67,3 +67,32 @@ void tableroDisposicionInicial ()
       tablero.casillas[a2 + col].pieza = PEON_B;               /* peones blancos     */
    }
 }
+/****************************************************************************************
+ * actualizaCursor
+ *
+ * Actualiza el cursor segun la accion indicada
+ ***************************************************************************************/
+void actualizaCursor (AJD_Accion accion)
+{
+    AJD_CursorPtr pcurMovil = &tablero.curMovil;
+    AJD_CasillaPtr casillasBegin = tablero.casillas;
+    AJD_CasillaPtr casillasEnd = &tablero.casillas[63];
+    long offset = casillasEnd - casillasBegin +1;
+
+    switch (accion)
+    {
+        case CUR_ARR: pcurMovil->casilla -= 8; break;
+        case CUR_ABJ: pcurMovil->casilla += 8; break;
+        case CUR_IZQ: pcurMovil->casilla -= 1; break;
+        case CUR_DER: pcurMovil->casilla += 1; break;
+
+        default: break;
+    }
+    
+    /* Impedir que el cursor apunte a una casilla fuera del array de casillas */
+    if (pcurMovil->casilla < casillasBegin)
+        pcurMovil->casilla += offset;
+
+    if (pcurMovil->casilla > casillasEnd)
+        pcurMovil->casilla -= offset;
+}

@@ -81,7 +81,6 @@ void dibujaFlags (const AJD_EstadoPtr estadoJuego);
 /****************************************************************************************
  * procesaTeclado
  *
- * Lectura del teclado y actualizacion de cursor
- * Modifica estadoJuego con la celda origen y destino de la pieza a mover.
+ * Lectura del teclado. Devuelve la accion de juego a realizar correspondiente.
  ***************************************************************************************/
-void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego);
+AJD_Accion procesaTeclado ();

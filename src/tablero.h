@@ -23,3 +23,9 @@ AJD_TableroPtr obtenTableroPtr ();
  * Coloca las piezas del ajedrez en su disposición de partida nueva
  ***************************************************************************************/
 void tableroDisposicionInicial ();
+/****************************************************************************************
+ * actualizaCursor
+ *
+ * Actualiza el cursor segun la accion indicada
+ ***************************************************************************************/
+void actualizaCursor (AJD_Accion accion);

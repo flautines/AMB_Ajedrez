@@ -296,26 +296,30 @@ void dibujaFlags (const AJD_EstadoPtr estadoJuego)
 /****************************************************************************************
  * procesaTeclado
  *
- * Lectura del teclado y actualizacion de cursor
- * Modifica estadoJuego con la celda origen y destino de la pieza a mover.
+ * Lectura del teclado. Devuelve la accion de juego a realizar correspondiente.
  ***************************************************************************************/
-void procesaTeclado (AJD_TableroPtr tablero, AJD_EstadoPtr estadoJuego)
+AJD_Accion procesaTeclado ()
 {
     int ch;
 
-    do {
     ch = getch();
 
     switch (ch)
     {
-        /* [ESC] exit current game */
-        case '\033': estadoJuego->finJuego = TRUE; return;
+        /* [ESC] salir  */
+        case '\033'     : return SALIR;
 
-        /* [ENTER] next move for now */
-        case '\n': return;
+        /* [ENTER] selecciona casilla debajo del cursor */
+        case '\n'       : return CUR_SELEC;
+
+        /* Teclas para mover el cursor de seleccion */
+        case KEY_UP     : return CUR_ARR;
+        case KEY_DOWN   : return CUR_ABJ;
+        case KEY_LEFT   : return CUR_IZQ;
+        case KEY_RIGHT  : return CUR_DER;
+
+        default         : return NO_ACCION;
     }
-    } while (TRUE);
-
 }
 
 /****************************************************************************************
