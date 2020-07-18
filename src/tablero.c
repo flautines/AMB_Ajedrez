@@ -69,6 +69,16 @@ void tableroDisposicionInicial ()
    }
 }
 /****************************************************************************************
+ * muevePieza
+ *
+ * Mueve la pieza que hay en la casilla origen a la casilla destino
+ ***************************************************************************************/
+void muevePieza (AJD_idCasilla origen, AJD_idCasilla destino)
+{
+    tablero.casillas[destino].pieza = tablero.casillas[origen].pieza;
+    tablero.casillas[origen].pieza  = NO_PIEZA;
+}
+/****************************************************************************************
  * actualizaCursor
  *
  * Actualiza el cursor segun la accion indicada
