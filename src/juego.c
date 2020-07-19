@@ -75,6 +75,9 @@ void nuevoJuego()
     tablero->curFijo.visible  = FALSE;
     tablero->curMovil.flash   = FALSE;
     tablero->curFijo.flash    = TRUE;
+
+    /* No hay ninguna casilla seleccionada */
+    estadoJuego.casillaSeleccionada = NO_SELECCION;     
 }
 /****************************************************************************************
  *  ejecutaPartida
@@ -155,7 +158,7 @@ void efectuaJugada (AJD_TableroPtr tablero)
         movimiento = &estadoJuego.jugada.movNegras;
     }
 
-    efectuaMovimiento (tablero, movimiento);   
+    efectuaMovimiento (movimiento);   
 }
 /****************************************************************************************
  * obtenEstadoPtr

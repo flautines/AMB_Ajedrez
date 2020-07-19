@@ -123,10 +123,13 @@ AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
     {
         if (estadoJuego->casillaSeleccionada == NO_SELECCION)
         {
-            estadoJuego->casillaSeleccionada = ORIGEN_SELECCIONADO;
-            /* Con el cursor fijo damos indicación visual de la casilla origen */
-            tablero.curFijo.casilla = tablero.curMovil.casilla;
-            tablero.curFijo.visible = TRUE;
+            if (hayPiezaValida(estadoJuego, tablero.curMovil.casilla))
+            {
+                estadoJuego->casillaSeleccionada = ORIGEN_SELECCIONADO;
+                /* Con el cursor fijo damos indicación visual de la casilla origen */
+                tablero.curFijo.casilla = tablero.curMovil.casilla;
+                tablero.curFijo.visible = TRUE;
+            }
         }
         else
         {
@@ -184,4 +187,17 @@ char *ptrToStr (AJD_CasillaPtr casilla)
 {
     AJD_idCasilla idCasilla = ptrToId (casilla);
     return strCasillas[idCasilla];
+}
+/****************************************************************************************
+ * hayPiezaValida
+ *
+ * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
+ * contrario (no hay pieza o es del color del oponente)
+ ***************************************************************************************/
+AJD_Bool hayPiezaValida(AJD_EstadoPtr pestado, AJD_CasillaPtr pcasilla)
+{
+    AJD_Pieza minValido = pestado->jueganBlancas ? PEON_B : PEON_N;
+    AJD_Pieza maxValido = pestado->jueganBlancas ? REY_B  : REY_N;
+    
+    return (pcasilla->pieza >= minValido && pcasilla->pieza <= maxValido);
 }

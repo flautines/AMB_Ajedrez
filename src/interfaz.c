@@ -188,7 +188,6 @@ void dibujaCursor (const AJD_TableroPtr tablero, AJD_Cursor cursor)
         attroff (A_REVERSE);
 
     ch = cursor.sprite->ch;
-    mvaddch (2,35, *ch);
 
     for (dy=0; dy<ALTO_CASILLA; dy++)
     {    
