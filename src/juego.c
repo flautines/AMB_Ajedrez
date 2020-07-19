@@ -100,14 +100,23 @@ AJD_Bool ejecutaPartida()
         
         actualizaCursor (accion);
 
+        /* Si se ha seleccionado origen y destino intenta efectuar el movimiento */
         estadoJuego.casillaSeleccionada = obtenSeleccion (&estadoJuego, accion);
         if (estadoJuego.casillaSeleccionada == DESTINO_SELECCIONADO)
         {
-            efectuaJugada (ptablero);
+            if (efectuaJugada (ptablero))
+            {
+                dibujaFlags (&estadoJuego);
 
-            dibujaFlags (&estadoJuego);            
-
-            siguienteTurno(ptablero);
+                siguienteTurno(ptablero);
+            }
+            else
+            /* El movimiento no se pudo efectuar por ser invalido, se debe seleccionar
+               otra casilla destino.                                                  */
+            {
+                estadoJuego.casillaSeleccionada = ORIGEN_SELECCIONADO;
+            }
+            
         }        
     }
     
@@ -143,9 +152,10 @@ void siguienteTurno(AJD_TableroPtr tablero)
 /****************************************************************************************
  *  efectuaJugada
  *
- *  Efectua movimiento de piezas blancas o negras
+ *  Efectua movimiento de piezas blancas / negras si es válido.
+ *  Devuelve TRUE si se efectuó el movimiento, FALSE en caso contrario.
  ***************************************************************************************/
-void efectuaJugada (AJD_TableroPtr tablero)
+AJD_Bool efectuaJugada (AJD_TableroPtr tablero)
 {
     AJD_MovimientoPtr movimiento;
 
@@ -158,7 +168,13 @@ void efectuaJugada (AJD_TableroPtr tablero)
         movimiento = &estadoJuego.jugada.movNegras;
     }
 
-    efectuaMovimiento (movimiento);   
+    if (esMovimientoValido (movimiento, &estadoJuego))
+    {
+        efectuaMovimiento (movimiento);
+        return TRUE;
+    }
+    else
+        return FALSE;
 }
 /****************************************************************************************
  * obtenEstadoPtr

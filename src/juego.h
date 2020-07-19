@@ -43,9 +43,10 @@ void siguienteTurno(AJD_TableroPtr tablero);
 /****************************************************************************************
  *  efectuaJugada
  *
- *  Efectua movimiento de piezas blancas / negras 
+ *  Efectua movimiento de piezas blancas / negras si es válido.
+ *  Devuelve TRUE si se efectuó el movimiento, FALSE en caso contrario.
  ***************************************************************************************/
-void efectuaJugada (AJD_TableroPtr tablero);
+AJD_Bool efectuaJugada (AJD_TableroPtr tablero);
 
 /****************************************************************************************
  * obtenEstadoPtr

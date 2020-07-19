@@ -113,7 +113,8 @@ void actualizaCursor (AJD_Accion accion)
  * Obtiene la casilla seleccionada (si es que se ha hecho una accion de seleccion)
  ***************************************************************************************/
 AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
-{  
+{
+    AJD_Bool jueganBlancas = estadoJuego->jueganBlancas;
     /* 
      * Si no hay ninguna seleccion previa, la selección actual corresponde al origen,
      * Si había una selección anterior, la selección actual corresponde al destino.
@@ -123,7 +124,7 @@ AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
     {
         if (estadoJuego->casillaSeleccionada == NO_SELECCION)
         {
-            if (hayPiezaValida(estadoJuego, tablero.curMovil.casilla))
+            if (hayPiezaJugador(jueganBlancas, tablero.curMovil.casilla))
             {
                 estadoJuego->casillaSeleccionada = ORIGEN_SELECCIONADO;
                 /* Con el cursor fijo damos indicación visual de la casilla origen */
@@ -149,7 +150,7 @@ AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
     if (estadoJuego->casillaSeleccionada == DESTINO_SELECCIONADO)
     {
         AJD_MovimientoPtr pmov;
-        pmov = estadoJuego->jueganBlancas ? 
+        pmov = jueganBlancas ? 
                 &estadoJuego->jugada.movBlancas : &estadoJuego->jugada.movNegras;
 
         pmov->idOrigen = ptrToId (tablero.curFijo.casilla);
@@ -157,6 +158,15 @@ AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
     }
 
     return estadoJuego->casillaSeleccionada;
+}
+/****************************************************************************************
+ * obtenPieza
+ *
+ * Obtiene la pieza que hay en la casilla (ptr) indicada o NO_PIEZA si está vacía
+ ***************************************************************************************/
+AJD_Pieza obtenPieza (AJD_CasillaPtr pcasilla)
+{
+    return pcasilla->pieza;
 }
 /****************************************************************************************
  * idToPtr
@@ -189,15 +199,15 @@ char *ptrToStr (AJD_CasillaPtr casilla)
     return strCasillas[idCasilla];
 }
 /****************************************************************************************
- * hayPiezaValida
+ * hayPiezaJugador
  *
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
  * contrario (no hay pieza o es del color del oponente)
  ***************************************************************************************/
-AJD_Bool hayPiezaValida(AJD_EstadoPtr pestado, AJD_CasillaPtr pcasilla)
+AJD_Bool hayPiezaJugador(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
 {
-    AJD_Pieza minValido = pestado->jueganBlancas ? PEON_B : PEON_N;
-    AJD_Pieza maxValido = pestado->jueganBlancas ? REY_B  : REY_N;
+    AJD_Pieza minValido = jueganBlancas ? PEON_B : PEON_N;
+    AJD_Pieza maxValido = jueganBlancas ? REY_B  : REY_N;
     
     return (pcasilla->pieza >= minValido && pcasilla->pieza <= maxValido);
 }

@@ -36,6 +36,12 @@ void actualizaCursor (AJD_Accion accion);
  ***************************************************************************************/
 AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion);
 /****************************************************************************************
+ * obtenPieza
+ *
+ * Obtiene la pieza que hay en la casilla (ptr) indicada o NO_PIEZA si está vacía
+ ***************************************************************************************/
+AJD_Pieza obtenPieza (AJD_CasillaPtr pcasilla);
+/****************************************************************************************
  * idToPtr
  *
  * Obten puntero de una casilla del tablero a partir de su id (p.ej a3)
@@ -54,9 +60,9 @@ AJD_idCasilla ptrToId (AJD_CasillaPtr casilla);
  ***************************************************************************************/
 char *ptrToStr (AJD_CasillaPtr casilla);
 /****************************************************************************************
- * hayPiezaValida
+ * hayPiezaJugador
  *
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
  * contrario (no hay pieza o es del color del oponente)
  ***************************************************************************************/
-AJD_Bool hayPiezaValida (AJD_EstadoPtr pestado, AJD_CasillaPtr pcasilla);
+AJD_Bool hayPiezaJugador (AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla);
