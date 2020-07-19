@@ -1,7 +1,7 @@
 # AMB_Ajedrez
 Juego del ajedrez basado en "Ajedrez en C: Cómo programar un juego de ajedrez en lenguaje C"
 
-La rama "development" es una re-escritura de casi todo el código. El motivo es intentar hacer un código más lógico y evitando repetir código innecesario.
+La rama "dev" es una re-escritura completa de todo el código.
 
-Segunda reimplementación, esta vez debido a no haber planificado bien cómo guardar el listado de turnos. En la implementación original sólo se guardaba información del turno actual. Pero para poder guardar un registro de toda la partida en esta ocasión se guardará una copia del turno actual dentro de una lista de turnos.
+Esta es ya la tercera reimplementación (espero que sea ya la última). Al reimplementar la rama "development" me daba cuenta que en las estructuras elegidas estaba guardando información redundante y a veces incluso inútil. En esta tercera implementación se ha procurado elegir estructuras que guarden lo mínimo imprescindible y eliminar (siempre que se pueda) cualquier información redundante.
 
