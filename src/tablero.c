@@ -211,3 +211,25 @@ AJD_Bool hayPiezaJugador(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
     
     return (pcasilla->pieza >= minValido && pcasilla->pieza <= maxValido);
 }
+/****************************************************************************************
+ * hayPiezaOponente
+ *
+ * Devuelve TRUE si en la casilla indicada hay una pieza del jugador contrario, 
+ * FALSE en caso contrario (no hay pieza o es del mismo color)
+ ***************************************************************************************/
+AJD_Bool hayPiezaOponente(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
+{
+    AJD_Pieza minValido = jueganBlancas ? PEON_N : PEON_B;
+    AJD_Pieza maxValido = jueganBlancas ? REY_N  : REY_B;
+    
+    return (pcasilla->pieza >= minValido && pcasilla->pieza <= maxValido);
+}
+/****************************************************************************************
+ * casillaVacia
+ *
+ * Devuelve TRUE si la casilla está vacía, FALSE en caso contrario
+ ***************************************************************************************/
+AJD_Bool casillaVacia (AJD_CasillaPtr pcasilla)
+{
+    return obtenPieza (pcasilla) == NO_PIEZA;
+}
