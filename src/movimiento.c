@@ -9,9 +9,10 @@
 /****************************************************************************************
  * Funciones PRIVADAS (forward declaration)
  ***************************************************************************************/
-AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza);
+AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Color colorPieza);
+AJD_Bool cumpleReglasCaballo (AJD_MovimientoPtr movimiento, AJD_Color colorPieza);
 AJD_MovInfo obtenMovInfo (AJD_MovimientoPtr movimiento);
-AJD_Bool esPrimerMovimiento (AJD_MovimientoPtr movimiento, AJD_Pieza pieza);
+AJD_Bool esPrimerMovimiento (AJD_MovimientoPtr movimiento, AJD_Color colorPieza);
 /****************************************************************************************
  ****************************************************************************************
  * Funciones PUBLICAS (Implementacion)
@@ -35,12 +36,17 @@ void efectuaMovimiento (AJD_MovimientoPtr movimiento)
 AJD_Bool esMovimientoValido (AJD_MovimientoPtr movimiento, AJD_EstadoPtr estadoJuego)
 {
     AJD_Pieza pieza = obtenPieza (idToPtr (movimiento->idOrigen));
+    AJD_Color colorPieza = estadoJuego->jueganBlancas ? BLANCO : NEGRO;
 
     switch (pieza)
     {
         case PEON_B:
         case PEON_N:
-            return cumpleReglasPeon (movimiento, pieza);
+            return cumpleReglasPeon (movimiento, colorPieza);
+
+        case CABALLO_B:
+        case CABALLO_N:
+            return cumpleReglasCaballo (movimiento, colorPieza);
 
         default:
             return TRUE;
@@ -52,7 +58,7 @@ AJD_Bool esMovimientoValido (AJD_MovimientoPtr movimiento, AJD_EstadoPtr estadoJ
  * Funciones PRIVADAS (Implementacion)
  ****************************************************************************************
  ***************************************************************************************/
-AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
+AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Color colorPieza)
 {
     /* Punteros a la casilla origen y destino */
     AJD_CasillaPtr porigen  = idToPtr (movimiento->idOrigen);
@@ -62,7 +68,7 @@ AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
     AJD_MovInfo movInfo = obtenMovInfo (movimiento); 
 
     /* Sentido vertical del movimiento: -1 BLANCAS, 1 NEGRAS */
-    int dirY = (pieza == PEON_B) ? -1 : 1;
+    int dirY = colorPieza ? -1 : 1;
     
     /* Distancia vertical, será >0 si se mueve adelante, <0 hacia atrás */
     int distY = dirY * movInfo.dy;
@@ -71,7 +77,7 @@ AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
      * primer movimiento. */
     if (movInfo.dx == 0 && casillaVacia (pdestino))
         return (distY == 2 && 
-                esPrimerMovimiento (movimiento, pieza) &&
+                esPrimerMovimiento (movimiento, colorPieza) &&
                 caminoLibre (porigen, pdestino, 0, movInfo.dy))
         /* TODO: comprobar camino libre cuando distY == 2 */
         || distY == 1;
@@ -80,7 +86,28 @@ AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
     else
         return abs(movInfo.dx) == 1 && 
                distY == 1 && 
-               hayPiezaOponente (pieza==PEON_B, pdestino);
+               hayPiezaOponente (colorPieza, pdestino);
+}
+/****************************************************************************************
+ * cumpleReglasMovimientoCaballo
+ ****************************************************************************************/
+AJD_Bool cumpleReglasCaballo (AJD_MovimientoPtr movimiento, AJD_Color colorPieza)
+{
+    AJD_CasillaPtr pdestino = idToPtr (movimiento->idDestino);
+
+    /* Desplazamiento X,Y del movimiento */    
+    AJD_MovInfo movInfo = obtenMovInfo (movimiento); 
+
+    /* En realidad queremos la magnitud del desplazamiento dx,dy */    
+    int distY = abs(movInfo.dx);
+    int distX = abs(movInfo.dy);
+
+    /* No puede haber una pieza del jugador en destino */
+    if (hayPiezaJugador (colorPieza, pdestino))
+        return FALSE;
+
+    /* Movmiento en "L" */
+    return (distY == 2 && distX == 1) || (distX == 2 && distY == 1);
 }
 /****************************************************************************************
  ***************************************************************************************/
@@ -107,12 +134,12 @@ AJD_MovInfo obtenMovInfo (AJD_MovimientoPtr movimiento)
  *
  * Devuelve TRUE si se está moviendo el peon indicado por primera vez.
  ***************************************************************************************/
-AJD_Bool esPrimerMovimiento (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
+AJD_Bool esPrimerMovimiento (AJD_MovimientoPtr movimiento, AJD_Color colorPieza)
 {
     /* Será primer movimiento si su origen es la fila inicial de peones de su color,
      * es decir, a7..h7 para las NEGRAS o a2..h2 para las BLANCAS.
      */
-    AJD_idCasilla filaInicioPeones = (pieza == PEON_B) ? a2 : a7;
+    AJD_idCasilla filaInicioPeones = colorPieza ? a2 : a7;
     return movimiento->idOrigen >= filaInicioPeones && 
            movimiento->idOrigen <= filaInicioPeones + 7;
 }

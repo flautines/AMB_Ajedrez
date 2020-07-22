@@ -115,7 +115,7 @@ void actualizaCursor (AJD_Accion accion)
  ***************************************************************************************/
 AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
 {
-    AJD_Bool jueganBlancas = estadoJuego->jueganBlancas;
+    AJD_Color colorPieza = estadoJuego->jueganBlancas ? BLANCO : NEGRO;
     /* 
      * Si no hay ninguna seleccion previa, la selección actual corresponde al origen,
      * Si había una selección anterior, la selección actual corresponde al destino.
@@ -125,7 +125,7 @@ AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
     {
         if (estadoJuego->casillaSeleccionada == NO_SELECCION)
         {
-            if (hayPiezaJugador(jueganBlancas, tablero.curMovil.casilla))
+            if (hayPiezaJugador(colorPieza, tablero.curMovil.casilla))
             {
                 estadoJuego->casillaSeleccionada = ORIGEN_SELECCIONADO;
                 /* Con el cursor fijo damos indicación visual de la casilla origen */
@@ -151,7 +151,7 @@ AJD_Seleccion obtenSeleccion (AJD_EstadoPtr estadoJuego, AJD_Accion accion)
     if (estadoJuego->casillaSeleccionada == DESTINO_SELECCIONADO)
     {
         AJD_MovimientoPtr pmov;
-        pmov = jueganBlancas ? 
+        pmov = estadoJuego->jueganBlancas ? 
                 &estadoJuego->jugada.movBlancas : &estadoJuego->jugada.movNegras;
 
         pmov->idOrigen = ptrToId (tablero.curFijo.casilla);
@@ -205,10 +205,10 @@ char *ptrToStr (AJD_CasillaPtr casilla)
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
  * contrario (no hay pieza o es del color del oponente)
  ***************************************************************************************/
-AJD_Bool hayPiezaJugador(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
+AJD_Bool hayPiezaJugador(AJD_Color colorPieza, AJD_CasillaPtr pcasilla)
 {
-    AJD_Pieza minValido = jueganBlancas ? PEON_B : PEON_N;
-    AJD_Pieza maxValido = jueganBlancas ? REY_B  : REY_N;
+    AJD_Pieza minValido = colorPieza ? PEON_B : PEON_N;
+    AJD_Pieza maxValido = colorPieza ? REY_B  : REY_N;
     
     return (pcasilla->pieza >= minValido && pcasilla->pieza <= maxValido);
 }
@@ -218,10 +218,10 @@ AJD_Bool hayPiezaJugador(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador contrario, 
  * FALSE en caso contrario (no hay pieza o es del mismo color)
  ***************************************************************************************/
-AJD_Bool hayPiezaOponente(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
+AJD_Bool hayPiezaOponente(AJD_Color colorPieza, AJD_CasillaPtr pcasilla)
 {
-    AJD_Pieza minValido = jueganBlancas ? PEON_N : PEON_B;
-    AJD_Pieza maxValido = jueganBlancas ? REY_N  : REY_B;
+    AJD_Pieza minValido = colorPieza ? PEON_N : PEON_B;
+    AJD_Pieza maxValido = colorPieza ? REY_N  : REY_B;
     
     return (pcasilla->pieza >= minValido && pcasilla->pieza <= maxValido);
 }

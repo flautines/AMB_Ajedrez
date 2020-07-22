@@ -65,14 +65,14 @@ char *ptrToStr (AJD_CasillaPtr casilla);
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
  * contrario (no hay pieza o es del color del oponente)
  ***************************************************************************************/
-AJD_Bool hayPiezaJugador (AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla);
+AJD_Bool hayPiezaJugador (AJD_Color colorPieza, AJD_CasillaPtr pcasilla);
 /****************************************************************************************
  * hayPiezaOponente
  *
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador contrario, 
  * FALSE en caso contrario (no hay pieza o es del mismo color)
  ***************************************************************************************/
-AJD_Bool hayPiezaOponente(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla);
+AJD_Bool hayPiezaOponente(AJD_Color colorPieza, AJD_CasillaPtr pcasilla);
 /****************************************************************************************
  * casillaVacia
  *
