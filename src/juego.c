@@ -7,13 +7,13 @@
  ***************************************************************************************/
 AJD_Estado estadoJuego;
 AJD_Estado estadoJuegoInicio = {
-    {1,                                 /* Jugada 1         */
-        { e2, e2, 0, 0, 0, 0 },         /* Peon rey Blancas */
-        { e7, e7, 0, 0, 0, 0 } },       /* Peon rey Negras  */
-    TRUE,                               /* Juegan Blancas   */
-    0,                                  /* Tiempo Blancas   */
-    0,                                  /* Tiempo Negras    */
-    FALSE                               /* Fin de juego     */
+    {1,                                 /* Jugada 1             */
+        { e2, e2, 0, 0, 0, 0 },         /* Peon rey Blancas     */
+        { e7, e7, 0, 0, 0, 0 } },       /* Peon rey Negras      */
+    TRUE,                               /* Juegan Blancas       */
+    0,                                  /* Tiempo Blancas       */
+    0,                                  /* Tiempo Negras        */
+    NO_SELECCION                        /* Casilla seleccionada */
 };
 /****************************************************************************************
  ****************************************************************************************
