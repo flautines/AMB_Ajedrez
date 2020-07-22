@@ -1,4 +1,5 @@
 #include <common.h>
+#include <utils.h>
 #include <stdio.h>
 /****************************************************************************************
 * Variables PRIVADAS
@@ -232,4 +233,25 @@ AJD_Bool hayPiezaOponente(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla)
 AJD_Bool casillaVacia (AJD_CasillaPtr pcasilla)
 {
     return obtenPieza (pcasilla) == NO_PIEZA;
+}
+/****************************************************************************************
+ * caminoLibre
+ *
+ * Devuelve TRUE si no hay ninguna pieza entre las casillas origen y destino indicadas, 
+ *          FALSE en caso contrario.
+ ***************************************************************************************/
+AJD_Bool caminoLibre (AJD_CasillaPtr origen, AJD_CasillaPtr destino, int dx, int dy)
+{
+    AJD_CasillaPtr pcasilla;
+
+    int offsetx = sign (dx);
+    int offsety = sign (dy) * 8;
+    int offset  = offsetx + offsety;
+
+    for (pcasilla = origen+offset; pcasilla != destino; pcasilla += offset)
+    {        
+        if (!casillaVacia (pcasilla)) 
+            return FALSE;
+    }
+    return TRUE;
 }

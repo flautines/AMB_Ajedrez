@@ -79,3 +79,10 @@ AJD_Bool hayPiezaOponente(AJD_Bool jueganBlancas, AJD_CasillaPtr pcasilla);
  * Devuelve TRUE si la casilla está vacía, FALSE en caso contrario
  ***************************************************************************************/
 AJD_Bool casillaVacia (AJD_CasillaPtr pcasilla);
+/****************************************************************************************
+ * caminoLibre
+ *
+ * Devuelve TRUE si no hay ninguna pieza entre las casillas origen y destino indicadas, 
+ *          FALSE en caso contrario.
+ ***************************************************************************************/
+AJD_Bool caminoLibre (AJD_CasillaPtr origen, AJD_CasillaPtr destino, int dx, int dy);

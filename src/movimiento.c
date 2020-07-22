@@ -12,7 +12,6 @@
 AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza);
 AJD_MovInfo obtenMovInfo (AJD_MovimientoPtr movimiento);
 AJD_Bool esPrimerMovimiento (AJD_MovimientoPtr movimiento, AJD_Pieza pieza);
-
 /****************************************************************************************
  ****************************************************************************************
  * Funciones PUBLICAS (Implementacion)
@@ -29,31 +28,11 @@ void efectuaMovimiento (AJD_MovimientoPtr movimiento)
     muevePieza (origen, destino);
 }
 /****************************************************************************************
- * 
+ * esMovimientoValido
+ *
+ * Comprueba si un movimiento desde una casilla origen a destino es válido.
  ***************************************************************************************/
 AJD_Bool esMovimientoValido (AJD_MovimientoPtr movimiento, AJD_EstadoPtr estadoJuego)
-{
-    AJD_Bool jueganBlancas = estadoJuego->jueganBlancas;
-    /*
-     * Primero que cumpla las reglas de movimiento especifico de la pieza.
-     * Si lo cumple, mira si la casilla destino está ocupada.
-     * Si la pieza ocupada es del mismo "bando", el movimiento no es valido 
-     * Si la casilla es del mismo color, come la pieza. 
-     * Si la casilla está libre, es un movimiento valido.
-     * El PEON es la única pieza que come de forma diferente, así que se 
-     * comprueba en un caso aparte si se detecta movimiento de pieza no válido.
-    */
-    if (cumpleReglasMovimiento (movimiento))
-    {
-        return !hayPiezaJugador (jueganBlancas, idToPtr(movimiento->idDestino));
-    }
-    else
-        return FALSE;
-}
-/****************************************************************************************
- * 
- ***************************************************************************************/
-AJD_Bool cumpleReglasMovimiento (AJD_MovimientoPtr movimiento)
 {
     AJD_Pieza pieza = obtenPieza (idToPtr (movimiento->idOrigen));
 
@@ -66,9 +45,7 @@ AJD_Bool cumpleReglasMovimiento (AJD_MovimientoPtr movimiento)
         default:
             return TRUE;
     }
-    
 }
-
 
 /****************************************************************************************
  ****************************************************************************************
@@ -77,7 +54,8 @@ AJD_Bool cumpleReglasMovimiento (AJD_MovimientoPtr movimiento)
  ***************************************************************************************/
 AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
 {
-    /* Puntero a la casilla destino */
+    /* Punteros a la casilla origen y destino */
+    AJD_CasillaPtr porigen  = idToPtr (movimiento->idOrigen);
     AJD_CasillaPtr pdestino = idToPtr (movimiento->idDestino);
 
     /* Desplazamiento X,Y del movimiento */    
@@ -92,7 +70,9 @@ AJD_Bool cumpleReglasPeon (AJD_MovimientoPtr movimiento, AJD_Pieza pieza)
     /* El peon sólo puede mover hacia adelante una casilla, o dos casillas si es su
      * primer movimiento. */
     if (movInfo.dx == 0 && casillaVacia (pdestino))
-        return (distY == 2 && esPrimerMovimiento (movimiento, pieza))
+        return (distY == 2 && 
+                esPrimerMovimiento (movimiento, pieza) &&
+                caminoLibre (porigen, pdestino, 0, movInfo.dy))
         /* TODO: comprobar camino libre cuando distY == 2 */
         || distY == 1;
 
