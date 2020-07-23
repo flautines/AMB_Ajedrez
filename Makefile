@@ -6,7 +6,8 @@ SOURCES := ${OBJDIR}/main.o 	\
 		   ${OBJDIR}/interfaz.o \
 		   ${OBJDIR}/juego.o 	\
 		   ${OBJDIR}/movimiento.o \
-		   ${OBJDIR}/utils.o
+		   ${OBJDIR}/utils.o \
+		   ${OBJDIR}/log.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
 CFLAGS 	:= -Wall -Werror -pedantic -std=c89 -I ${INCDIRS} -finput-charset=UTF-8

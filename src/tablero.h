@@ -86,3 +86,9 @@ AJD_Bool casillaVacia (AJD_CasillaPtr pcasilla);
  *          FALSE en caso contrario.
  ***************************************************************************************/
 AJD_Bool caminoLibre (AJD_CasillaPtr origen, AJD_CasillaPtr destino, int dx, int dy);
+/****************************************************************************************
+ * actualizaFlags
+ *
+ * Actualiza los flags de un movimiento (captura, jaque, mate, enroque, etc.)
+ ***************************************************************************************/
+void actualizaFlags (AJD_MovimientoPtr movimiento);

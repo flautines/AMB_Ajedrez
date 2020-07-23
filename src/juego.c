@@ -1,6 +1,6 @@
 #include <common.h>
 #include <movimiento.h>
-
+#include <log.h>
 #include <stdio.h>
 /****************************************************************************************
  * Variables PRIVADAS
@@ -15,6 +15,8 @@ AJD_Estado estadoJuegoInicio = {
     0,                                  /* Tiempo Negras        */
     NO_SELECCION                        /* Casilla seleccionada */
 };
+/* TODO: este buffer debe eliminarse, es para probar log de partida */
+char buff[1024];
 /****************************************************************************************
  ****************************************************************************************
  * Funciones PUBLICAS (Implementacion)
@@ -33,6 +35,9 @@ void inicializa()
 
     /* Inicializa sprites de los cursores */
     inicializaSprites(obtenTableroPtr());
+
+    /* Inicializa el log que guarda los movimientos */
+    initLogPartida();
 }
 /****************************************************************************************
  * liberaRecursos
@@ -40,9 +45,10 @@ void inicializa()
  * Libera los recursos usados por el programa, incluída la UI
  ***************************************************************************************/
 void liberaRecursos()
-{   
-   liberaPantalla();
-   puts ("ncurses finalizado");
+{       
+    liberaPantalla();
+    puts ("ncurses finalizado");
+    liberaLogPartida();
 }
 /****************************************************************************************
  * nuevoJuego
@@ -170,7 +176,18 @@ AJD_Bool efectuaJugada (AJD_TableroPtr tablero)
 
     if (esMovimientoValido (movimiento, &estadoJuego))
     {
-        efectuaMovimiento (movimiento);
+        /* Actualiza los flags de captura, enroque, jaque, etc. */
+        actualizaFlags (movimiento);
+        /* Primero hay que añadir el movimiento al log. Si lo hacemos despues de
+         * mover la ficha, las piezas en el tablero han cambiado y la información
+         * es incorrecta.
+         */
+        appendMovimiento (movimiento);
+        efectuaMovimiento (movimiento);    
+
+        /* TODO: mostrar movimientos --> interfaz.c */
+        sprintPartida(buff);
+        mvprintw (40,0, "%s", buff);
         return TRUE;
     }
     else
