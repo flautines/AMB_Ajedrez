@@ -18,16 +18,16 @@ size_t movToStr (AJD_MovimientoPtr movimiento, char* buff)
     AJD_CasillaPtr pdestino = idToPtr (movimiento->idDestino);
     AJD_Pieza      pieza    = obtenPieza (porigen);
     char           chPieza  = piezaToStr (pieza);
-    AJD_Enroque    enroque  = movimiento->enroque;
+    AJD_Flags      flags    = movimiento->flags;
     char           *begin   = buff;
     char       strOrigen[2] = "";
 
     /* Si hay algún enroque no se anota nada más */
-    if (enroque == ER_LARGO) {
+    if (flags.enroque == ER_LARGO) {
         strncpy (buff, "O-O-O", 5);
         buff += 5;
     }
-    else if (enroque == ER_CORTO) {
+    else if (flags.enroque == ER_CORTO) {
         strncpy (buff, "O-O", 3);
         buff += 3;
     }
@@ -40,7 +40,7 @@ size_t movToStr (AJD_MovimientoPtr movimiento, char* buff)
         strncpy (strOrigen, ptrToStr (porigen), 2);
     
         /* 2. 'x' si captura pieza */
-        if (movimiento->captura) {
+        if (flags.captura) {
             if (chPieza == 'P') {
                 /* Cuando un peon captura, se indica la columna de origen */
                 *buff++ = strOrigen[0];
@@ -52,8 +52,8 @@ size_t movToStr (AJD_MovimientoPtr movimiento, char* buff)
         strncpy (buff, ptrToStr (pdestino), 2);        
         buff += 2;
     
-        if (movimiento->mate)       *buff++ = '#';
-        else if (movimiento->jaque) *buff++ = '+';
+        if (flags.mate)       *buff++ = '#';
+        else if (flags.jaque) *buff++ = '+';
     
     }
     *buff = '\0';

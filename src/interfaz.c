@@ -287,10 +287,10 @@ void dibujaFlags (const AJD_EstadoPtr estadoJuego)
                                     estadoJuego->jugada.movNegras;
     mvprintw (0,0, 
         "captura:%d   enroque:%d   jaque:%d   mate:%d",
-        movCausante.captura,
-        movCausante.enroque,
-        movCausante.jaque,
-        movCausante.mate);
+        movCausante.flags.captura,
+        movCausante.flags.enroque,
+        movCausante.flags.jaque,
+        movCausante.flags.mate);
 }
 /****************************************************************************************
  * procesaTeclado

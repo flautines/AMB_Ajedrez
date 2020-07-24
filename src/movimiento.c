@@ -33,10 +33,14 @@ void efectuaMovimiento (AJD_MovimientoPtr movimiento)
  *
  * Comprueba si un movimiento desde una casilla origen a destino es válido.
  ***************************************************************************************/
-AJD_Bool esMovimientoValido (AJD_MovimientoPtr movimiento, AJD_EstadoPtr estadoJuego)
+AJD_Bool esMovimientoValido (AJD_MovimientoPtr movimiento, AJD_EstadoPtr estadoJuego,
+                             AJD_FlagsPtr flags)
 {
-    AJD_Pieza pieza = obtenPieza (idToPtr (movimiento->idOrigen));
-    AJD_Color colorPieza = estadoJuego->jueganBlancas ? BLANCO : NEGRO;
+    AJD_Pieza      pieza      = obtenPieza (idToPtr (movimiento->idOrigen));
+    AJD_CasillaPtr pdestino   = idToPtr (movimiento->idDestino);
+    AJD_Color      colorPieza = estadoJuego->jueganBlancas ? BLANCO : NEGRO;
+
+    flags->captura = hayPiezaOponente (colorPieza, pdestino);
 
     switch (pieza)
     {

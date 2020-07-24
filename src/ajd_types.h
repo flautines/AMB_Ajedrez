@@ -62,15 +62,22 @@ typedef struct {
    AJD_Pieza   pieza:4;
 } AJD_Casilla, *AJD_CasillaPtr;
 
+/** 'Flags' para indicar situaciones especiales de un movimiento
+ ***************************************************************************************/
+typedef struct {
+   AJD_Bool    captura   :1;
+   AJD_Bool    jaque     :1;
+   AJD_Enroque enroque   :2;
+   AJD_Bool    mate      :1;
+   AJD_Bool    promociona:1;
+} AJD_Flags, *AJD_FlagsPtr;
+
 /** Información mínima imprescindible para almacenar un movimiento
  ***************************************************************************************/
 typedef struct {
-      AJD_idCasilla   idOrigen   :6;
-      AJD_idCasilla   idDestino  :6;
-      AJD_Bool        captura    :1;
-      AJD_Bool        jaque      :1;
-      AJD_Enroque     enroque    :2;
-      AJD_Bool        mate       :1;
+      AJD_idCasilla  idOrigen   :6;
+      AJD_idCasilla  idDestino  :6;
+      AJD_Flags      flags;
 } AJD_Movimiento, *AJD_MovimientoPtr;
 
 /** Información de cada jugada

@@ -7,13 +7,18 @@
  ***************************************************************************************/
 AJD_Estado estadoJuego;
 AJD_Estado estadoJuegoInicio = {
-    {1,                                 /* Jugada 1             */
-        { e2, e2, 0, 0, 0, 0 },         /* Peon rey Blancas     */
-        { e7, e7, 0, 0, 0, 0 } },       /* Peon rey Negras      */
-    TRUE,                               /* Juegan Blancas       */
-    0,                                  /* Tiempo Blancas       */
-    0,                                  /* Tiempo Negras        */
-    NO_SELECCION                        /* Casilla seleccionada */
+    {1,                             /* Jugada 1             */
+        { e2, e2,                   /* Origen/Destino movimiento Blancas */
+            {0, 0, 0, 0}            /* Flags del movimiento anterior */
+        },               
+        { e7, e7,                   /* Origen/Destino movimiento Blancas */
+            {0, 0, 0, 0 }           /* Flags del movimiento anterior */
+        }
+    },
+    TRUE,                           /* Juegan Blancas       */
+    0,                              /* Tiempo Blancas       */
+    0,                              /* Tiempo Negras        */
+    NO_SELECCION                    /* Casilla seleccionada */
 };
 /* TODO: este buffer debe eliminarse, es para probar log de partida */
 char buff[1024];
@@ -164,6 +169,7 @@ void siguienteTurno(AJD_TableroPtr tablero)
 AJD_Bool efectuaJugada (AJD_TableroPtr tablero)
 {
     AJD_MovimientoPtr movimiento;
+    AJD_Flags         flags;
 
     if (estadoJuego.jueganBlancas)
     {
@@ -174,10 +180,10 @@ AJD_Bool efectuaJugada (AJD_TableroPtr tablero)
         movimiento = &estadoJuego.jugada.movNegras;
     }
 
-    if (esMovimientoValido (movimiento, &estadoJuego))
+    if (esMovimientoValido (movimiento, &estadoJuego, &flags))
     {
-        /* Actualiza los flags de captura, enroque, jaque, etc. */
-        actualizaFlags (movimiento);
+        /* El movimiento es válido, por tanto, los flags alterados también.  */
+        movimiento->flags = flags;
         /* Primero hay que añadir el movimiento al log. Si lo hacemos despues de
          * mover la ficha, las piezas en el tablero han cambiado y la información
          * es incorrecta.

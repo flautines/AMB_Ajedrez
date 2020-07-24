@@ -255,13 +255,3 @@ AJD_Bool caminoLibre (AJD_CasillaPtr origen, AJD_CasillaPtr destino, int dx, int
     }
     return TRUE;
 }
-/****************************************************************************************
- * actualizaFlags
- *
- * Actualiza los flags de un movimiento (captura, jaque, mate, enroque, etc.)
- ***************************************************************************************/
-void actualizaFlags (AJD_MovimientoPtr movimiento)
-{
-    AJD_CasillaPtr pdestino = idToPtr (movimiento->idDestino);
-    movimiento->captura = !casillaVacia (pdestino);
-}
