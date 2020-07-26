@@ -170,6 +170,7 @@ AJD_Bool efectuaJugada (AJD_TableroPtr tablero)
 {
     AJD_MovimientoPtr movimiento;
     AJD_Flags         flags;
+    AJD_Color         colorPieza = estadoJuego.jueganBlancas ? BLANCO : NEGRO;
 
     if (estadoJuego.jueganBlancas)
     {
@@ -180,7 +181,7 @@ AJD_Bool efectuaJugada (AJD_TableroPtr tablero)
         movimiento = &estadoJuego.jugada.movNegras;
     }
 
-    if (esMovimientoValido (movimiento, &estadoJuego, &flags))
+    if (esMovimientoValido (movimiento, colorPieza, &flags))
     {
         /* El movimiento es válido, por tanto, los flags alterados también.  */
         movimiento->flags = flags;

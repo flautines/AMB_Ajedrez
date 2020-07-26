@@ -60,31 +60,6 @@ size_t movToStr (AJD_MovimientoPtr movimiento, char* buff)
 
     return buff-begin;
 }
-
-/****************************************************************************************
- * jugadaToStr
- *  Convierte la información de una jugada a string
- *  Devuelve tamaño del string formado (sin contar el '\0').
- ***************************************************************************************/
-void jugadaToStr (AJD_JugadaPtr jugada, char *buff)
-{
-    int num = 0;
-
-    /* Numero de jugada */
-    num = sprintf (buff, "%d.", jugada->nturno);
-    buff += num;
-
-    /* Movimiento BLANCAS */
-    num = movToStr (&jugada->movBlancas, buff);
-    buff += num;
-
-    /* Separación */
-    *buff++ = ' ';
-
-    /* Movimiento NEGRAS */
-    num = movToStr (&jugada->movNegras, buff);
-    buff += num;
-}
 /****************************************************************************************
  * piezaToStr
  *  Devuelve un char con la representación de la pieza (P, T, C, A, D, R).

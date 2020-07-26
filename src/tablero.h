@@ -60,6 +60,12 @@ AJD_idCasilla ptrToId (AJD_CasillaPtr casilla);
  ***************************************************************************************/
 char *ptrToStr (AJD_CasillaPtr casilla);
 /****************************************************************************************
+ * strToId
+ *
+ * Obtiene el id casilla a partir de su nombre (p.ej: "a8" --> 0)
+ ***************************************************************************************/
+ AJD_idCasilla strToId (char *strCasilla);
+/****************************************************************************************
  * hayPiezaJugador
  *
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
@@ -87,3 +93,6 @@ AJD_Bool casillaVacia (AJD_CasillaPtr pcasilla);
  ***************************************************************************************/
 AJD_Bool caminoLibre (AJD_CasillaPtr origen, AJD_CasillaPtr destino, int dx, int dy);
 
+/*
+ */
+AJD_idCasilla buscaIdOrigen (AJD_Pieza pieza, AJD_idCasilla idDestino, AJD_Color colorPieza);

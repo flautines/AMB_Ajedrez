@@ -1,5 +1,7 @@
 #include <common.h>
+#include <movimiento.h>
 #include <utils.h>
+#include <string.h>
 #include <stdio.h>
 /****************************************************************************************
 * Variables PRIVADAS
@@ -200,6 +202,21 @@ char *ptrToStr (AJD_CasillaPtr casilla)
     return strCasillas[idCasilla];
 }
 /****************************************************************************************
+ * strToId
+ *
+ * Obtiene el id casilla a partir de su nombre (p.ej: "a8" --> 0)
+ ***************************************************************************************/
+AJD_idCasilla strToId (char *strCasilla)
+{
+    char **pstrCasilla = strCasillas;
+    AJD_idCasilla idCasilla = a8;
+
+    for (; strncmp (*pstrCasilla, strCasilla, 2); idCasilla++, pstrCasilla++)
+        ;
+
+    return idCasilla;
+}
+/****************************************************************************************
  * hayPiezaJugador
  *
  * Devuelve TRUE si en la casilla indicada hay una pieza del jugador, FALSE en caso
@@ -254,4 +271,28 @@ AJD_Bool caminoLibre (AJD_CasillaPtr origen, AJD_CasillaPtr destino, int dx, int
             return FALSE;
     }
     return TRUE;
+}
+
+/*
+ */
+AJD_idCasilla buscaIdOrigen (AJD_Pieza pieza, AJD_idCasilla idDestino, AJD_Color colorPieza)
+{
+    AJD_CasillaPtr  pcasilla, pend;
+    AJD_Movimiento  mov = {0,0, {0,0,0,0}};
+
+    pcasilla = tablero.casillas;
+    pend = idToPtr (h1) + 1;
+
+    while (pcasilla != pend) {
+        if (pcasilla->pieza == pieza) {
+            mov.idOrigen = ptrToId (pcasilla);
+            mov.idDestino = idDestino;
+
+            if (esMovimientoValido (&mov, colorPieza, NULL)) {
+                return mov.idOrigen;
+            }
+        }
+    }
+
+    return ptrToId (pcasilla);
 }
