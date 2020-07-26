@@ -1,0 +1,10 @@
+[Site "Chess.com"]
+[Date "2020.07.25"]
+[Event "Vs. Computer"]
+[Round "2"]
+[White "Invitado"]
+[Black "Computer Level 2"]
+[Result "1-0"]
+[CurrentPosition "N2k1b1r/p2Q2pp/2P2p2/1p6/8/1PNPB3/P4PP1/R3R1K1 b - - 1 22"]
+
+1.e4 c6 2.d4 Nf6 3.Nc3 d6 4.Nf3 d5 5.Bd3 e5 6.Be3 Ng4 7.O-O Nd7 8.h3 Ngf6 9.b3 exd4 10.Nxd4 Ne5 11.Qe2 b6 12.Rfe1 Nxd3 13.cxd3 Qd6 14.exd5 Qe7 15.dxc6 Bf5 16.Qf3 Bg4 17.hxg4 Qe6 18.Nxe6 Nxg4 19.Nc7+ Kd8 20.Nxa8 b5 21.Qxg4 f6 22.Qd7#  1-0

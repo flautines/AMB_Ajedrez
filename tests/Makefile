@@ -1,3 +1,4 @@
+APP     := test_pgnread
 SRCDIR  := ../src
 OBJDIR  := ../obj
 OBJTEST := ./obj
@@ -7,7 +8,8 @@ SOURCES := ${OBJDIR}/tablero.o  \
 		   ${OBJDIR}/juego.o 	\
 		   ${OBJDIR}/movimiento.o \
 		   ${OBJDIR}/utils.o \
-		   ${OBJDIR}/log.o
+		   ${OBJDIR}/log.o \
+		   ${OBJDIR}/pgnreader.o
 INCDIRS := ${SRCDIR}
 CC 		:= clang
 CFLAGS 	:= -Wall -Werror -pedantic -std=c89 -I ${INCDIRS} -finput-charset=UTF-8
@@ -15,7 +17,7 @@ LDFLAGS := -lncurses
 
 .PHONY: clean cleanall
 
-test_log: ${SOURCES} ${OBJTEST}/test_log.o
+${APP}: ${SOURCES} ${OBJTEST}/${APP}.o
 	${CC} ${LDFLAGS} $^ -o $@
 
 ${OBJTEST}/%.o : $(TESTDIR)/%.c
